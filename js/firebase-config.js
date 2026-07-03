@@ -29,12 +29,12 @@
    ============================================================ */
 
 const FIREBASE_CONFIG = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_PROJECT.firebaseapp.com',
-  projectId: 'YOUR_PROJECT',
-  storageBucket: 'YOUR_PROJECT.appspot.com',
-  messagingSenderId: 'YOUR_SENDER_ID',
-  appId: 'YOUR_APP_ID',
+  apiKey: 'AIzaSyAokNGhs-7HNiUZ6VCdhtT0eVGvgIKqGMc',
+  authDomain: 'sirawatsp-bc337.firebaseapp.com',
+  projectId: 'sirawatsp-bc337',
+  storageBucket: 'sirawatsp-bc337.firebasestorage.app',
+  messagingSenderId: '1014136636321',
+  appId: '1:1014136636321:web:6cbd27e800aa36c0b8c1e0',
   // shared document all devices read/write — leave as-is unless
   // you want a different trip to use its own doc.
   tripId: 'japan-oct-2026',
