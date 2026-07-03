@@ -1,0 +1,457 @@
+/* ============================================================
+   秋の旅 — Japan Autumn Trip 2026
+   Aesthetic: Japanese autumn travel journal / washi editorial
+   ============================================================ */
+
+:root {
+  --paper: #f6f0e4;
+  --paper-deep: #efe6d3;
+  --ink: #2b2118;
+  --ink-soft: #5f5244;
+  --line: #d9cdb6;
+
+  --tokyo: #2f4870;      /* aizome indigo */
+  --tochigi: #b8860b;    /* kuchiba gold */
+  --nikko: #c73e2e;      /* shu vermillion */
+  --fukushima: #3e5c46;  /* matsuba pine */
+
+  --accent: #c73e2e;
+  --accent-warm: #d97b29;
+
+  --card: #fffdf7;
+  --shadow: 0 2px 4px rgba(64, 45, 22, .06), 0 12px 28px -12px rgba(64, 45, 22, .18);
+
+  --font-body: 'Anuphan', sans-serif;
+  --font-jp: 'Shippori Mincho B1', serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--paper);
+  /* washi grain */
+  background-image:
+    radial-gradient(ellipse at 15% 8%, rgba(217, 123, 41, .07), transparent 45%),
+    radial-gradient(ellipse at 88% 90%, rgba(199, 62, 46, .06), transparent 40%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.28 0 0 0 0 0.18 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  line-height: 1.65;
+}
+
+.jp { font-family: var(--font-jp); }
+.mono { font-family: var(--font-mono); }
+
+/* ---------- nav ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 1100;
+  background: rgba(246, 240, 228, .92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner {
+  max-width: 1180px; margin: 0 auto; padding: .55rem 1.2rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.nav-logo {
+  font-size: 1.35rem; font-weight: 800; color: var(--accent);
+  text-decoration: none; display: flex; align-items: baseline; gap: .5rem;
+}
+.nav-logo-sub {
+  font-family: var(--font-mono); font-size: .68rem; letter-spacing: .18em;
+  color: var(--ink-soft); font-weight: 600;
+}
+.nav-links { display: flex; flex-wrap: wrap; gap: .15rem; }
+.nav-links a {
+  color: var(--ink-soft); text-decoration: none; font-size: .86rem; font-weight: 600;
+  padding: .35rem .6rem; border-radius: 999px; transition: all .18s;
+}
+.nav-links a:hover { color: var(--accent); background: rgba(199, 62, 46, .08); }
+
+/* ---------- hero ---------- */
+.hero {
+  position: relative; overflow: hidden;
+  padding: 5.5rem 1.5rem 4.5rem;
+  text-align: center;
+  border-bottom: 3px solid var(--ink);
+}
+.hero-vertical {
+  position: absolute; top: 3rem; right: clamp(.4rem, 3vw, 3rem);
+  writing-mode: vertical-rl; letter-spacing: .45em;
+  font-size: clamp(.8rem, 1.6vw, 1.1rem); color: var(--ink);
+  opacity: .28; user-select: none;
+}
+.hero-inner { max-width: 760px; margin: 0 auto; position: relative; }
+.hero-kicker {
+  font-family: var(--font-mono); font-size: .8rem; letter-spacing: .35em;
+  text-transform: uppercase; color: var(--accent-warm); font-weight: 600;
+  animation: rise .7s ease both;
+}
+.hero-title {
+  font-size: clamp(4.2rem, 13vw, 8.5rem);
+  font-weight: 800; line-height: 1.05; color: var(--ink);
+  margin: .5rem 0 .8rem;
+  animation: rise .7s .1s ease both;
+}
+.hero-title .hero-no { color: var(--accent); font-size: .55em; vertical-align: .18em; }
+.hero-sub { font-size: 1.08rem; color: var(--ink-soft); animation: rise .7s .2s ease both; }
+.hero-sub strong { color: var(--ink); }
+
+.route-strip {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+  gap: .45rem; margin: 1.6rem 0;
+  animation: rise .7s .3s ease both;
+}
+.route-stop {
+  font-family: var(--font-mono); font-weight: 600; font-size: .82rem;
+  letter-spacing: .06em; padding: .3rem .75rem; border-radius: 999px;
+  color: #fff; box-shadow: var(--shadow);
+}
+.route-stop[data-area="tokyo"] { background: var(--tokyo); }
+.route-stop[data-area="tochigi"] { background: var(--tochigi); }
+.route-stop[data-area="nikko"] { background: var(--nikko); }
+.route-stop[data-area="fukushima"] { background: var(--fukushima); }
+.route-arrow { color: var(--ink-soft); font-weight: 700; }
+
+.countdown {
+  display: inline-flex; flex-direction: column; align-items: center;
+  margin-top: .6rem; padding: 1rem 2.4rem;
+  border: 1.5px solid var(--ink); border-radius: 14px;
+  background: var(--card); box-shadow: 4px 4px 0 var(--accent);
+  animation: rise .7s .4s ease both;
+}
+.countdown-num { font-size: 2.6rem; font-weight: 600; color: var(--accent); line-height: 1.1; }
+.countdown-label { font-size: .82rem; color: var(--ink-soft); font-weight: 600; }
+
+.hero-momiji span {
+  position: absolute; top: -8%; font-size: 1.5rem; opacity: .8;
+  animation: fall linear infinite;
+}
+.hero-momiji span:nth-child(1) { left: 6%;  animation-duration: 11s; animation-delay: 0s; }
+.hero-momiji span:nth-child(2) { left: 22%; animation-duration: 14s; animation-delay: 3s; font-size: 1.1rem; }
+.hero-momiji span:nth-child(3) { left: 45%; animation-duration: 12s; animation-delay: 6s; }
+.hero-momiji span:nth-child(4) { left: 64%; animation-duration: 15s; animation-delay: 1.5s; font-size: 1.2rem; }
+.hero-momiji span:nth-child(5) { left: 80%; animation-duration: 10s; animation-delay: 4.5s; }
+.hero-momiji span:nth-child(6) { left: 92%; animation-duration: 13s; animation-delay: 8s; font-size: 1rem; }
+
+@keyframes fall {
+  0%   { transform: translateY(-5vh) rotate(0deg); }
+  100% { transform: translateY(110vh) rotate(340deg); }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- sections ---------- */
+.section { max-width: 1180px; margin: 0 auto; padding: 4.2rem 1.2rem 1.5rem; }
+.section-head { margin-bottom: 1.8rem; position: relative; }
+.section-ja {
+  position: absolute; top: -2.4rem; left: -.4rem;
+  font-size: 5.2rem; font-weight: 800; color: var(--ink);
+  opacity: .07; user-select: none; pointer-events: none; line-height: 1;
+}
+.section-head h2 {
+  font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 700;
+  border-left: 6px solid var(--accent); padding-left: .8rem; line-height: 1.25;
+}
+.section-desc { color: var(--ink-soft); margin-top: .45rem; padding-left: 1.1rem; font-size: .95rem; }
+.sub-head { margin: 2.2rem 0 .9rem; font-size: 1.15rem; }
+
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 14px; padding: 1.3rem 1.4rem; box-shadow: var(--shadow);
+}
+
+/* ---------- itinerary ---------- */
+.itinerary-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 1rem;
+}
+.day-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 1.05rem 1.15rem; box-shadow: var(--shadow);
+  border-top: 4px solid var(--area, var(--ink));
+  cursor: pointer; transition: transform .18s, box-shadow .18s;
+}
+.day-card:hover { transform: translateY(-3px); box-shadow: 0 6px 8px rgba(64,45,22,.08), 0 18px 34px -12px rgba(64,45,22,.25); }
+.day-card[data-area="tokyo"] { --area: var(--tokyo); }
+.day-card[data-area="tochigi"] { --area: var(--tochigi); }
+.day-card[data-area="nikko"] { --area: var(--nikko); }
+.day-card[data-area="fukushima"] { --area: var(--fukushima); }
+.day-card .day-no {
+  font-family: var(--font-mono); font-size: .72rem; font-weight: 600;
+  letter-spacing: .16em; color: var(--area, var(--accent));
+}
+.day-card .day-date { font-weight: 700; font-size: 1.02rem; margin: .1rem 0 .1rem; }
+.day-card .day-title { font-size: .9rem; color: var(--ink-soft); font-weight: 600; margin-bottom: .5rem; }
+.day-card ul { list-style: none; font-size: .86rem; color: var(--ink-soft); }
+.day-card li { padding: .16rem 0 .16rem 1rem; position: relative; }
+.day-card li::before { content: "▸"; position: absolute; left: 0; color: var(--area, var(--accent)); }
+.day-badge {
+  display: inline-block; font-size: .68rem; font-weight: 700; color: #fff;
+  background: var(--area, var(--ink)); border-radius: 999px; padding: .06rem .55rem;
+  margin-left: .4rem; vertical-align: middle;
+}
+
+/* ---------- map ---------- */
+.section-wide { max-width: 1280px; }
+.map-filters { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; padding-left: .15rem; }
+.chip {
+  font-family: var(--font-body); font-size: .84rem; font-weight: 600;
+  border: 1.5px solid var(--line); background: var(--card); color: var(--ink-soft);
+  border-radius: 999px; padding: .35rem .95rem; cursor: pointer;
+  display: inline-flex; align-items: center; gap: .45rem; transition: all .15s;
+}
+.chip:hover { border-color: var(--ink); color: var(--ink); }
+.chip.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.chip .dot { width: .62rem; height: .62rem; border-radius: 50%; display: inline-block; }
+.dot[data-area="tokyo"] { background: var(--tokyo); }
+.dot[data-area="tochigi"] { background: var(--tochigi); }
+.dot[data-area="nikko"] { background: var(--nikko); }
+.dot[data-area="fukushima"] { background: var(--fukushima); }
+.chip-toggle input { accent-color: var(--accent); }
+
+.map-layout {
+  display: grid; grid-template-columns: 1fr 320px; gap: 1rem; align-items: stretch;
+}
+#leaflet-map {
+  height: 560px; border-radius: 14px; border: 1.5px solid var(--ink);
+  box-shadow: var(--shadow); z-index: 1;
+}
+.place-list {
+  max-height: 560px; overflow-y: auto; display: flex; flex-direction: column; gap: .45rem;
+  padding-right: .2rem;
+}
+.place-item {
+  background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--pin, var(--ink));
+  border-radius: 10px; padding: .5rem .8rem; cursor: pointer; transition: all .15s;
+}
+.place-item:hover { transform: translateX(3px); border-color: var(--pin, var(--ink)); }
+.place-item .p-name { font-weight: 700; font-size: .9rem; }
+.place-item .p-meta { font-size: .76rem; color: var(--ink-soft); }
+.place-item[data-area="tokyo"] { --pin: var(--tokyo); }
+.place-item[data-area="tochigi"] { --pin: var(--tochigi); }
+.place-item[data-area="nikko"] { --pin: var(--nikko); }
+.place-item[data-area="fukushima"] { --pin: var(--fukushima); }
+
+.pin-marker { background: transparent; border: none; }
+.pin-marker svg { filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
+.leaflet-popup-content-wrapper {
+  background: var(--card); color: var(--ink); border-radius: 10px;
+  font-family: var(--font-body);
+}
+.leaflet-popup-content { margin: .8rem 1rem; line-height: 1.5; }
+.popup-title { font-weight: 700; font-size: .95rem; }
+.popup-ja { font-family: var(--font-jp); color: var(--ink-soft); font-size: .8rem; }
+.popup-desc { font-size: .82rem; margin-top: .3rem; color: var(--ink-soft); }
+.popup-day {
+  display: inline-block; margin-top: .35rem; font-family: var(--font-mono);
+  font-size: .7rem; font-weight: 600; background: var(--paper-deep);
+  border-radius: 999px; padding: .1rem .55rem;
+}
+
+/* ---------- transport ---------- */
+.transport-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.4rem; }
+.seg-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.seg-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: .6rem;
+  padding: .85rem 1.2rem .6rem; border-bottom: 1px dashed var(--line);
+}
+.seg-head h3 { font-size: 1.02rem; }
+.seg-day {
+  font-family: var(--font-mono); font-size: .72rem; font-weight: 600;
+  color: var(--accent-warm); letter-spacing: .1em;
+}
+.seg-options { padding: .4rem 0; }
+.seg-opt {
+  display: grid; grid-template-columns: 1fr auto auto auto; gap: .8rem; align-items: center;
+  padding: .5rem 1.2rem; font-size: .9rem;
+}
+.seg-opt + .seg-opt { border-top: 1px solid rgba(217, 205, 182, .45); }
+.seg-opt .o-method { font-weight: 600; }
+.seg-opt .o-note { display: block; font-weight: 400; font-size: .78rem; color: var(--ink-soft); }
+.seg-opt .o-time { font-family: var(--font-mono); font-size: .8rem; color: var(--ink-soft); white-space: nowrap; }
+.seg-opt .o-price { font-family: var(--font-mono); font-weight: 600; color: var(--ink); white-space: nowrap; }
+.btn-mini {
+  font-family: var(--font-body); font-size: .74rem; font-weight: 700;
+  border: 1.5px solid var(--accent); color: var(--accent); background: transparent;
+  border-radius: 999px; padding: .18rem .6rem; cursor: pointer; white-space: nowrap;
+  transition: all .15s;
+}
+.btn-mini:hover { background: var(--accent); color: #fff; }
+.btn-mini.added { background: var(--fukushima); border-color: var(--fukushima); color: #fff; cursor: default; }
+.pass-note h3 { margin-bottom: .4rem; font-size: 1.02rem; }
+.pass-note p { font-size: .92rem; color: var(--ink-soft); }
+
+/* ---------- hike ---------- */
+.section-hike .section-head h2 { border-left-color: var(--fukushima); }
+.hike-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 1rem; }
+.hike-plan h3, .hike-grid .card h3 { font-size: 1.02rem; margin-bottom: .7rem; }
+.timeline { list-style: none; }
+.timeline li {
+  padding: .45rem 0 .45rem 1.1rem; border-left: 2.5px solid var(--fukushima);
+  margin-left: .4rem; font-size: .9rem; position: relative;
+}
+.timeline li::before {
+  content: ""; position: absolute; left: -6.5px; top: .95rem;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--paper); border: 2.5px solid var(--fukushima);
+}
+.timeline .mono { color: var(--fukushima); font-weight: 600; margin-right: .35rem; }
+.note {
+  margin-top: .9rem; font-size: .82rem; color: var(--ink-soft);
+  background: var(--paper-deep); border-radius: 10px; padding: .65rem .85rem;
+}
+.gear-list { list-style: none; font-size: .9rem; }
+.gear-list li { padding: .28rem 0; border-bottom: 1px dashed var(--line); }
+.mini-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.mini-table td { padding: .35rem 0; border-bottom: 1px dashed var(--line); }
+.mini-table td:last-child { text-align: right; font-weight: 600; }
+
+/* ---------- events ---------- */
+.event-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem; margin-bottom: 1.4rem;
+}
+.event-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 1.05rem 1.2rem; box-shadow: var(--shadow);
+  border-top: 4px solid var(--ev, var(--ink)); position: relative;
+  display: flex; flex-direction: column; gap: .35rem;
+}
+.event-card[data-area="tokyo"] { --ev: var(--tokyo); }
+.event-card[data-area="tochigi"] { --ev: var(--tochigi); }
+.event-card[data-area="fukushima"] { --ev: var(--fukushima); }
+.event-card h3 { font-size: .98rem; line-height: 1.35; padding-right: 4.2rem; }
+.event-date { font-family: var(--font-mono); font-size: .76rem; font-weight: 600; color: var(--ink-soft); }
+.event-desc { font-size: .85rem; color: var(--ink-soft); flex: 1; }
+.event-link { font-size: .8rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+.event-link:hover { text-decoration: underline; }
+.event-status {
+  position: absolute; top: .85rem; right: .9rem;
+  font-size: .66rem; font-weight: 700; border-radius: 999px; padding: .14rem .55rem;
+}
+.event-status.hit { background: rgba(62, 92, 70, .14); color: var(--fukushima); }
+.event-status.miss { background: rgba(120, 120, 120, .14); color: #777; }
+.event-status.tba { background: rgba(217, 123, 41, .16); color: #a25a12; }
+.event-sources h3 { font-size: 1rem; margin-bottom: .6rem; }
+.source-links { display: flex; flex-wrap: wrap; gap: .5rem; }
+.source-links a {
+  font-size: .8rem; font-weight: 600; text-decoration: none; color: var(--tokyo);
+  border: 1.5px solid var(--line); border-radius: 999px; padding: .3rem .8rem;
+  transition: all .15s;
+}
+.source-links a:hover { border-color: var(--tokyo); background: rgba(47, 72, 112, .07); }
+
+/* ---------- forms / shopping / budget ---------- */
+.add-form {
+  display: grid; grid-template-columns: 2fr 1fr .8fr 1.2fr auto; gap: .55rem;
+  margin-bottom: 1.1rem;
+}
+.add-form input, .add-form select, .rate-row input {
+  font-family: var(--font-body); font-size: .9rem; color: var(--ink);
+  background: var(--card); border: 1.5px solid var(--line); border-radius: 10px;
+  padding: .5rem .75rem; min-width: 0;
+}
+.add-form input:focus, .add-form select:focus, .rate-row input:focus {
+  outline: none; border-color: var(--accent);
+}
+.btn {
+  font-family: var(--font-body); font-size: .9rem; font-weight: 700;
+  background: var(--accent); color: #fff; border: none; border-radius: 10px;
+  padding: .5rem 1.1rem; cursor: pointer; transition: filter .15s; white-space: nowrap;
+}
+.btn:hover { filter: brightness(1.12); }
+
+.shop-list { display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1rem; }
+.shop-item {
+  display: grid; grid-template-columns: auto 1fr auto auto auto; gap: .8rem; align-items: center;
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: .55rem .9rem; font-size: .9rem; transition: opacity .2s;
+}
+.shop-item.bought { opacity: .55; }
+.shop-item.bought .s-name { text-decoration: line-through; }
+.shop-item input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: var(--fukushima); cursor: pointer; }
+.shop-item .s-name { font-weight: 600; }
+.shop-item .s-cat { font-size: .72rem; color: var(--ink-soft); background: var(--paper-deep); border-radius: 999px; padding: .08rem .55rem; white-space: nowrap; }
+.shop-item .s-price { font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
+.del-btn {
+  background: none; border: none; color: var(--ink-soft); cursor: pointer;
+  font-size: 1rem; padding: .1rem .3rem; border-radius: 6px; transition: all .15s;
+}
+.del-btn:hover { color: var(--accent); background: rgba(199, 62, 46, .1); }
+
+.shop-summary { display: flex; flex-wrap: wrap; gap: 2rem; font-size: .95rem; }
+.shop-summary .sum-block strong { display: block; font-family: var(--font-mono); font-size: 1.3rem; }
+.shop-summary .sum-label { font-size: .78rem; color: var(--ink-soft); font-weight: 600; }
+
+.rate-row { display: flex; align-items: center; gap: .7rem; margin-bottom: 1.2rem; font-size: .92rem; }
+.rate-row input { width: 110px; }
+
+.budget-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: .9rem; margin-bottom: 1rem;
+}
+.budget-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: .9rem 1.05rem; box-shadow: var(--shadow);
+}
+.budget-card .b-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
+.budget-card .b-name { font-weight: 700; font-size: .92rem; }
+.budget-card .b-plan-input {
+  font-family: var(--font-mono); font-size: .84rem; width: 100px; text-align: right;
+  background: var(--paper-deep); border: 1px solid var(--line); border-radius: 8px; padding: .2rem .5rem;
+  color: var(--ink);
+}
+.budget-card .b-plan-input:focus { outline: none; border-color: var(--accent); }
+.b-bar { height: 8px; background: var(--paper-deep); border-radius: 999px; overflow: hidden; margin: .35rem 0; }
+.b-bar-fill { height: 100%; border-radius: 999px; background: var(--fukushima); transition: width .4s; }
+.b-bar-fill.over { background: var(--accent); }
+.b-nums { display: flex; justify-content: space-between; font-size: .76rem; color: var(--ink-soft); }
+.b-nums .mono { font-weight: 600; }
+.b-over { color: var(--accent); font-weight: 700; }
+
+.budget-total { display: flex; flex-wrap: wrap; gap: 2.2rem; margin-bottom: .5rem; }
+.budget-total .sum-block strong { display: block; font-family: var(--font-mono); font-size: 1.45rem; }
+.budget-total .sum-label { font-size: .78rem; color: var(--ink-soft); font-weight: 600; }
+.thb { color: var(--tokyo); }
+
+.expense-list { display: flex; flex-direction: column; gap: .4rem; }
+.expense-item {
+  display: grid; grid-template-columns: auto 1fr auto auto auto; gap: .8rem; align-items: center;
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: .5rem .9rem; font-size: .88rem;
+}
+.expense-item .e-day {
+  font-family: var(--font-mono); font-size: .7rem; font-weight: 600;
+  background: var(--paper-deep); border-radius: 999px; padding: .1rem .5rem; white-space: nowrap;
+}
+.expense-item .e-name { font-weight: 600; }
+.expense-item .e-cat { font-size: .72rem; color: var(--ink-soft); white-space: nowrap; }
+.expense-item .e-amount { font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
+.empty-note { color: var(--ink-soft); font-size: .88rem; padding: .8rem .2rem; }
+
+/* ---------- footer ---------- */
+.footer {
+  margin-top: 4rem; padding: 2.5rem 1.5rem 3rem; text-align: center;
+  border-top: 3px solid var(--ink); color: var(--ink-soft); font-size: .85rem;
+}
+.footer .jp { font-size: 1.6rem; color: var(--accent); margin-bottom: .3rem; font-weight: 700; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 920px) {
+  .map-layout { grid-template-columns: 1fr; }
+  .place-list { max-height: 300px; }
+  .hike-grid { grid-template-columns: 1fr; }
+  .add-form { grid-template-columns: 1fr 1fr; }
+  .add-form input[type="text"] { grid-column: 1 / -1; }
+  .nav-links { display: none; }
+  .seg-opt { grid-template-columns: 1fr auto; }
+  .seg-opt .o-time { display: none; }
+}

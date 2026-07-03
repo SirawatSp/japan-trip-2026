@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>秋の旅 — Japan Trip 20–28 Oct 2026 | Tokyo · Tochigi · Nikko · Fukushima</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Anuphan:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="nav-logo"><span class="jp">秋の旅</span><span class="nav-logo-sub">JPN 2026</span></a>
+    <div class="nav-links">
+      <a href="#itinerary">แผนรายวัน</a>
+      <a href="#map">แผนที่</a>
+      <a href="#transport">การเดินทาง</a>
+      <a href="#hike">เดินเขา</a>
+      <a href="#events">Events</a>
+      <a href="#shopping">ของที่จะซื้อ</a>
+      <a href="#budget">งบประมาณ</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-vertical jp" aria-hidden="true">日本紀行・東京・栃木・日光・福島</div>
+  <div class="hero-inner">
+    <p class="hero-kicker">Autumn Trip · ใบไม้เปลี่ยนสี</p>
+    <h1 class="hero-title jp">秋<span class="hero-no">の</span>旅</h1>
+    <p class="hero-sub">ทริปญี่ปุ่น <strong>20 – 28 ตุลาคม 2026</strong> · 9 วัน 8 คืน<br>
+    ถึงเช้าวันที่ 20 ต.ค. · บินกลับ 28 ต.ค. เวลา 17:00</p>
+    <div class="route-strip" aria-label="เส้นทางทริป">
+      <span class="route-stop" data-area="tokyo">Tokyo</span><span class="route-arrow">→</span>
+      <span class="route-stop" data-area="tochigi">Tochigi</span><span class="route-arrow">→</span>
+      <span class="route-stop" data-area="nikko">Nikko</span><span class="route-arrow">→</span>
+      <span class="route-stop" data-area="fukushima">Fukushima</span><span class="route-arrow">→</span>
+      <span class="route-stop" data-area="tokyo">Tokyo</span>
+    </div>
+    <div class="countdown">
+      <div class="countdown-num mono" id="countdown-days">—</div>
+      <div class="countdown-label">วัน ก่อนออกเดินทาง</div>
+    </div>
+  </div>
+  <div class="hero-momiji" aria-hidden="true">
+    <span>🍁</span><span>🍁</span><span>🍁</span><span>🍂</span><span>🍁</span><span>🍂</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ ITINERARY ============ -->
+<section class="section" id="itinerary">
+  <div class="section-head">
+    <span class="section-ja jp">旅程</span>
+    <h2>แผนรายวัน</h2>
+    <p class="section-desc">9 วัน 8 คืน — คลิกวันเพื่อดูหมุดของวันนั้นบนแผนที่</p>
+  </div>
+  <div class="itinerary-grid" id="itinerary-grid"></div>
+</section>
+
+<!-- ============ MAP ============ -->
+<section class="section section-wide" id="map">
+  <div class="section-head">
+    <span class="section-ja jp">地図</span>
+    <h2>แผนที่ปักหมุด</h2>
+    <p class="section-desc">หมุดทุกจุดที่จะไป แยกสีตามพื้นที่ · คลิกชื่อสถานที่ในลิสต์เพื่อซูมไป</p>
+  </div>
+  <div class="map-filters" id="map-filters">
+    <button class="chip active" data-filter="all">ทั้งหมด</button>
+    <button class="chip" data-filter="tokyo"><span class="dot" data-area="tokyo"></span>Tokyo</button>
+    <button class="chip" data-filter="tochigi"><span class="dot" data-area="tochigi"></span>Tochigi</button>
+    <button class="chip" data-filter="nikko"><span class="dot" data-area="nikko"></span>Nikko</button>
+    <button class="chip" data-filter="fukushima"><span class="dot" data-area="fukushima"></span>Fukushima</button>
+    <label class="chip chip-toggle"><input type="checkbox" id="route-toggle" checked> เส้นทางหลัก</label>
+  </div>
+  <div class="map-layout">
+    <div id="leaflet-map" role="application" aria-label="แผนที่สถานที่ท่องเที่ยว"></div>
+    <div class="place-list" id="place-list"></div>
+  </div>
+</section>
+
+<!-- ============ TRANSPORT ============ -->
+<section class="section" id="transport">
+  <div class="section-head">
+    <span class="section-ja jp">交通</span>
+    <h2>วิธีเดินทาง & ค่าเดินทาง</h2>
+    <p class="section-desc">ราคาโดยประมาณต่อคน (เช็คราคาจริงก่อนเดินทาง) · กด「＋งบ」เพื่อบันทึกเข้าเครื่องคิดงบด้านล่าง</p>
+  </div>
+  <div class="transport-list" id="transport-list"></div>
+  <div class="pass-note card">
+    <h3>🎫 คุ้มไหมถ้าซื้อ JR EAST PASS (Tohoku Area)?</h3>
+    <p>พาส 5 วันติดกัน ราคา <span class="mono">¥30,000</span> — แต่ค่ารถไฟเส้นทางหลักของทริปนี้รวมแล้วประมาณ <span class="mono" id="rail-total">¥—</span> เท่านั้น
+    <strong>ซื้อตั๋วแยกถูกกว่า</strong> ยกเว้นจะนั่งชินคันเซ็นเที่ยวเพิ่มหลายรอบ (เช่น แวะเซนได/ยามากาตะ)</p>
+  </div>
+</section>
+
+<!-- ============ HIKE ============ -->
+<section class="section section-hike" id="hike">
+  <div class="section-head">
+    <span class="section-ja jp">登山</span>
+    <h2>เดินเขา 1 วัน — Mt. Issaikyo <span class="jp">一切経山</span></h2>
+    <p class="section-desc">1,949 ม. · Bandai-Azuma Skyline, Fukushima · ไฮไลต์: ทะเลสาบ Goshikinuma「ดวงตาแม่มด 魔女の瞳」</p>
+  </div>
+  <div class="hike-grid">
+    <div class="card hike-plan">
+      <h3>ตารางวันเดินเขา (แผน: 26 ต.ค.)</h3>
+      <ul class="timeline">
+        <li><span class="mono">08:30</span> ขึ้นบัส <strong>Jododaira Sky Access</strong> จาก Fukushima Sta. (ฝั่ง West Exit) — ต้องจองล่วงหน้า</li>
+        <li><span class="mono">10:00</span> ถึง Jododaira Visitor Center (1,600 ม.) — เข้าห้องน้ำ เตรียมตัว</li>
+        <li><span class="mono">10:15</span> เริ่มเดิน: Jododaira → สันเขา → ยอด Issaikyo (~90 นาที)</li>
+        <li><span class="mono">12:00</span> ถึงยอด — วิว Goshikinuma สีฟ้าเทอร์ควอยซ์ · พักกินข้าวกล่อง</li>
+        <li><span class="mono">13:00</span> ลงทางฝั่ง Kamanuma → Okenuma wetland วนกลับ Jododaira</li>
+        <li><span class="mono">15:00</span> เดินเสริม Azuma-Kofuji (ปากปล่องภูเขาไฟ ~15 นาทีถึงขอบ)</li>
+        <li><span class="mono">15:30</span> ขึ้นบัสกลับ → ถึง Fukushima Sta. <span class="mono">17:00</span> → แช่ออนเซ็น 🍜</li>
+      </ul>
+      <p class="note">⚠️ บัสวิ่งตามฤดูกาล (พ.ค.–กลาง พ.ย.) เช็คตาราง/จองที่ Japan Bus Online ก่อนไป · ถ้าอากาศแย่ให้สลับวันกับวันช้อปปิ้ง · Skyline อาจปิดถ้าหิมะมาเร็ว</p>
+    </div>
+    <div class="card">
+      <h3>ของที่ต้องเตรียม</h3>
+      <ul class="gear-list">
+        <li>🧥 เสื้อกันลม/กันหนาว — ปลาย ต.ค. บนเขา ~0–8°C ลมแรง</li>
+        <li>👟 รองเท้าเดินเขา (ทางกรวดภูเขาไฟ ลื่น)</li>
+        <li>🧤 ถุงมือ + หมวก + buff</li>
+        <li>🍙 ข้าวกล่อง + น้ำ 1–1.5 ลิตร (ซื้อจากเซเว่นหน้าสถานี — บนเขามีแค่ resthouse)</li>
+        <li>🧴 กันแดด + แว่นกันแดด (ไม่มีร่มเงาตลอดเส้น)</li>
+        <li>💴 เงินสด (ค่าบัส/resthouse)</li>
+        <li>📱 โหลดแผนที่ออฟไลน์ (YAMAP / Google Maps offline)</li>
+      </ul>
+      <h3 style="margin-top:1.4rem">ค่าใช้จ่ายวันเดินเขา</h3>
+      <table class="mini-table">
+        <tr><td>บัส Sky Access ไป–กลับ</td><td class="mono">~¥4,000</td></tr>
+        <tr><td>ข้าวกล่อง + น้ำ + ขนม</td><td class="mono">~¥1,500</td></tr>
+        <tr><td>ออนเซ็นตอนเย็น</td><td class="mono">~¥800</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EVENTS ============ -->
+<section class="section" id="events">
+  <div class="section-head">
+    <span class="section-ja jp">祭</span>
+    <h2>Events เดือนตุลาคม</h2>
+    <p class="section-desc">รวบรวมจากเว็บ event ญี่ปุ่น (อัปเดต ก.ค. 2026) — ช่วงทริปคือ <strong>20–28 ต.ค.</strong> · บางงานยังรอประกาศวันจริงปี 2026</p>
+  </div>
+  <div class="map-filters" id="event-filters">
+    <button class="chip active" data-efilter="all">ทั้งหมด</button>
+    <button class="chip" data-efilter="tokyo"><span class="dot" data-area="tokyo"></span>Tokyo</button>
+    <button class="chip" data-efilter="tochigi"><span class="dot" data-area="tochigi"></span>Tochigi/Nikko</button>
+    <button class="chip" data-efilter="fukushima"><span class="dot" data-area="fukushima"></span>Fukushima</button>
+    <button class="chip" data-efilter="hit">✓ เฉพาะที่ทันทริป</button>
+  </div>
+  <div class="event-grid" id="event-grid"></div>
+  <div class="card event-sources">
+    <h3>เช็ค event สด ๆ ใกล้วันเดินทาง</h3>
+    <div class="source-links" id="event-sources"></div>
+  </div>
+</section>
+
+<!-- ============ SHOPPING ============ -->
+<section class="section" id="shopping">
+  <div class="section-head">
+    <span class="section-ja jp">買物</span>
+    <h2>ลิสต์ของที่จะซื้อ</h2>
+    <p class="section-desc">ติ๊กเมื่อซื้อแล้ว — ยอดที่ซื้อจริงจะไปรวมในงบหมวด「ช้อปปิ้ง」อัตโนมัติ · ข้อมูลบันทึกในเครื่อง</p>
+  </div>
+  <form class="add-form" id="shopping-form">
+    <input type="text" id="shop-name" placeholder="ชื่อของ เช่น KitKat ชาเขียว" required>
+    <input type="number" id="shop-price" placeholder="ราคา ¥" min="0" required>
+    <input type="number" id="shop-qty" placeholder="จำนวน" min="1" value="1" required>
+    <select id="shop-cat">
+      <option>ขนม/ของกิน</option><option>ยา/สกินแคร์</option><option>เสื้อผ้า</option><option>ของฝาก</option><option>อื่นๆ</option>
+    </select>
+    <button type="submit" class="btn">＋ เพิ่ม</button>
+  </form>
+  <div class="shop-list" id="shop-list"></div>
+  <div class="shop-summary card" id="shop-summary"></div>
+</section>
+
+<!-- ============ BUDGET ============ -->
+<section class="section" id="budget">
+  <div class="section-head">
+    <span class="section-ja jp">予算</span>
+    <h2>คำนวณค่าใช้จ่ายทริป</h2>
+    <p class="section-desc">ตั้งงบต่อหมวด → บันทึกรายจ่ายจริง → ดูว่าเหลือ/เกินเท่าไหร่ · แปลงเป็นบาทด้วยเรตที่ตั้งเอง</p>
+  </div>
+  <div class="rate-row card">
+    <label for="rate-input">อัตราแลกเปลี่ยน <span class="mono">1 JPY =</span></label>
+    <input type="number" id="rate-input" step="0.001" min="0.01" class="mono"> <span>THB</span>
+  </div>
+  <div class="budget-grid" id="budget-grid"></div>
+  <div class="budget-total card" id="budget-total"></div>
+  <h3 class="sub-head">บันทึกรายจ่าย</h3>
+  <form class="add-form" id="expense-form">
+    <input type="text" id="exp-name" placeholder="รายการ เช่น N'EX เข้าเมือง" required>
+    <input type="number" id="exp-amount" placeholder="จำนวนเงิน ¥" min="0" required>
+    <select id="exp-cat"></select>
+    <select id="exp-day"></select>
+    <button type="submit" class="btn">＋ บันทึก</button>
+  </form>
+  <div class="expense-list" id="expense-list"></div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <p class="jp">よい旅を！</p>
+  <p>Japan Autumn Trip · 20–28 Oct 2026 · Tokyo — Tochigi — Nikko — Fukushima — Tokyo</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
