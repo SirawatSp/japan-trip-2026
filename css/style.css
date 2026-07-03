@@ -184,27 +184,60 @@ body {
   background: var(--card); border: 1px solid var(--line); border-radius: 14px;
   padding: 1.05rem 1.15rem; box-shadow: var(--shadow);
   border-top: 4px solid var(--area, var(--ink));
-  cursor: pointer; transition: transform .18s, box-shadow .18s;
+  transition: box-shadow .18s;
 }
-.day-card:hover { transform: translateY(-3px); box-shadow: 0 6px 8px rgba(64,45,22,.08), 0 18px 34px -12px rgba(64,45,22,.25); }
+.day-card:focus-within { box-shadow: 0 6px 8px rgba(64,45,22,.08), 0 18px 34px -12px rgba(64,45,22,.25); }
 .day-card[data-area="tokyo"] { --area: var(--tokyo); }
 .day-card[data-area="tochigi"] { --area: var(--tochigi); }
 .day-card[data-area="nikko"] { --area: var(--nikko); }
 .day-card[data-area="fukushima"] { --area: var(--fukushima); }
+
+.day-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .3rem; }
 .day-card .day-no {
   font-family: var(--font-mono); font-size: .72rem; font-weight: 600;
   letter-spacing: .16em; color: var(--area, var(--accent));
 }
-.day-card .day-date { font-weight: 700; font-size: 1.02rem; margin: .1rem 0 .1rem; }
-.day-card .day-title { font-size: .9rem; color: var(--ink-soft); font-weight: 600; margin-bottom: .5rem; }
+.day-card-actions { display: flex; gap: .2rem; }
+.icon-btn {
+  background: none; border: none; cursor: pointer; font-size: .8rem;
+  color: var(--ink-soft); padding: .15rem .35rem; border-radius: 6px;
+  opacity: .55; transition: all .15s; line-height: 1;
+}
+.icon-btn:hover { opacity: 1; background: var(--paper-deep); }
+.day-map-btn { font-size: .95rem; }
+
+.day-date-row { display: flex; align-items: center; gap: .5rem; margin: .2rem 0 .55rem; }
+.day-date-input {
+  font-weight: 700; font-size: .92rem; color: var(--ink); background: transparent;
+  border: none; border-bottom: 1px dashed transparent; padding: .1rem .1rem; width: 100px; min-width: 0;
+}
+.day-area-select {
+  font-family: var(--font-body); font-size: .66rem; font-weight: 700; color: #fff;
+  background: var(--area, var(--ink)); border: none; border-radius: 999px;
+  padding: .12rem .5rem; cursor: pointer; flex-shrink: 0;
+}
+.day-title-input {
+  display: block; width: 100%; font-size: .9rem; font-weight: 600; color: var(--ink-soft);
+  background: transparent; border: none; border-bottom: 1px dashed transparent;
+  padding: .15rem .1rem; margin-bottom: .5rem;
+}
+.day-date-input:hover, .day-title-input:hover { border-bottom-color: var(--line); }
+.day-date-input:focus, .day-title-input:focus {
+  outline: none; border-bottom-color: var(--area, var(--accent));
+}
 .day-card ul { list-style: none; font-size: .86rem; color: var(--ink-soft); }
 .day-card li { padding: .16rem 0 .16rem 1rem; position: relative; }
 .day-card li::before { content: "▸"; position: absolute; left: 0; color: var(--area, var(--accent)); }
-.day-badge {
-  display: inline-block; font-size: .68rem; font-weight: 700; color: #fff;
-  background: var(--area, var(--ink)); border-radius: 999px; padding: .06rem .55rem;
-  margin-left: .4rem; vertical-align: middle;
+.day-items li { display: flex; align-items: center; gap: .3rem; }
+.day-item-input {
+  flex: 1; min-width: 0; font-family: var(--font-body); font-size: .86rem; color: var(--ink-soft);
+  background: transparent; border: none; border-bottom: 1px dashed transparent; padding: .1rem;
 }
+.day-item-input:hover { border-bottom-color: var(--line); }
+.day-item-input:focus { outline: none; border-bottom-color: var(--area, var(--accent)); }
+.item-del-btn { flex-shrink: 0; }
+.add-item-btn { margin-top: .6rem; }
+.itinerary-actions { display: flex; align-items: center; gap: .9rem; margin-top: 1.2rem; }
 
 /* ---------- map ---------- */
 .section-wide { max-width: 1280px; }

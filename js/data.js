@@ -23,8 +23,8 @@ const AREA_LABELS = {
   fukushima: 'Fukushima',
 };
 
-/* ---------- itinerary ---------- */
-const ITINERARY = [
+/* ---------- itinerary (default — user can edit/reset in the app) ---------- */
+const DEFAULT_ITINERARY = [
   { day: 1, date: 'อ. 20 ต.ค.', area: 'tokyo', title: 'ถึงโตเกียวตอนเช้า', items: [
     'ถึงสนามบิน → เข้าเมือง (N\'EX / Skyliner)', 'ฝากกระเป๋า/เช็คอินโรงแรม', 'Asakusa — วัด Sensoji + ถนน Nakamise', 'Ueno Park / Ameyoko', 'เย็น: Akihabara' ] },
   { day: 2, date: 'พ. 21 ต.ค.', area: 'tokyo', title: 'โตเกียวฝั่งตะวันตก', items: [
