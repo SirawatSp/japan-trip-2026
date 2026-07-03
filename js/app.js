@@ -23,6 +23,30 @@ let planned = store.load('jt26_planned', DEFAULT_BUDGET);
 let expenses = store.load('jt26_expenses', []);
 let rate = store.load('jt26_rate', TRIP.defaultRate);
 
+function persistAll() {
+  store.save('jt26_shopping', shopping);
+  store.save('jt26_planned', planned);
+  store.save('jt26_expenses', expenses);
+  store.save('jt26_rate', rate);
+  TripSync.push({ shopping, planned, expenses, rate });
+}
+
+TripSync.init((remote) => {
+  if (remote.shopping) shopping = remote.shopping;
+  if (remote.planned) planned = remote.planned;
+  if (remote.expenses) expenses = remote.expenses;
+  if (typeof remote.rate === 'number') rate = remote.rate;
+  store.save('jt26_shopping', shopping);
+  store.save('jt26_planned', planned);
+  store.save('jt26_expenses', expenses);
+  store.save('jt26_rate', rate);
+  $('#rate-input').value = rate;
+  $('#exp-cat').innerHTML = planned.map((b) => `<option>${esc(b.cat)}</option>`).join('');
+  renderShopping();
+  renderBudget();
+  renderExpenses();
+});
+
 /* ============ countdown ============ */
 (function countdown() {
   const el = $('#countdown-days');
@@ -177,7 +201,7 @@ refreshMap();
     const seg = TRANSPORT[+btn.dataset.seg];
     const opt = seg.options[+btn.dataset.opt];
     expenses.push({ name: `${seg.title} — ${opt.method}`, amount: opt.price, cat: 'เดินทาง', day: seg.day });
-    store.save('jt26_expenses', expenses);
+    persistAll();
     btn.classList.add('added');
     btn.textContent = '✓ แล้ว';
     renderBudget();
@@ -253,7 +277,7 @@ $('#shopping-form').addEventListener('submit', (e) => {
     cat: $('#shop-cat').value,
     bought: false,
   });
-  store.save('jt26_shopping', shopping);
+  persistAll();
   e.target.reset();
   $('#shop-qty').value = 1;
   renderShopping();
@@ -262,13 +286,13 @@ $('#shopping-form').addEventListener('submit', (e) => {
 $('#shop-list').addEventListener('click', (e) => {
   if (e.target.matches('input[type="checkbox"]')) {
     shopping[+e.target.dataset.i].bought = e.target.checked;
-    store.save('jt26_shopping', shopping);
+    persistAll();
     renderShopping();
   }
   const del = e.target.closest('.del-btn');
   if (del) {
     shopping.splice(+del.dataset.del, 1);
-    store.save('jt26_shopping', shopping);
+    persistAll();
     renderShopping();
   }
 });
@@ -311,7 +335,7 @@ $('#budget-grid').addEventListener('change', (e) => {
   const input = e.target.closest('.b-plan-input');
   if (!input) return;
   planned[+input.dataset.plan].planned = +input.value || 0;
-  store.save('jt26_planned', planned);
+  persistAll();
   renderBudget();
 });
 
@@ -319,7 +343,7 @@ $('#budget-grid').addEventListener('change', (e) => {
 $('#rate-input').value = rate;
 $('#rate-input').addEventListener('change', (e) => {
   rate = +e.target.value || TRIP.defaultRate;
-  store.save('jt26_rate', rate);
+  persistAll();
   renderShopping();
   renderExpenses();
 });
@@ -336,7 +360,7 @@ $('#expense-form').addEventListener('submit', (e) => {
     cat: $('#exp-cat').value,
     day: $('#exp-day').value,
   });
-  store.save('jt26_expenses', expenses);
+  persistAll();
   e.target.reset();
   renderBudget();
   renderExpenses();
@@ -357,7 +381,7 @@ $('#expense-list').addEventListener('click', (e) => {
   const del = e.target.closest('.del-btn');
   if (!del) return;
   expenses.splice(+del.dataset.del, 1);
-  store.save('jt26_expenses', expenses);
+  persistAll();
   renderBudget();
   renderExpenses();
 });
