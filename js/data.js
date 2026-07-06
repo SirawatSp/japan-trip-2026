@@ -26,23 +26,23 @@ const AREA_LABELS = {
 /* ---------- itinerary (default — user can edit/reset in the app) ---------- */
 const DEFAULT_ITINERARY = [
   { day: 1, date: 'อ. 20 ต.ค.', area: 'tokyo', title: 'ถึงโตเกียวตอนเช้า', items: [
-    'ถึงสนามบิน → เข้าเมือง (N\'EX / Skyliner)', 'ฝากกระเป๋า/เช็คอินโรงแรม', 'Asakusa — วัด Sensoji + ถนน Nakamise', 'Ueno Park / Ameyoko', 'เย็น: Akihabara' ] },
+    'ถึงสนามบิน → เข้าเมือง (N\'EX / Skyliner)', 'ฝากกระเป๋า/เช็คอินโรงแรม', 'Asakusa — วัด Sensoji + ถนน Nakamise', 'Ueno Park / Ameyoko + แวะ Gallery of Hōryū-ji Treasures (Taniguchi)', 'เย็น: Akihabara' ] },
   { day: 2, date: 'พ. 21 ต.ค.', area: 'tokyo', title: 'โตเกียวฝั่งตะวันตก', items: [
     'ศาลเจ้า Meiji Jingu', 'Harajuku — Takeshita St.', 'Shibuya — แยกไฟแดง + Shibuya Sky', 'เย็น: Shinjuku (Omoide Yokocho)' ] },
   { day: 3, date: 'พฤ. 22 ต.ค.', area: 'tochigi', title: 'Tokyo → Utsunomiya (โทจิกิ)', items: [
-    'ชินคันเซ็นเช้า ~50 นาที', 'Oya History Museum (เหมืองหินใต้ดิน)', 'ศาลเจ้า Utsunomiya Futaarayama', 'เย็น: ตะลุยเกี๊ยวซ่า — เมืองหลวงเกี๊ยวซ่าของญี่ปุ่น' ] },
+    'ชินคันเซ็นเช้า ~50 นาที', 'Oya History Museum (เหมืองหินใต้ดิน)', 'ศาลเจ้า Utsunomiya Futaarayama', 'Tochigi Prefectural Museum of Fine Arts (คอลเลกชัน Meissen)', 'เย็น: ตะลุยเกี๊ยวซ่า — เมืองหลวงเกี๊ยวซ่าของญี่ปุ่น' ] },
   { day: 4, date: 'ศ. 23 ต.ค.', area: 'nikko', title: 'Utsunomiya → Nikko (มรดกโลก)', items: [
     'JR Nikko Line ~45 นาที', 'ศาลเจ้า Toshogu + Rinnoji', 'สะพานแดง Shinkyo', 'Kanmangafuchi Abyss (แถวจิโซ)' ] },
   { day: 5, date: 'ส. 24 ต.ค.', area: 'nikko', title: 'Nikko — ใบไม้แดงพีค 🍁', items: [
     'ขึ้นบัสผ่านโค้ง Irohazaka (48 โค้ง)', 'Akechidaira Ropeway — จุดชมวิว', 'น้ำตก Kegon + ทะเลสาบ Chuzenji', 'น้ำตก Ryuzu ตอนเย็นแสงสวย' ] },
   { day: 6, date: 'อา. 25 ต.ค.', area: 'fukushima', title: 'Nikko → Fukushima', items: [
-    'กลับ Utsunomiya → ชินคันเซ็นไป Fukushima', 'เช็คอิน + ซื้อเสบียงวันเดินเขา (เซเว่นหน้าสถานี)', 'บ่าย: Hanamiyama / เมือง Fukushima', 'เย็น: แช่ออนเซ็น Iizaka Onsen' ] },
+    'กลับ Utsunomiya → ชินคันเซ็นไป Fukushima', 'เช็คอิน + ซื้อเสบียงวันเดินเขา (เซเว่นหน้าสถานี)', 'บ่าย: Hanamiyama Park หรือ Fukushima Prefectural Museum of Art', 'เย็น: แช่ออนเซ็น Iizaka Onsen' ] },
   { day: 7, date: 'จ. 26 ต.ค.', area: 'fukushima', title: '⛰ เดินเขา Mt. Issaikyo', items: [
     '08:30 บัส Sky Access จากสถานี', 'Jododaira → ยอด Issaikyo (1,949 ม.)', 'วิว「ดวงตาแม่มด」Goshikinuma', 'Azuma-Kofuji → กลับถึงเมือง 17:00 → ออนเซ็น' ] },
   { day: 8, date: 'อ. 27 ต.ค.', area: 'tokyo', title: 'Fukushima → Tokyo — วันช้อปปิ้ง', items: [
-    'ชินคันเซ็นเช้า ~95 นาที', 'Shinjuku / Ginza — เก็บลิสต์ของซื้อ', 'Don Quijote + drugstore', 'เย็น: มื้อส่งท้าย' ] },
+    'ชินคันเซ็นเช้า ~95 นาที', 'Shinjuku / Ginza — เก็บลิสต์ของซื้อ + แวะดูอาคาร GINZA SIX', 'Don Quijote + drugstore', 'เย็น: มื้อส่งท้าย' ] },
   { day: 9, date: 'พ. 28 ต.ค.', area: 'tokyo', title: 'เดินทางกลับ ✈ 17:00', items: [
-    'เช้า: เก็บตกของซื้อ / คาเฟ่', '~13:30 ออกจากโรงแรมไปสนามบิน', 'ถึงสนามบินก่อน 15:00', 'บินกลับ 17:00' ] },
+    'เช้า (ถ้ามีแรง): Tokyo Sea Life Park ที่ Kasai (Taniguchi ออกแบบ)', 'ไม่งั้นเก็บตกของซื้อ / คาเฟ่แทน', '~13:30 ออกจากโรงแรมไปสนามบิน', 'ถึงสนามบินก่อน 15:00 · บินกลับ 17:00' ] },
 ];
 
 /* ---------- map places ---------- */
@@ -50,17 +50,21 @@ const PLACES = [
   // Tokyo
   { name: 'วัด Sensoji (Asakusa)', ja: '浅草寺', area: 'tokyo', lat: 35.7148, lng: 139.7967, day: 1, desc: 'วัดเก่าแก่ที่สุดในโตเกียว + ถนนช้อป Nakamise' },
   { name: 'Ueno Park / Ameyoko', ja: '上野公園', area: 'tokyo', lat: 35.7141, lng: 139.7745, day: 1, desc: 'สวน+พิพิธภัณฑ์ ตลาด Ameyoko ของกินเพียบ' },
+  { name: 'Gallery of Hōryū-ji Treasures', ja: '法隆寺宝物館', area: 'tokyo', lat: 35.7186, lng: 139.7758, day: 1, desc: '🏛 งานออกแบบของ Yoshio Taniguchi (1999) ในเขต Tokyo National Museum — กล่องหินเรียบคู่ล็อบบี้กระจก ในกรอบสเตนเลส เดินจากประตู Ueno Park อีกไม่กี่นาที' },
   { name: 'Akihabara', ja: '秋葉原', area: 'tokyo', lat: 35.6984, lng: 139.7731, day: 1, desc: 'ย่านเครื่องใช้ไฟฟ้า อนิเมะ เกม' },
   { name: 'ศาลเจ้า Meiji Jingu', ja: '明治神宮', area: 'tokyo', lat: 35.6764, lng: 139.6993, day: 2, desc: 'ศาลเจ้าใหญ่กลางป่าในเมือง ติด Harajuku' },
   { name: 'Shibuya Crossing + Sky', ja: '渋谷', area: 'tokyo', lat: 35.6595, lng: 139.7005, day: 2, desc: 'แยกไฟแดงที่พลุกพล่านที่สุดในโลก + จุดชมวิว Shibuya Sky' },
   { name: 'Shinjuku', ja: '新宿', area: 'tokyo', lat: 35.6896, lng: 139.7006, day: 2, desc: 'Omoide Yokocho, Kabukicho, ช้อปปิ้งยักษ์' },
   { name: 'Ginza', ja: '銀座', area: 'tokyo', lat: 35.6717, lng: 139.7650, day: 8, desc: 'ย่านช้อปไฮเอนด์ + Uniqlo 12 ชั้น, Itoya' },
+  { name: 'GINZA SIX', ja: 'ギンザシックス', area: 'tokyo', lat: 35.6699, lng: 139.7638, day: 8, desc: '🏛 ภายนอกอาคารออกแบบโดย Taniguchi (ร่วมกับ Kajima Design, 2017) — ชายคาสเตนเลสรอบชั้นออฟฟิศ + สวนดาดฟ้า อยู่ในย่าน Ginza ที่จะไปช้อปอยู่แล้ว' },
   { name: 'Don Quijote Shinjuku', ja: 'ドン・キホーテ', area: 'tokyo', lat: 35.6944, lng: 139.7016, day: 8, desc: 'แหล่งกวาดของฝาก เปิดดึก อย่าลืมพาสปอร์ต (tax-free)' },
+  { name: 'Tokyo Sea Life Park (Kasai)', ja: '葛西臨海水族園', area: 'tokyo', lat: 35.6423, lng: 139.8607, day: 9, desc: '🏛 อควาเรียมออกแบบโดย Taniguchi (1989, รางวัล Mainichi Art Award) — จากสถานีโตเกียวนั่ง JR Keiyo Line ~15 นาที ในสวนเดียวกันมีงาน Taniguchi อีก 2 หลัง เหมาะเป็นช่วงเช้าก่อนไปสนามบินวันสุดท้าย (เปิด 9:30)' },
   // Tochigi
   { name: 'สถานี Utsunomiya', ja: '宇都宮駅', area: 'tochigi', lat: 36.5591, lng: 139.8986, day: 3, desc: 'ฮับของโทจิกิ — จุดต่อรถไป Nikko' },
   { name: 'Oya History Museum', ja: '大谷資料館', area: 'tochigi', lat: 36.6009, lng: 139.8228, day: 3, desc: 'เหมืองหินใต้ดินสุดอลัง เย็น 8°C พกเสื้อคลุม' },
   { name: 'ถนนเกี๊ยวซ่า (Kirasse)', ja: '宇都宮餃子', area: 'tochigi', lat: 36.5583, lng: 139.8830, day: 3, desc: 'เมืองหลวงเกี๊ยวซ่า — ร้าน Minmin, Masashi ห้ามพลาด' },
   { name: 'ศาลเจ้า Futaarayama', ja: '二荒山神社', area: 'tochigi', lat: 36.5658, lng: 139.8823, day: 3, desc: 'ศาลเจ้าเก่าแก่ใจกลางเมือง Utsunomiya' },
+  { name: 'Tochigi Prefectural Museum of Fine Arts', ja: '栃木県立美術館', area: 'tochigi', lat: 36.5486, lng: 139.8890, day: 3, desc: 'คอลเลกชันเครื่องเคลือบ Meissen ระดับแนวหน้าของญี่ปุ่น + งานศิลปะยุโรป/ญี่ปุ่นสมัยใหม่ — บัส 15 นาทีจากฝั่งตะวันตกสถานี Utsunomiya' },
   // Nikko
   { name: 'ศาลเจ้า Toshogu', ja: '日光東照宮', area: 'nikko', lat: 36.7581, lng: 139.5986, day: 4, desc: 'มรดกโลก สุสานโชกุน Tokugawa Ieyasu — แกะสลักแมวหลับ/ลิงสามตัว' },
   { name: 'สะพาน Shinkyo', ja: '神橋', area: 'nikko', lat: 36.7550, lng: 139.5995, day: 4, desc: 'สะพานแดงศักดิ์สิทธิ์ จุดถ่ายรูปซิกเนเจอร์' },
@@ -76,6 +80,7 @@ const PLACES = [
   { name: 'ยอด Mt. Issaikyo', ja: '一切経山', area: 'fukushima', lat: 37.7311, lng: 140.2439, day: 7, desc: 'ยอด 1,949 ม. — วิวทะเลสาบ Goshikinuma「ดวงตาแม่มด」' },
   { name: 'ทะเลสาบ Goshikinuma', ja: '五色沼(魔女の瞳)', area: 'fukushima', lat: 37.7355, lng: 140.2450, day: 7, desc: 'ทะเลสาบปล่องภูเขาไฟสีเทอร์ควอยซ์ มองจากยอด Issaikyo' },
   { name: 'Azuma-Kofuji', ja: '吾妻小富士', area: 'fukushima', lat: 37.7147, lng: 140.2588, day: 7, desc: '“ฟูจิน้อย” — เดิน 15 นาทีถึงขอบปากปล่อง อยู่ตรงข้าม Jododaira' },
+  { name: 'Fukushima Prefectural Museum of Art', ja: '福島県立美術館', area: 'fukushima', lat: 37.7602, lng: 140.4649, day: 6, desc: 'งาน Andrew Wyeth + ภาพพิมพ์ไซโตะ คิโยชิ ตั้งในสวนกว้างริมลำธาร — ลง Iizaka Line ที่ป้าย "美術館図書館前" เดิน 2 นาที (ไลน์เดียวกับที่จะไป Iizaka Onsen พอดี)' },
   { name: 'Iizaka Onsen', ja: '飯坂温泉', area: 'fukushima', lat: 37.8259, lng: 140.4478, day: 6, desc: 'เมืองออนเซ็นเก่าแก่ ห่างสถานี Fukushima ~25 นาที (รถไฟ Iizaka Line)' },
   { name: 'Hanamiyama Park', ja: '花見山公園', area: 'fukushima', lat: 37.7269, lng: 140.5090, day: 6, desc: 'สวนบนเนินเขา วิวเมือง+ภูเขา (ดังช่วงซากุระ แต่ฤดูใบไม้ร่วงก็สวย)' },
 ];
