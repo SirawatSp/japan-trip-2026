@@ -256,6 +256,15 @@ body {
 .dot[data-area="nikko"] { background: var(--nikko); }
 .dot[data-area="fukushima"] { background: var(--fukushima); }
 .chip-toggle input { accent-color: var(--accent); }
+#type-filters { margin-bottom: 1.2rem; }
+#type-filters .chip[data-type="taniguchi"].active { background: var(--accent); border-color: var(--accent); }
+
+.popup-tag {
+  display: inline-block; font-size: .66rem; font-weight: 700; color: #fff;
+  background: var(--ink-soft); border-radius: 999px; padding: .04rem .5rem;
+  margin-left: .3rem; vertical-align: middle;
+}
+.popup-tag-taniguchi { background: var(--accent); }
 
 .map-layout {
   display: grid; grid-template-columns: 1fr 320px; gap: 1rem; align-items: stretch;

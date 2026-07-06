@@ -124,7 +124,7 @@ const markers = PLACES.map((p) => {
     <div class="popup-title">${esc(p.name)}</div>
     <div class="popup-ja">${esc(p.ja)}</div>
     <div class="popup-desc">${esc(p.desc)}</div>
-    <span class="popup-day">DAY ${p.day} · ${AREA_LABELS[p.area]}</span>`);
+    <span class="popup-day">DAY ${p.day} · ${AREA_LABELS[p.area]}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}`);
   m._place = p;
   return m;
 });
@@ -134,14 +134,23 @@ const routeLine = L.polyline(ROUTE, {
 });
 
 let activeArea = 'all';
+let activeType = 'all'; // 'all' | 'museum' | 'taniguchi'
+
+function placeMatches(p) {
+  const areaOk = activeArea === 'all' || p.area === activeArea;
+  const typeOk = activeType === 'all'
+    || (activeType === 'museum' && p.type === 'museum')
+    || (activeType === 'taniguchi' && p.taniguchi === true);
+  return areaOk && typeOk;
+}
 
 function refreshMap() {
   markers.forEach((m) => {
-    const show = activeArea === 'all' || m._place.area === activeArea;
+    const show = placeMatches(m._place);
     if (show && !map.hasLayer(m)) m.addTo(map);
     if (!show && map.hasLayer(m)) map.removeLayer(m);
   });
-  if ($('#route-toggle').checked && activeArea === 'all') {
+  if ($('#route-toggle').checked && activeArea === 'all' && activeType === 'all') {
     if (!map.hasLayer(routeLine)) routeLine.addTo(map);
   } else if (map.hasLayer(routeLine)) {
     map.removeLayer(routeLine);
@@ -154,12 +163,12 @@ function refreshMap() {
 }
 
 function renderPlaceList() {
-  const list = PLACES.filter((p) => activeArea === 'all' || p.area === activeArea);
+  const list = PLACES.filter(placeMatches);
   $('#place-list').innerHTML = list.map((p) => `
     <div class="place-item" data-area="${p.area}" data-lat="${p.lat}" data-lng="${p.lng}">
-      <div class="p-name">${esc(p.name)} <span class="popup-ja">${esc(p.ja)}</span></div>
+      <div class="p-name">${esc(p.name)} <span class="popup-ja">${esc(p.ja)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️</span>' : ''}</div>
       <div class="p-meta">DAY ${p.day} · ${AREA_LABELS[p.area]} — ${esc(p.desc)}</div>
-    </div>`).join('');
+    </div>`).join('') || '<p class="empty-note">ไม่มีสถานที่ตามตัวกรองนี้</p>';
 }
 
 $('#map-filters').addEventListener('click', (e) => {
@@ -170,6 +179,14 @@ $('#map-filters').addEventListener('click', (e) => {
   refreshMap();
 });
 $('#route-toggle').addEventListener('change', refreshMap);
+
+$('#type-filters').addEventListener('click', (e) => {
+  const btn = e.target.closest('button.chip');
+  if (!btn) return;
+  activeType = btn.dataset.type;
+  document.querySelectorAll('#type-filters button.chip').forEach((b) => b.classList.toggle('active', b === btn));
+  refreshMap();
+});
 
 $('#place-list').addEventListener('click', (e) => {
   const item = e.target.closest('.place-item');
