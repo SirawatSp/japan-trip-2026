@@ -118,13 +118,19 @@ function pinIcon(color) {
   });
 }
 
+const dayLabel = (p) => (p.day ? `DAY ${p.day}` : 'นอกแผนทริป');
+const searchUrl = (p) => `https://www.google.com/search?q=${encodeURIComponent(p.name + ' ' + p.ja)}`;
+
 const markers = PLACES.map((p) => {
   const m = L.marker([p.lat, p.lng], { icon: pinIcon(AREA_COLORS[p.area]) });
   m.bindPopup(`
+    ${p.img ? `<img class="popup-img" src="${esc(p.img)}" alt="${esc(p.name)}" loading="lazy">` : ''}
     <div class="popup-title">${esc(p.name)}</div>
     <div class="popup-ja">${esc(p.ja)}</div>
     <div class="popup-desc">${esc(p.desc)}</div>
-    <span class="popup-day">DAY ${p.day} · ${AREA_LABELS[p.area]}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}`);
+    <span class="popup-day">${dayLabel(p)} · ${AREA_LABELS[p.area]}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}
+    ${p.ticket ? `<div class="popup-ticket">🎫 ${esc(p.ticket)}</div>` : ''}
+    <a class="popup-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener">${p.url ? 'เว็บทางการ' : 'ค้นหา'} ↗</a>`);
   m._place = p;
   return m;
 });
@@ -137,7 +143,9 @@ let activeArea = 'all';
 let activeType = 'all'; // 'all' | 'museum' | 'taniguchi'
 
 function placeMatches(p) {
-  const areaOk = activeArea === 'all' || p.area === activeArea;
+  const areaOk = activeArea === 'all'
+    ? (activeType === 'taniguchi' ? true : p.area !== 'other')
+    : p.area === activeArea;
   const typeOk = activeType === 'all'
     || (activeType === 'museum' && p.type === 'museum')
     || (activeType === 'taniguchi' && p.taniguchi === true);
@@ -166,8 +174,13 @@ function renderPlaceList() {
   const list = PLACES.filter(placeMatches);
   $('#place-list').innerHTML = list.map((p) => `
     <div class="place-item" data-area="${p.area}" data-lat="${p.lat}" data-lng="${p.lng}">
-      <div class="p-name">${esc(p.name)} <span class="popup-ja">${esc(p.ja)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️</span>' : ''}</div>
-      <div class="p-meta">DAY ${p.day} · ${AREA_LABELS[p.area]} — ${esc(p.desc)}</div>
+      ${p.img ? `<img class="place-thumb" src="${esc(p.img)}" alt="" loading="lazy">` : ''}
+      <div class="place-item-body">
+        <div class="p-name">${esc(p.name)} <span class="popup-ja">${esc(p.ja)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️</span>' : ''}</div>
+        <div class="p-meta">${dayLabel(p)} · ${AREA_LABELS[p.area]} — ${esc(p.desc)}</div>
+        ${p.ticket ? `<div class="p-ticket">🎫 ${esc(p.ticket)}</div>` : ''}
+        <a class="p-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${p.url ? 'เว็บทางการ' : 'ค้นหา'} ↗</a>
+      </div>
     </div>`).join('') || '<p class="empty-note">ไม่มีสถานที่ตามตัวกรองนี้</p>';
 }
 

@@ -14,6 +14,7 @@ const AREA_COLORS = {
   tochigi: '#b8860b',
   nikko: '#c73e2e',
   fukushima: '#3e5c46',
+  other: '#7a5c8e',
 };
 
 const AREA_LABELS = {
@@ -21,7 +22,13 @@ const AREA_LABELS = {
   tochigi: 'Tochigi',
   nikko: 'Nikko',
   fukushima: 'Fukushima',
+  other: 'อื่นๆ ทั่วญี่ปุ่น',
 };
+
+/* Wikimedia Commons file name → hotlinkable thumbnail URL */
+function commonsImg(file, width) {
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=${width || 480}`;
+}
 
 /* ---------- itinerary (default — user can edit/reset in the app) ---------- */
 const DEFAULT_ITINERARY = [
@@ -50,31 +57,32 @@ const PLACES = [
   // Tokyo
   { name: 'วัด Sensoji (Asakusa)', ja: '浅草寺', area: 'tokyo', lat: 35.7148, lng: 139.7967, day: 1, desc: 'วัดเก่าแก่ที่สุดในโตเกียว + ถนนช้อป Nakamise' },
   { name: 'Ueno Park / Ameyoko', ja: '上野公園', area: 'tokyo', lat: 35.7141, lng: 139.7745, day: 1, desc: 'สวน+พิพิธภัณฑ์ ตลาด Ameyoko ของกินเพียบ' },
-  { name: 'Gallery of Hōryū-ji Treasures', ja: '法隆寺宝物館', area: 'tokyo', lat: 35.7186, lng: 139.7758, day: 1, type: 'museum', taniguchi: true, desc: '🏛 งานออกแบบของ Yoshio Taniguchi (1999) ในเขต Tokyo National Museum — กล่องหินเรียบคู่ล็อบบี้กระจก ในกรอบสเตนเลส เดินจากประตู Ueno Park อีกไม่กี่นาที' },
-  { name: 'National Museum of Western Art', ja: '国立西洋美術館', area: 'tokyo', lat: 35.7156, lng: 139.7745, day: 1, type: 'museum', desc: '🏛 ตึกเดียวของ Le Corbusier ในญี่ปุ่น — ขึ้นทะเบียนมรดกโลก UNESCO 2016 ทางเข้าแบบ pilotis + ทางลาดวนชมงานสไตล์เฉพาะตัว อยู่ในคลัสเตอร์ Ueno เดียวกัน' },
-  { name: 'Sumida Hokusai Museum', ja: 'すみだ北斎美術館', area: 'tokyo', lat: 35.6960, lng: 139.7960, day: 1, type: 'museum', desc: '🏛 ออกแบบโดย Sejima Kazuyo (SANAA) ผนังอะลูมิเนียมกระจกสะท้อนบริบทรอบข้าง — เดินจาก Ryogoku Sta. 5 นาที ห่างจาก Asakusa ข้ามแม่น้ำนิดเดียว รวมงานอุกิโยเอะของโฮคุไซ' },
+  { name: 'Gallery of Hōryū-ji Treasures', ja: '法隆寺宝物館', area: 'tokyo', lat: 35.7186, lng: 139.7758, day: 1, type: 'museum', taniguchi: true, img: commonsImg('Tokyo_National_Museum_Gallery_of_Horyuji_Treasures_P5163920.jpg'), ticket: 'รวมในตั๋ว Tokyo National Museum (ผู้ใหญ่ ~¥1,000)', url: 'https://www.tnm.jp/modules/r_free_page/index.php?id=119', desc: '🏛 งานออกแบบของ Yoshio Taniguchi (1999) ในเขต Tokyo National Museum — กล่องหินเรียบคู่ล็อบบี้กระจก ในกรอบสเตนเลส เดินจากประตู Ueno Park อีกไม่กี่นาที' },
+  { name: 'National Museum of Western Art', ja: '国立西洋美術館', area: 'tokyo', lat: 35.7156, lng: 139.7745, day: 1, type: 'museum', img: commonsImg("Le_musée_national_d'art_occidental_conçu_par_Le_Corbusier_(Tokyo)_(41659392274).jpg"), ticket: 'คอลเลกชันถาวรฟรี · นิทรรศการพิเศษมีค่าใช้จ่ายแยก', url: 'https://www.nmwa.go.jp/', desc: '🏛 ตึกเดียวของ Le Corbusier ในญี่ปุ่น — ขึ้นทะเบียนมรดกโลก UNESCO 2016 ทางเข้าแบบ pilotis + ทางลาดวนชมงานสไตล์เฉพาะตัว อยู่ในคลัสเตอร์ Ueno เดียวกัน' },
+  { name: 'Sumida Hokusai Museum', ja: 'すみだ北斎美術館', area: 'tokyo', lat: 35.6960, lng: 139.7960, day: 1, type: 'museum', img: commonsImg('2020_Sumida_Hokusai_Museum_02.jpg'), ticket: 'เช็คราคาที่เว็บ (มีทั้งคอลเลกชันถาวร+นิทรรศการพิเศษ)', url: 'https://hokusai-museum.jp/', desc: '🏛 ออกแบบโดย Sejima Kazuyo (SANAA) ผนังอะลูมิเนียมกระจกสะท้อนบริบทรอบข้าง — เดินจาก Ryogoku Sta. 5 นาที ห่างจาก Asakusa ข้ามแม่น้ำนิดเดียว รวมงานอุกิโยเอะของโฮคุไซ' },
   { name: 'Akihabara', ja: '秋葉原', area: 'tokyo', lat: 35.6984, lng: 139.7731, day: 1, desc: 'ย่านเครื่องใช้ไฟฟ้า อนิเมะ เกม' },
   { name: 'ศาลเจ้า Meiji Jingu', ja: '明治神宮', area: 'tokyo', lat: 35.6764, lng: 139.6993, day: 2, desc: 'ศาลเจ้าใหญ่กลางป่าในเมือง ติด Harajuku' },
-  { name: 'Nezu Museum', ja: '根津美術館', area: 'tokyo', lat: 35.6654, lng: 139.7188, day: 2, type: 'museum', desc: '🏛 ออกแบบโดย Kengo Kuma (2009) — สวนญี่ปุ่นสวยเงียบสงบกลาง Omotesando คอลเลกชันโบราณวัตถุเอเชีย มีสมบัติชาติ 7 ชิ้น เดิน 8 นาทีจากสถานี Omotesando' },
+  { name: 'Nezu Museum', ja: '根津美術館', area: 'tokyo', lat: 35.6654, lng: 139.7188, day: 2, type: 'museum', ticket: 'เช็คราคาที่เว็บ (แพงกว่าพิพิธภัณฑ์รัฐ เพราะเป็นเอกชน)', url: 'https://www.nezu-muse.or.jp/', desc: '🏛 ออกแบบโดย Kengo Kuma (2009) — สวนญี่ปุ่นสวยเงียบสงบกลาง Omotesando คอลเลกชันโบราณวัตถุเอเชีย มีสมบัติชาติ 7 ชิ้น เดิน 8 นาทีจากสถานี Omotesando' },
   { name: 'Shibuya Crossing + Sky', ja: '渋谷', area: 'tokyo', lat: 35.6595, lng: 139.7005, day: 2, desc: 'แยกไฟแดงที่พลุกพล่านที่สุดในโลก + จุดชมวิว Shibuya Sky' },
   { name: 'Shinjuku', ja: '新宿', area: 'tokyo', lat: 35.6896, lng: 139.7006, day: 2, desc: 'Omoide Yokocho, Kabukicho, ช้อปปิ้งยักษ์' },
   { name: 'Ginza', ja: '銀座', area: 'tokyo', lat: 35.6717, lng: 139.7650, day: 8, desc: 'ย่านช้อปไฮเอนด์ + Uniqlo 12 ชั้น, Itoya' },
-  { name: 'GINZA SIX', ja: 'ギンザシックス', area: 'tokyo', lat: 35.6699, lng: 139.7638, day: 8, taniguchi: true, desc: '🏛 ภายนอกอาคารออกแบบโดย Taniguchi (ร่วมกับ Kajima Design, 2017) — ชายคาสเตนเลสรอบชั้นออฟฟิศ + สวนดาดฟ้า อยู่ในย่าน Ginza ที่จะไปช้อปอยู่แล้ว' },
-  { name: '21_21 DESIGN SIGHT', ja: '21_21 デザインサイト', area: 'tokyo', lat: 35.6640, lng: 139.7301, day: 8, type: 'museum', desc: '🏛 ออกแบบโดย Tadao Ando (2007) — หลังคาเหล็กแผ่นเดียวพับตามแนวคิด "ผ้าหนึ่งผืน" ของ Issey Miyake ส่วนใหญ่ฝังอยู่ใต้ดิน ใน Tokyo Midtown, Roppongi (นอกเส้นทางหลัก แต่คุ้มถ้าชอบงานสถาปัตย์)' },
-  { name: 'Tokyo Metropolitan Teien Art Museum', ja: '東京都庭園美術館', area: 'tokyo', lat: 35.6350, lng: 139.7168, day: 8, type: 'museum', desc: '🏛 อดีตวังเจ้าชาย Asaka สไตล์ Art Deco แท้ๆ จากฝรั่งเศส (1933) ทั้งหลังคือมรดกวัฒนธรรมสำคัญ — เดิน 6-7 นาทีจากสถานี Meguro/Shirokanedai' },
+  { name: 'GINZA SIX', ja: 'ギンザシックス', area: 'tokyo', lat: 35.6699, lng: 139.7638, day: 8, taniguchi: true, img: commonsImg('GINZA_SIX_Office_Building.jpg'), ticket: 'ฟรี (เดินชมอาคาร+สวนดาดฟ้าได้ไม่มีค่าใช้จ่าย)', url: 'https://ginza6.tokyo/', desc: '🏛 ภายนอกอาคารออกแบบโดย Taniguchi (ร่วมกับ Kajima Design, 2017) — ชายคาสเตนเลสรอบชั้นออฟฟิศ + สวนดาดฟ้า อยู่ในย่าน Ginza ที่จะไปช้อปอยู่แล้ว' },
+  { name: '21_21 DESIGN SIGHT', ja: '21_21 デザインサイト', area: 'tokyo', lat: 35.6640, lng: 139.7301, day: 8, type: 'museum', img: commonsImg('21_21_DESIGN_SIGHT.jpg'), ticket: 'เช็คราคาที่เว็บ (เปลี่ยนตามนิทรรศการ)', url: 'https://2121designsight.jp/', desc: '🏛 ออกแบบโดย Tadao Ando (2007) — หลังคาเหล็กแผ่นเดียวพับตามแนวคิด "ผ้าหนึ่งผืน" ของ Issey Miyake ส่วนใหญ่ฝังอยู่ใต้ดิน ใน Tokyo Midtown, Roppongi (นอกเส้นทางหลัก แต่คุ้มถ้าชอบงานสถาปัตย์)' },
+  { name: 'Tokyo Metropolitan Teien Art Museum', ja: '東京都庭園美術館', area: 'tokyo', lat: 35.6350, lng: 139.7168, day: 8, type: 'museum', img: commonsImg('Tokyo_Metropolitan_Teien_Art_Museum.jpg'), ticket: 'เช็คราคาที่เว็บ (เปลี่ยนตามนิทรรศการ + ค่าเข้าสวนแยก)', url: 'https://www.teien-art-museum.ne.jp/en/', desc: '🏛 อดีตวังเจ้าชาย Asaka สไตล์ Art Deco แท้ๆ จากฝรั่งเศส (1933) ทั้งหลังคือมรดกวัฒนธรรมสำคัญ — เดิน 6-7 นาทีจากสถานี Meguro/Shirokanedai' },
   { name: 'Don Quijote Shinjuku', ja: 'ドン・キホーテ', area: 'tokyo', lat: 35.6944, lng: 139.7016, day: 8, desc: 'แหล่งกวาดของฝาก เปิดดึก อย่าลืมพาสปอร์ต (tax-free)' },
-  { name: 'Tokyo Sea Life Park (Kasai)', ja: '葛西臨海水族園', area: 'tokyo', lat: 35.6423, lng: 139.8607, day: 9, type: 'museum', taniguchi: true, desc: '🏛 อควาเรียมออกแบบโดย Taniguchi (1989, รางวัล Mainichi Art Award) — จากสถานีโตเกียวนั่ง JR Keiyo Line ~15 นาที ในสวนเดียวกันมีงาน Taniguchi อีก 2 หลัง เหมาะเป็นช่วงเช้าก่อนไปสนามบินวันสุดท้าย (เปิด 9:30)' },
+  { name: 'Tokyo Sea Life Park (Kasai)', ja: '葛西臨海水族園', area: 'tokyo', lat: 35.6423, lng: 139.8607, day: 9, type: 'museum', taniguchi: true, img: commonsImg('Tokyo_Sea_Life_Park_Edogawa-ward_Tokyo_Japan.JPG'), ticket: 'เช็คราคาปัจจุบันที่เว็บ (ผู้ใหญ่ประมาณ ¥700)', url: 'https://www.tokyo-zoo.net/', desc: '🏛 อควาเรียมออกแบบโดย Taniguchi (1989, รางวัล Mainichi Art Award) — จากสถานีโตเกียวนั่ง JR Keiyo Line ~15 นาที ในสวนเดียวกันมีงาน Taniguchi อีก 2 หลัง เหมาะเป็นช่วงเช้าก่อนไปสนามบินวันสุดท้าย (เปิด 9:30)' },
+  { name: 'Kasai Rinkai Park Visitor Center', ja: '葛西臨海公園ビジターセンター', area: 'tokyo', lat: 35.6438, lng: 139.8580, day: 9, type: 'museum', taniguchi: true, ticket: 'ฟรี', url: 'https://www.tokyo-park.or.jp/park/kasairinkai/', desc: '🏛 อีกหนึ่งงานของ Taniguchi ในสวนเดียวกัน (1996) — จุดชมนกและธรรมชาติ เข้าฟรี เดินต่อจากอควาเรียมได้เลย (รวมเป็น 3 อาคารของ Taniguchi ในสวนนี้)' },
   // Tochigi
   { name: 'สถานี Utsunomiya', ja: '宇都宮駅', area: 'tochigi', lat: 36.5591, lng: 139.8986, day: 3, desc: 'ฮับของโทจิกิ — จุดต่อรถไป Nikko' },
   { name: 'Oya History Museum', ja: '大谷資料館', area: 'tochigi', lat: 36.6009, lng: 139.8228, day: 3, desc: 'เหมืองหินใต้ดินสุดอลัง เย็น 8°C พกเสื้อคลุม' },
   { name: 'ถนนเกี๊ยวซ่า (Kirasse)', ja: '宇都宮餃子', area: 'tochigi', lat: 36.5583, lng: 139.8830, day: 3, desc: 'เมืองหลวงเกี๊ยวซ่า — ร้าน Minmin, Masashi ห้ามพลาด' },
   { name: 'ศาลเจ้า Futaarayama', ja: '二荒山神社', area: 'tochigi', lat: 36.5658, lng: 139.8823, day: 3, desc: 'ศาลเจ้าเก่าแก่ใจกลางเมือง Utsunomiya' },
-  { name: 'Tochigi Prefectural Museum of Fine Arts', ja: '栃木県立美術館', area: 'tochigi', lat: 36.5486, lng: 139.8890, day: 3, type: 'museum', desc: 'คอลเลกชันเครื่องเคลือบ Meissen ระดับแนวหน้าของญี่ปุ่น + งานศิลปะยุโรป/ญี่ปุ่นสมัยใหม่ — บัส 15 นาทีจากฝั่งตะวันตกสถานี Utsunomiya' },
-  { name: 'Utsunomiya Museum of Art', ja: '宇都宮美術館', area: 'tochigi', lat: 36.5730, lng: 139.8420, day: 3, type: 'museum', desc: 'อาคารชั้นเดียวกลมกลืนกับป่า ใน Bunka no Mori Park — งาน Magritte, Chagall และคอลเลกชันดีไซน์ บัส ~25 นาทีจากฝั่งตะวันตกสถานี Utsunomiya' },
-  { name: 'Mashiko Museum of Ceramic Art', ja: '益子陶芸美術館', area: 'tochigi', lat: 36.4550, lng: 140.1080, day: 3, type: 'museum', desc: 'เมืองเครื่องปั้นดินเผามาชิโกะ งานของช่างระดับ Living National Treasure Hamada Shoji + เตาเผาโบราณ — บัส ~60 นาทีจากสถานี Utsunomiya (ไกลหน่อย เผื่อเวลาครึ่งวัน)' },
+  { name: 'Tochigi Prefectural Museum of Fine Arts', ja: '栃木県立美術館', area: 'tochigi', lat: 36.5486, lng: 139.8890, day: 3, type: 'museum', img: commonsImg('Tochigi_Prefectural_Museum_of_Fine_Arts.jpg'), ticket: 'คอลเลกชัน ¥260 · นิทรรศการพิเศษแยก', url: 'https://www.art.pref.tochigi.lg.jp/', desc: 'คอลเลกชันเครื่องเคลือบ Meissen ระดับแนวหน้าของญี่ปุ่น + งานศิลปะยุโรป/ญี่ปุ่นสมัยใหม่ — บัส 15 นาทีจากฝั่งตะวันตกสถานี Utsunomiya' },
+  { name: 'Utsunomiya Museum of Art', ja: '宇都宮美術館', area: 'tochigi', lat: 36.5730, lng: 139.8420, day: 3, type: 'museum', img: commonsImg('Utsunomiya_museum.jpg'), ticket: 'เช็คราคาที่เว็บ (คอลเลกชันถาวรราคาย่อมเยา)', url: 'https://u-moa.jp/', desc: 'อาคารชั้นเดียวกลมกลืนกับป่า ใน Bunka no Mori Park — งาน Magritte, Chagall และคอลเลกชันดีไซน์ บัส ~25 นาทีจากฝั่งตะวันตกสถานี Utsunomiya' },
+  { name: 'Mashiko Museum of Ceramic Art', ja: '益子陶芸美術館', area: 'tochigi', lat: 36.4550, lng: 140.1080, day: 3, type: 'museum', img: commonsImg('Mashiko_Museum_of_Ceramic_Art.JPG'), ticket: 'เช็คราคาที่เว็บ', url: 'https://www.mashiko-museum.jp/', desc: 'เมืองเครื่องปั้นดินเผามาชิโกะ งานของช่างระดับ Living National Treasure Hamada Shoji + เตาเผาโบราณ — บัส ~60 นาทีจากสถานี Utsunomiya (ไกลหน่อย เผื่อเวลาครึ่งวัน)' },
   // Nikko
   { name: 'ศาลเจ้า Toshogu', ja: '日光東照宮', area: 'nikko', lat: 36.7581, lng: 139.5986, day: 4, desc: 'มรดกโลก สุสานโชกุน Tokugawa Ieyasu — แกะสลักแมวหลับ/ลิงสามตัว' },
-  { name: 'Nikko Toshogu Museum (Treasure Hall)', ja: '日光東照宮宝物館', area: 'nikko', lat: 36.7583, lng: 139.5990, day: 4, type: 'museum', desc: 'เปิดปี 2015 ฉลอง 400 ปี Toshogu — ดาบและเครื่องรบของ Ieyasu, โรงหนัง VR เล่าเรื่องประตู Yomeimon เข้าใจง่ายแม้ไม่รู้ประวัติศาสตร์มาก่อน อยู่ในคอมเพล็กซ์เดียวกับศาลเจ้า' },
+  { name: 'Nikko Toshogu Museum (Treasure Hall)', ja: '日光東照宮宝物館', area: 'nikko', lat: 36.7583, lng: 139.5990, day: 4, type: 'museum', img: commonsImg('Nikko_toshogu_yomeimon_gate_ver1.jpg'), ticket: '¥1,000 (แยกจากตั๋วศาลเจ้าหลัก)', url: 'https://www.toshogu.jp/shisetsu/houmotsu.html', desc: 'เปิดปี 2015 ฉลอง 400 ปี Toshogu — ดาบและเครื่องรบของ Ieyasu, โรงหนัง VR เล่าเรื่องประตู Yomeimon เข้าใจง่ายแม้ไม่รู้ประวัติศาสตร์มาก่อน อยู่ในคอมเพล็กซ์เดียวกับศาลเจ้า' },
   { name: 'สะพาน Shinkyo', ja: '神橋', area: 'nikko', lat: 36.7550, lng: 139.5995, day: 4, desc: 'สะพานแดงศักดิ์สิทธิ์ จุดถ่ายรูปซิกเนเจอร์' },
   { name: 'Kanmangafuchi Abyss', ja: '憾満ヶ淵', area: 'nikko', lat: 36.7469, lng: 139.5911, day: 4, desc: 'หุบผาริมแม่น้ำ + รูปปั้นจิโซใส่หมวกแดง ~70 องค์' },
   { name: 'โค้ง Irohazaka', ja: 'いろは坂', area: 'nikko', lat: 36.7280, lng: 139.5250, day: 5, desc: 'ถนน 48 โค้งขึ้นเขา — ใบไม้แดงพีคช่วงปลาย ต.ค. รถติดให้เผื่อเวลา' },
@@ -88,9 +96,20 @@ const PLACES = [
   { name: 'ยอด Mt. Issaikyo', ja: '一切経山', area: 'fukushima', lat: 37.7311, lng: 140.2439, day: 7, desc: 'ยอด 1,949 ม. — วิวทะเลสาบ Goshikinuma「ดวงตาแม่มด」' },
   { name: 'ทะเลสาบ Goshikinuma', ja: '五色沼(魔女の瞳)', area: 'fukushima', lat: 37.7355, lng: 140.2450, day: 7, desc: 'ทะเลสาบปล่องภูเขาไฟสีเทอร์ควอยซ์ มองจากยอด Issaikyo' },
   { name: 'Azuma-Kofuji', ja: '吾妻小富士', area: 'fukushima', lat: 37.7147, lng: 140.2588, day: 7, desc: '“ฟูจิน้อย” — เดิน 15 นาทีถึงขอบปากปล่อง อยู่ตรงข้าม Jododaira' },
-  { name: 'Fukushima Prefectural Museum of Art', ja: '福島県立美術館', area: 'fukushima', lat: 37.7602, lng: 140.4649, day: 6, type: 'museum', desc: 'งาน Andrew Wyeth + ภาพพิมพ์ไซโตะ คิโยชิ ตั้งในสวนกว้างริมลำธาร — ลง Iizaka Line ที่ป้าย "美術館図書館前" เดิน 2 นาที (ไลน์เดียวกับที่จะไป Iizaka Onsen พอดี)' },
+  { name: 'Fukushima Prefectural Museum of Art', ja: '福島県立美術館', area: 'fukushima', lat: 37.7602, lng: 140.4649, day: 6, type: 'museum', img: commonsImg('Fukushima_Prefectural_Museum_of_Art_ac.jpg'), ticket: 'คอลเลกชันถาวรมักฟรี/ราคาย่อมเยา · เช็คนิทรรศการพิเศษที่เว็บ', url: 'https://art-museum.fcs.ed.jp/', desc: 'งาน Andrew Wyeth + ภาพพิมพ์ไซโตะ คิโยชิ ตั้งในสวนกว้างริมลำธาร — ลง Iizaka Line ที่ป้าย "美術館図書館前" เดิน 2 นาที (ไลน์เดียวกับที่จะไป Iizaka Onsen พอดี)' },
   { name: 'Iizaka Onsen', ja: '飯坂温泉', area: 'fukushima', lat: 37.8259, lng: 140.4478, day: 6, desc: 'เมืองออนเซ็นเก่าแก่ ห่างสถานี Fukushima ~25 นาที (รถไฟ Iizaka Line)' },
   { name: 'Hanamiyama Park', ja: '花見山公園', area: 'fukushima', lat: 37.7269, lng: 140.5090, day: 6, desc: 'สวนบนเนินเขา วิวเมือง+ภูเขา (ดังช่วงซากุระ แต่ฤดูใบไม้ร่วงก็สวย)' },
+  // Other Taniguchi works in Japan — far from this route, reference only (from architecture-history.org)
+  { name: 'Ken Domon Museum of Photography', ja: '土門拳記念館', area: 'other', lat: 38.906, lng: 139.845, day: null, type: 'museum', taniguchi: true, ticket: 'เช็คราคาที่เว็บ', url: 'http://www.domonken-kinenkan.jp/', desc: '🏛 Sakata, Yamagata (1983) — ผลงานที่ Taniguchi ได้รางวัล Japan Art Academy Prize ถือเป็นงานที่คนรัก Taniguchi ยกย่องสุด แต่ไกลมาก (~4 ชม.จากโตเกียว ผ่าน Niigata) เหมาะเป็นทริปแยกต่างหาก' },
+  { name: 'D.T. Suzuki Museum', ja: '鈴木大拙館', area: 'other', lat: 36.560, lng: 136.663, day: null, type: 'museum', taniguchi: true, ticket: '¥310', url: 'https://www.kanazawa-museum.jp/daisetz/', desc: '🏛 Kanazawa (2011) — 3 ห้อง 3 สวนเชื่อมด้วยทางเดิน จบด้วย "Water Mirror Garden" เงียบสงบมาก ไป Hokuriku Shinkansen จากโตเกียว ~2.5 ชม.' },
+  { name: 'Taniguchi Yoshiro/Yoshio Museum of Architecture', ja: '谷口吉郎・吉生記念金沢建築館', area: 'other', lat: 36.5615, lng: 136.6605, day: null, type: 'museum', taniguchi: true, ticket: '¥310', url: 'https://www.kanazawa-museum.jp/architecture/', desc: '🏛 Kanazawa (2019) — พิพิธภัณฑ์เกี่ยวกับตัว Taniguchi เองกับพ่อ (Yoshiro) โดยเฉพาะ อยู่เมืองเดียวกับ D.T. Suzuki Museum ไปคู่กันได้' },
+  { name: 'Kyoto National Museum — Heisei Chishinkan', ja: '京都国立博物館 平成知新館', area: 'other', lat: 34.9916, lng: 135.7717, day: null, type: 'museum', taniguchi: true, ticket: '¥700', url: 'https://www.kyohaku.go.jp/', desc: '🏛 Kyoto (2014) — งานปลายทางของ Taniguchi ในสายพิพิธภัณฑ์แห่งชาติ ไป Tokaido Shinkansen จากโตเกียว ~2.5 ชม.' },
+  { name: 'Toyota Municipal Museum of Art', ja: '豊田市美術館', area: 'other', lat: 35.083, lng: 137.156, day: null, type: 'museum', taniguchi: true, img: commonsImg('Toyota_Municipal_Museum_of_Art,_Kozakahon-machi_Toyota_2012.JPG'), ticket: 'เช็คราคาที่เว็บ', url: 'https://www.museum.toyota.aichi.jp/', desc: '🏛 Toyota, Aichi (1995) — หลายคนยกให้เป็นงานที่ "สมบูรณ์แบบที่สุด" ของ Taniguchi เส้นแนวนอน/ตั้งฉาก + แสงธรรมชาติ ใกล้นาโกย่า' },
+  { name: 'MIMOCA (Marugame Genichiro-Inokuma Museum)', ja: '丸亀市猪熊弦一郎現代美術館', area: 'other', lat: 34.290, lng: 133.798, day: null, type: 'museum', taniguchi: true, ticket: '¥300', url: 'https://www.mimoca.jp/en/', desc: '🏛 Marugame, Kagawa (1991) — ติดหน้าสถานีรถไฟพอดี บนเกาะชิโกกุ ไกลมาก ต้องนั่งชินคันเซ็น+รถไฟท้องถิ่นต่อหลายทอด' },
+  { name: 'Higashiyama Kaii Gallery (Nagano)', ja: '長野県信濃美術館 東山魁夷館', area: 'other', lat: 36.667, lng: 138.194, day: null, type: 'museum', taniguchi: true, ticket: 'เช็คราคาที่เว็บ', url: 'https://www.npsam.com/', desc: '🏛 Nagano City (1990) — แกลเลอรีรวมงานจิตรกร Higashiyama Kaii ไป Hokuriku Shinkansen จากโตเกียว ~90 นาที' },
+  { name: 'Higashiyama Kaii Setouchi Museum (Kagawa)', ja: '香川県立東山魁夷せとうち美術館', area: 'other', lat: 34.35, lng: 133.85, day: null, type: 'museum', taniguchi: true, ticket: '¥310', url: 'https://www.pref.kagawa.lg.jp/higasiyamakaii/', desc: '🏛 Sakaide, Kagawa (2005) — แกลเลอรีที่สองของ Higashiyama Kaii โดย Taniguchi วิวสะพานเซโตะโอฮาชิ อยู่บนเกาะชิโกกุ' },
+  { name: 'Shiseido Art House', ja: '資生堂アートハウス', area: 'other', lat: 34.79, lng: 138.05, day: null, type: 'museum', taniguchi: true, ticket: 'ฟรี — แต่⚠️ปิดถาวร มิ.ย. 2026 (ก่อนทริปนี้)', url: 'https://corp.shiseido.com/art-house/jp/', desc: '🏛 Kakegawa, Shizuoka (1978) — ผลงานที่ทำให้ Taniguchi ได้รางวัลสถาปัตยกรรมใหญ่ครั้งแรก แต่จะปิดถาวรปลายเดือน มิ.ย. 2026 ก่อนทริปนี้จะเริ่ม — ไปไม่ทันแล้ว' },
+  { name: 'IBM Makuhari Building', ja: 'IBM幕張ビル', area: 'other', lat: 35.648, lng: 140.034, day: null, taniguchi: true, ticket: 'อาคารสำนักงานเอกชน ไม่เปิดให้เข้าชมด้านใน', url: '', desc: '🏛 Chiba (1991) — อาคารสำนักงาน IBM ชมได้แค่ภายนอก ไม่ใช่พิพิธภัณฑ์' },
 ];
 
 /* ---------- main route line (station to station) ---------- */
