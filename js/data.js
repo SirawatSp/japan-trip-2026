@@ -162,28 +162,44 @@ const TRANSPORT = [
 /* เส้นทางรถไฟหลักที่ใช้เทียบกับ JR EAST PASS (¥30,000) */
 const RAIL_MAIN_TOTAL = 3070 + 5020 + 770 + 7270 + 8810 + 3070; // ~¥28,010... exclude N'EX x2 if Skyliner
 
-/* ---------- events (curated from Japan event sites, July 2026) ---------- */
+/* ---------- events (ยืนยันวันที่จริงปี 2026 แล้ว — อัปเดต ก.ค. 2026) ---------- */
 const EVENTS = [
-  { title: 'Tokyo Ramen Festa @ Komazawa Olympic Park', area: 'tokyo', dateText: 'ปลาย ต.ค. – ต้น พ.ย. (ปีก่อน ~21 ต.ค.–4 พ.ย.)', status: 'hit',
-    desc: 'เทศกาลราเมงใหญ่สุดของโตเกียว ร้านดังทั่วประเทศ ~40 ร้าน ชามละ ~¥1,100', url: 'https://ra-fes.com/' },
-  { title: 'Tokyo International Film Festival', area: 'tokyo', dateText: 'ปลาย ต.ค. (ปีก่อนเริ่ม ~27 ต.ค.) — รอประกาศวันปี 2026', status: 'tba',
-    desc: 'เทศกาลหนังใหญ่สุดของเอเชีย โซน Hibiya/Ginza/Marunouchi มีพรมแดง+ฉายกลางแจ้ง', url: 'https://2026.tiff-jp.net/en/' },
-  { title: 'Kanda Used Book Festival (Jimbocho)', area: 'tokyo', dateText: 'ปลาย ต.ค. – 3 พ.ย. (ปกติ)', status: 'hit',
-    desc: 'ถนนหนังสือเก่า Jimbocho กลายเป็นตลาดหนังสือกลางแจ้งยักษ์ ล้านเล่ม', url: 'https://jimbou.info/' },
-  { title: 'บรรยากาศ Halloween — Shibuya / Ikebukuro', area: 'tokyo', dateText: 'ตลอดเดือน ต.ค. (พีค 31 ต.ค. — หลังกลับ)', status: 'hit',
-    desc: 'ตกแต่ง+อีเวนต์คอสเพลย์ทั่วเมืองตลอดเดือน แต่คืนพีคจริงคือหลังบินกลับ', url: 'https://tokyocheapo.com/events/october/' },
-  { title: 'Ginchakai — พิธีชงชากลางแจ้งย่าน Ginza', area: 'tokyo', dateText: 'ปลาย ต.ค. — รอประกาศวันปี 2026', status: 'tba',
-    desc: 'จุดชงชาตามมุมถนน Ginza จิบมัทฉะ+วากาชิ สัมผัสวัฒนธรรมชาแบบไม่ต้องจอง', url: 'https://www.magical-trip.com/media/ginza-october-2025-complete-guide-to-autumn-festivals-cultural-events-traditional-matsuri/' },
-  { title: 'Nikko Toshogu Autumn Grand Festival (千人武者行列)', area: 'tochigi', dateText: '16–17 ต.ค. 2026 ❌ ก่อนถึง 3 วัน', status: 'miss',
-    desc: 'ขบวนซามูไรพันคน + ยิงธนูบนหลังม้า (yabusame) — ปีนี้พลาด ไว้รอบหน้า', url: 'https://japancheapo.com/events/shuki-taisai-grand-autumn-festival/' },
+  // --- เทศกาล/บรรยากาศ ---
+  { title: 'Tokyo Ramen Festa @ Komazawa Olympic Park', area: 'tokyo', dateText: '23 ต.ค. – 3 พ.ย. 2026 ✓ ยืนยันแล้ว', status: 'hit',
+    desc: 'เทศกาลราเมงใหญ่สุดของโตเกียว ร้านดัง ~39 ร้าน หมุนเวียน 3 ช่วง เข้าฟรี ซื้อตั๋วราเมงใบละ ¥1,100 ต่อชาม', url: 'https://tokyocheapo.com/events/tokyo-ramen-show/' },
+  { title: 'Tokyo International Film Festival (TIFF)', area: 'tokyo', dateText: '26 ต.ค. – 4 พ.ย. 2026 ✓ ยืนยันแล้ว ตรงกับวันเดินทางกลับ (27-28 ต.ค.)', status: 'hit',
+    desc: 'เทศกาลหนังใหญ่สุดของเอเชีย ครั้งที่ 39 โซน Hibiya/Ginza/Marunouchi พรมแดง+ฉายกลางแจ้ง เดินเล่นดูบรรยากาศได้แม้ไม่มีตั๋ว', url: 'https://2026.tiff-jp.net/en/' },
+  { title: 'Kanda Used Book Festival (Jimbocho)', area: 'tokyo', dateText: '❌ แก้ไข: จริงๆจัดเดือน มี.ค.-เม.ย. (ฤดูใบไม้ผลิ) ไม่ใช่ฤดูใบไม้ร่วง', status: 'miss',
+    desc: 'ตรวจสอบซ้ำแล้วพบว่าปกติจัดช่วงปลายมี.ค.-เม.ย. (ตรงซากุระ) ไม่ใช่ ต.ค. อย่างที่เข้าใจผิดก่อนหน้านี้ — ต้องขออภัยที่ให้ข้อมูลผิดไปตอนแรก', url: 'https://jimbou.info/' },
+  { title: 'บรรยากาศ Halloween — Shibuya / Ikebukuro', area: 'tokyo', dateText: 'ตลอดเดือน ต.ค. (พีคจริง 31 ต.ค. — หลังบินกลับ 3 วัน)', status: 'hit',
+    desc: 'ตกแต่ง+อีเวนต์คอสเพลย์ทั่วเมืองตลอดเดือน จะเห็นบรรยากาศได้ตั้งแต่วันแรก แต่คืนพีคสุด (31 ต.ค.) คือหลังบินกลับแล้ว', url: 'https://tokyocheapo.com/events/october/' },
+  { title: 'Nikko Toshogu Autumn Grand Festival (千人武者行列)', area: 'tochigi', dateText: '16–17 ต.ค. 2026 ✓ ยืนยันแล้ว ❌ ก่อนถึง 3 วัน', status: 'miss',
+    desc: 'ยืนยันวันแล้ว: yabusame (ยิงธนูบนหลังม้า) 16 ต.ค. + ขบวนซามูไรพันคน 17 ต.ค. — ปีนี้พลาดแน่นอน ไว้รอบหน้า', url: 'https://www.nikko-kankou.org/spot/506' },
   { title: 'ใบไม้เปลี่ยนสี Irohazaka / Chuzenji / Ryuzu', area: 'tochigi', dateText: 'พีคกลาง–ปลาย ต.ค. ✓ ตรงทริปพอดี', status: 'hit',
     desc: 'ช่วงที่ไปคือพีคของโซนทะเลสาบ Chuzenji พอดี — ไฮไลต์ธรรมชาติของทริป', url: 'https://www.japan-guide.com/e/e3801.html' },
-  { title: 'Kawaji Onsen Autumn Leaves Festival', area: 'tochigi', dateText: 'ตลอดเดือน ต.ค.', status: 'hit',
-    desc: 'เทศกาลใบไม้แดงเมืองออนเซ็น Kawaji — food stall + ไฟประดับใบเมเปิล (ต้องนั่งรถไฟสายพิเศษเพิ่ม)', url: 'https://www.visitnikko.jp/en/things-to-do/festivals-and-events/' },
   { title: 'ใบไม้เปลี่ยนสี Bandai-Azuma Skyline / Jododaira', area: 'fukushima', dateText: 'พีคต้น–กลาง ต.ค. · ปลายเดือนยังเก็บตกได้ที่ระดับล่าง', status: 'hit',
     desc: 'ถนนสวยติดอันดับญี่ปุ่น — วันเดินเขาจะได้วิวใบไม้เปลี่ยนสีระหว่างทางขึ้นเต็ม ๆ', url: 'https://fukushima.travel/destination/bandai-azuma-skyline/189' },
   { title: 'Nihonmatsu Chrysanthemum Doll Festival (菊人形)', area: 'fukushima', dateText: 'กลาง ต.ค. – กลาง พ.ย. ✓', status: 'hit',
     desc: 'เทศกาลตุ๊กตาดอกเบญจมาศที่ปราสาท Kasumigajo, Nihonmatsu — นั่งชินคันเซ็นจาก Fukushima แค่ ~15 นาที + บัส', url: 'https://fukushima.travel/blogs/the-guide-to-every-fukushima-festival-in-2026/169' },
+  // --- นิทรรศการพิเศษตามพิพิธภัณฑ์ที่ปักหมุดไว้ (เช็ควันจริงแล้ว) ---
+  { title: '特別展「源氏物語」The Tale of Genji @ Tokyo National Museum', area: 'tokyo', dateText: '14 ต.ค. – 6 ธ.ค. 2026 ✓ ทันทั้ง Day 1 และ Day 8', status: 'hit',
+    desc: 'นิทรรศการภาพวาด/ต้นฉบับที่เกี่ยวกับ Tale of Genji ครบรอบพิเศษ — จัดคู่กับ Gallery of Hōryū-ji Treasures ที่ปักหมุดไว้แล้ว ไปได้ทั้ง Day 1 และตอนกลับ Day 8', url: 'https://www.tnm.jp/modules/r_free_page/index.php?id=1255' },
+  { title: '特別展「大徳寺」Daitokuji 700th Anniversary @ Tokyo National Museum', area: 'tokyo', dateText: '14 ต.ค. – 6 ธ.ค. 2026 ✓ ทันทั้ง Day 1 และ Day 8', status: 'hit',
+    desc: 'รวมสมบัติวัด Daitokuji และวัดในเครือ ฉลอง 700 ปี จัดพร้อมกับนิทรรศการ Genji ที่ TNM เดียวกัน', url: 'https://daitokuji2026.exhn.jp/' },
+  { title: 'テート美術館 ターナー展 Tate\'s Turner Exhibition @ National Museum of Western Art', area: 'tokyo', dateText: '24 ต.ค. 2026 – 21 ก.พ. 2027 ⚠️ พลาด Day 1 (20 ต.ค.) แต่ทัน Day 8 (27 ต.ค.)', status: 'hit',
+    desc: 'งานจาก Tate กว่า 80 ชิ้น (สีน้ำมัน+watercolor) — เปิดหลัง Day 1 ไป 4 วัน ถ้าอยากดูให้แวะ Ueno อีกรอบช่วง Day 8 แทน (ตอนนี้ itinerary Day 8 ไปแค่ Shinjuku/Ginza ต้องปรับเอง)', url: 'https://www.nmwa.go.jp/jp/exhibitions/upcoming.html' },
+  { title: '「舞楽装束」Bugaku Costumes @ Nezu Museum', area: 'tokyo', dateText: '24 ต.ค. – 23 พ.ย. 2026 ❌ พลาด (Day 2 คือ 21 ต.ค. — เปิดหลังจากนั้น 3 วัน)', status: 'miss',
+    desc: 'นิทรรศการก่อนหน้า (やきもの名品紀行) ปิดไปแล้ว 12 ต.ค. — วันที่ไป Nezu Museum (Day 2) อยู่ในช่วง "ว่าง" ระหว่าง 2 นิทรรศการพอดี จะเห็นแค่ส่วนคอลเลกชันถาวร', url: 'https://www.nezu-muse.or.jp/jp/exhibition/next.html' },
+  { title: '「逸翁美術館名品展」Itten Museum Masterpieces @ Suntory Museum of Art', area: 'tokyo', dateText: '16 ก.ย. – 8 พ.ย. 2026 ✓ ทันตลอดทริป', status: 'hit',
+    desc: 'งานคัดสรรจากคอลเลกชัน Itten Museum ~5,500 ชิ้น (ต้นฉบับโบราณ, ชุดน้ำชา, ภาพวาด Buson/Goshun) — อยู่ Tokyo Midtown ใกล้ 21_21 Design Sight ไปคู่กันได้ Day 8', url: 'https://www.suntory.co.jp/sma/exhibition/future.html' },
+  { title: '森万里子展 Mariko Mori @ Mori Art Museum', area: 'tokyo', dateText: '31 ต.ค. 2026 – 28 มี.ค. 2027 ❌ เปิดหลังบินกลับ 3 วัน', status: 'miss',
+    desc: 'นิทรรศการใหญ่เปิดหลังทริปจบ (บินกลับ 28 ต.ค. เย็น) — พลาดแน่นอนรอบนี้', url: 'https://www.mori.art.museum/jp/exhibitions/index.html' },
+  { title: '特別展（日本画・書・写真部門）@ Tochigi Prefectural Museum of Fine Arts', area: 'tochigi', dateText: '24 ต.ค. – 3 พ.ย. 2026 ❌ พลาด (Day 3 คือ 22 ต.ค. — เปิดหลังจากนั้น 2 วัน)', status: 'miss',
+    desc: 'นิทรรศการพิเศษเปิดหลัง Day 3 (Utsunomiya) ไป 2 วันพอดี — วันที่แวะจะเห็นแค่คอลเลกชันถาวร (Meissen) ไม่ทันนิทรรศการนี้', url: 'https://www.art.pref.tochigi.lg.jp/schedule/index.html' },
+  { title: 'マグリット展 Magritte Exhibition @ Utsunomiya Museum of Art', area: 'tochigi', dateText: '24 ต.ค. – 6 ธ.ค. 2026 ❌ พลาด (Day 3 คือ 22 ต.ค. — เปิดหลังจากนั้น 2 วัน)', status: 'miss',
+    desc: 'นิทรรศการ Magritte ใหญ่ก็เปิดหลัง Day 3 ไป 2 วันเป๊ะเหมือนกัน — บังเอิญพิพิธภัณฑ์ทั้งสองที่ Utsunomiya เปลี่ยนนิทรรศการวันเดียวกันคือ 24 ต.ค. ถ้าอยากทันจริงๆ ต้องขยับวัน Tochigi ไปเป็นวันหลังของทริป (แต่เส้นทางตอนนี้ไม่ผ่าน Tochigi อีกรอบ)', url: 'https://u-moa.jp/exhibition/schedule.html' },
+  { title: 'คอลเลกชันถาวร (นิทรรศการปรับใหม่) @ Fukushima Prefectural Museum of Art', area: 'fukushima', dateText: '10 ต.ค. – 6 ธ.ค. 2026 ✓ ทัน Day 6 (25 ต.ค.)', status: 'hit',
+    desc: 'พิพิธภัณฑ์ปิดปรับปรุงนิทรรศการ 25 ก.ย.–9 ต.ค. แล้วเปิดคอลเลกชันชุดใหม่ 10 ต.ค. — ทันพอดีตอนแวะวัน Day 6', url: 'https://art-museum.fcs.ed.jp/exhibition' },
 ];
 
 const EVENT_SOURCES = [
