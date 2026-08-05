@@ -140,7 +140,7 @@ const TRANSPORT = [
     { method: 'JR Nikko Line + Shinkansen (เปลี่ยนที่ Utsunomiya)', note: 'Nikko → Utsunomiya (¥770) → Yamabiko ไป Fukushima (~¥6,500) — วันเดินทางยาว ให้ออกจาก Chuzenji ไม่เกิน 15:00', time: '~2 ชม. 15 น.', price: 7270 },
   ]},
   { title: 'วันเดินเขา: Fukushima ⇄ Jododaira', day: 'DAY 5 · 24 ต.ค.', options: [
-    { method: 'บัส Jododaira Sky Access (ไป-กลับ)', note: 'ออก 08:30 West Exit กลับถึง 17:00 — ต้องจองล่วงหน้า (Japan Bus Online)', time: '~90 นาที/เที่ยว', price: 4000 },
+    { method: 'Jododaira Sky Access — คอร์สนักเดินเขา', note: 'ออก Fukushima West Exit 08:30 · ถึง Jododaira 09:30 · รถกลับ 15:00 · ถึงสถานี 16:00 · จองภายใน 15:00 วันก่อน', time: '5.5 ชม. ที่ Jododaira', price: 13000 },
     { method: 'เช่ารถขับเอง (ทางเลือก)', note: 'อิสระกว่า + ค่าน้ำมัน ~¥1,500 · Skyline ขับสวยมาก แต่โค้งเยอะ', time: '~75 นาที', price: 8000 },
   ]},
   { title: 'Fukushima → Tokyo (นัดเพื่อนเย็นนี้)', day: 'DAY 6 · 25 ต.ค.', options: [
