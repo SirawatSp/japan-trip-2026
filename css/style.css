@@ -305,6 +305,10 @@ body {
   background: rgba(199, 62, 46, .08); border: 1px solid rgba(199, 62, 46, .35);
   border-left: 4px solid var(--accent); border-radius: 10px; color: var(--ink);
 }
+.stay-alert-ok {
+  background: rgba(62, 92, 70, .1); border-color: rgba(62, 92, 70, .35);
+  border-left-color: var(--fukushima);
+}
 .stay-alert ul { margin: .4rem 0 0 1.1rem; }
 .stay-alert li { margin-top: .2rem; }
 .popup-tag-stay { background: var(--tochigi); }

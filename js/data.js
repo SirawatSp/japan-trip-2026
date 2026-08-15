@@ -63,18 +63,30 @@ function commonsImg(file, width) {
 
 /* ---------- itinerary (default — user can edit/reset in the app) ---------- */
 const DEFAULT_ITINERARY = [
-  { day: 1, date: 'อ. 20 ต.ค.', area: 'tochigi', title: 'ถึงโตเกียว → ตรงไป Tochigi', items: [
-    'ถึงสนามบิน → เข้าเมือง (N\'EX / Skyliner)', 'ต่อชินคันเซ็นไป Utsunomiya ทันที (~50 นาทีจาก Tokyo Sta.)', 'เช็คอินโรงแรม Utsunomiya', 'เย็น: ตะลุยเกี๊ยวซ่า — เมืองหลวงเกี๊ยวซ่าของญี่ปุ่น' ] },
-  { day: 2, date: 'พ. 21 ต.ค.', area: 'tochigi', title: 'Utsunomiya เต็มวัน → ย้ายเข้า Nikko', items: [
-    'Oya History Museum (เหมืองหินใต้ดิน)', 'ศาลเจ้า Utsunomiya Futaarayama', 'Tochigi Prefectural Museum of Fine Arts / Utsunomiya Museum of Art', 'เย็น: JR Nikko Line ไป Nikko (~45 นาที) เช็คอินโรงแรมใหม่' ] },
-  { day: 3, date: 'พฤ. 22 ต.ค.', area: 'nikko', title: 'Nikko — มรดกโลก', items: [
-    'ศาลเจ้า Toshogu + Rinnoji', 'Nikko Toshogu Treasure Hall (โรงหนัง VR)', 'สะพานแดง Shinkyo', 'Kanmangafuchi Abyss (แถวจิโซ)' ] },
-  { day: 4, date: 'ศ. 23 ต.ค.', area: 'nikko', title: 'Nikko ธรรมชาติ → ย้ายเข้า Fukushima', items: [
-    'ขึ้นบัสผ่านโค้ง Irohazaka (48 โค้ง)', 'Akechidaira Ropeway + น้ำตก Kegon', 'ทะเลสาบ Chuzenji + น้ำตก Ryuzu', 'เย็น: กลับ Utsunomiya → ชินคันเซ็นไป Fukushima (วันเดินทางยาว เผื่อเวลา)' ] },
+  { day: 1, date: 'อ. 20 ต.ค.', area: 'tochigi', title: 'Narita → Utsunomiya รวดเดียว', items: [
+    'Narita → Tokyo Sta. (N\'EX ~60 นาที) หรือ Skyliner ลง Ueno', 'ต่อชินคันเซ็นไป Utsunomiya ทันที (~50 นาทีจาก Tokyo Sta.)', 'เช็คอิน Airbnb Utsunomiya (พัก 2 คืน ไม่ต้องย้ายอีก)', 'เย็น: ตะลุยเกี๊ยวซ่า — เมืองหลวงเกี๊ยวซ่าของญี่ปุ่น' ] },
+  { day: 2, date: 'พ. 21 ต.ค.', area: 'nikko', title: 'เดย์ทริป Nikko (ไป-กลับ ไม่ย้ายที่พัก)', items: [
+    '07:00 ออกจาก Utsunomiya — JR Nikko Line ~45 นาที (ซื้อตั๋วบัส Chuzenji ที่ Nikko เลย)',
+    '08:15 ขึ้นบัสไป Chuzenji ก่อน — ขึ้นเช้าเพื่อหนีรถติด Irohazaka ช่วงใบไม้แดง',
+    'Akechidaira Ropeway → น้ำตก Kegon → ทะเลสาบ Chuzenji (ถ้าเวลาเหลือค่อยต่อน้ำตก Ryuzu)',
+    '13:30 ลงมาศาลเจ้า Toshogu + Treasure Hall — ปิด 17:00 ขายตั๋วถึงราว 16:30',
+    'ปิดท้าย: สะพาน Shinkyo / Kanmangafuchi ถ้าแดดยังอยู่',
+    '17:30 กลับ Utsunomiya — เกี๊ยวซ่ารอบสอง 🥟' ] },
+  { day: 3, date: 'พฤ. 22 ต.ค.', area: 'fukushima', title: 'Utsunomiya ครึ่งวัน → ย้ายเข้า Fukushima', items: [
+    'เช็คเอาท์ ฝากกระเป๋าไว้ล็อกเกอร์สถานี Utsunomiya',
+    'เช้า: Oya History Museum (เหมืองหินใต้ดิน · บัส ~30 นาที) — หรือสลับเป็นพิพิธภัณฑ์ในเมือง + ศาลเจ้า Futaarayama',
+    '~13:30 ชินคันเซ็น Utsunomiya → Fukushima (~55 นาที)',
+    'บ่าย: เช็คอิน Airbnb Fukushima · เดินสำรวจทางไป West Exit ให้ชัวร์ก่อนวันเดินเขา' ] },
+  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'Fukushima แบบสบาย ๆ (เป็นวันสำรองของวันเดินเขาด้วย)', items: [
+    '⚠️ เช็คพยากรณ์อากาศวันพรุ่งนี้ก่อน — ถ้าเสาร์ 24 อากาศแย่ ให้สลับมาเดินเขาวันนี้แทน',
+    'Fukushima Prefectural Museum of Art (ลง Iizaka Line ป้าย 美術館図書館前)',
+    'Hanamiyama Park — วิวเมืองกับภูเขา',
+    'ทางเลือกเที่ยวไกล: Tsuruga Castle (Aizu-Wakamatsu) หรือบึง Goshiki-numa ที่ Urabandai — ไป-กลับกินเวลา 4-5 ชม. บนรถ',
+    'เย็น: Iizaka Onsen แช่น้ำร้อนเตรียมขา' ] },
   { day: 5, date: 'ส. 24 ต.ค.', area: 'fukushima', title: '⛰ เดินเขา Mt. Issaikyo', items: [
     'เช้ามืด: ซื้อเสบียงที่เซเว่นหน้าสถานี', '08:30 บัส Sky Access → Jododaira → ยอด Issaikyo (1,949 ม.)', 'วิว「ดวงตาแม่มด」Goshikinuma + Azuma-Kofuji', 'กลับถึงเมือง 17:00 → แช่ออนเซ็น Iizaka Onsen' ] },
   { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', title: 'Fukushima → Tokyo — นัดเพื่อนตอนเย็น 🍽', items: [
-    'เช้า: Hanamiyama Park หรือ Fukushima Prefectural Museum of Art (ถ้าทันเวลา)', 'สาย: เช็คเอาท์ → ชินคันเซ็นไป Tokyo (~95 นาที)', 'บ่าย: เช็คอินโรงแรมโตเกียว พักผ่อน', 'ค่ำ: 🍽 นัดกินข้าวกับเพื่อนในเมือง' ] },
+    'เช้า: เก็บที่ยังไม่ได้ไปจากวันศุกร์ (ถ้าเวลาเหลือ)', 'สาย: เช็คเอาท์ → ชินคันเซ็นไป Tokyo (~95 นาที)', 'บ่าย: เช็คอินโรงแรมโตเกียว พักผ่อน', 'ค่ำ: 🍽 นัดกินข้าวกับเพื่อนในเมือง' ] },
   { day: 7, date: 'จ. 26 ต.ค.', area: 'tokyo', title: 'Asakusa + Ueno', items: [
     'Asakusa — วัด Sensoji + ถนน Nakamise', 'Ueno Park / Ameyoko + Gallery of Hōryū-ji Treasures (Taniguchi)', 'National Museum of Western Art + Sumida Hokusai Museum', 'เย็น: Akihabara' ] },
   { day: 8, date: 'อ. 27 ต.ค.', area: 'tokyo', title: 'Harajuku — Shibuya — Shinjuku', items: [
@@ -123,40 +135,40 @@ const PLACES = [
   // Tochigi
   { name: 'สถานี Utsunomiya', ja: '宇都宮駅', area: 'tochigi', lat: 36.5591, lng: 139.8986, day: 1, desc: 'ฮับของโทจิกิ — จุดต่อรถไป Nikko',
     en: { name: 'Utsunomiya Station', desc: 'Tochigi hub — transfer point for trains to Nikko' } },
-  { name: 'Oya History Museum', ja: '大谷資料館', area: 'tochigi', lat: 36.6009, lng: 139.8228, day: 2, desc: 'เหมืองหินใต้ดินสุดอลัง เย็น 8°C พกเสื้อคลุม',
+  { name: 'Oya History Museum', ja: '大谷資料館', area: 'tochigi', lat: 36.6009, lng: 139.8228, day: 3, desc: 'เหมืองหินใต้ดินสุดอลัง เย็น 8°C พกเสื้อคลุม',
     en: { name: 'Oya History Museum', desc: 'Vast underground stone quarry — a steady 8°C, so bring a jacket' } },
   { name: 'ถนนเกี๊ยวซ่า (Kirasse)', ja: '宇都宮餃子', area: 'tochigi', lat: 36.5583, lng: 139.8830, day: 1, desc: 'เมืองหลวงเกี๊ยวซ่า — ร้าน Minmin, Masashi ห้ามพลาด',
     en: { name: 'Gyoza Street (Kirasse)', desc: "Japan's gyoza capital — Minmin and Masashi are the must-try shops" } },
-  { name: 'ศาลเจ้า Futaarayama', ja: '二荒山神社', area: 'tochigi', lat: 36.5658, lng: 139.8823, day: 2, desc: 'ศาลเจ้าเก่าแก่ใจกลางเมือง Utsunomiya',
+  { name: 'ศาลเจ้า Futaarayama', ja: '二荒山神社', area: 'tochigi', lat: 36.5658, lng: 139.8823, day: 3, desc: 'ศาลเจ้าเก่าแก่ใจกลางเมือง Utsunomiya',
     en: { name: 'Utsunomiya Futaarayama Shrine', desc: 'Ancient shrine in the centre of Utsunomiya' } },
-  { name: 'Tochigi Prefectural Museum of Fine Arts', ja: '栃木県立美術館', area: 'tochigi', lat: 36.5486, lng: 139.8890, day: 2, type: 'museum', img: commonsImg('Tochigi_Prefectural_Museum_of_Fine_Arts.jpg'), ticket: 'คอลเลกชัน ¥260 · นิทรรศการพิเศษแยก (⚠️ นิทรรศการพิเศษ ต.ค. เปิด 24 ต.ค. — ไม่ทันวันที่แวะ)', url: 'https://www.art.pref.tochigi.lg.jp/', desc: 'คอลเลกชันเครื่องเคลือบ Meissen ระดับแนวหน้าของญี่ปุ่น + งานศิลปะยุโรป/ญี่ปุ่นสมัยใหม่ — บัส 15 นาทีจากฝั่งตะวันตกสถานี Utsunomiya',
+  { name: 'Tochigi Prefectural Museum of Fine Arts', ja: '栃木県立美術館', area: 'tochigi', lat: 36.5486, lng: 139.8890, day: 3, type: 'museum', img: commonsImg('Tochigi_Prefectural_Museum_of_Fine_Arts.jpg'), ticket: 'คอลเลกชัน ¥260 · นิทรรศการพิเศษแยก (⚠️ นิทรรศการพิเศษ ต.ค. เปิด 24 ต.ค. — ไม่ทันวันที่แวะ)', url: 'https://www.art.pref.tochigi.lg.jp/', desc: 'คอลเลกชันเครื่องเคลือบ Meissen ระดับแนวหน้าของญี่ปุ่น + งานศิลปะยุโรป/ญี่ปุ่นสมัยใหม่ — บัส 15 นาทีจากฝั่งตะวันตกสถานี Utsunomiya',
     en: { name: 'Tochigi Prefectural Museum of Fine Arts', ticket: 'Collection ¥260 · special exhibitions separate (⚠️ the October special exhibition opens 24 Oct — after our visit)', desc: 'One of the strongest Meissen porcelain collections in Japan, plus modern European and Japanese art — 15 min by bus from the west side of Utsunomiya Sta.' } },
-  { name: 'Utsunomiya Museum of Art', ja: '宇都宮美術館', area: 'tochigi', lat: 36.5730, lng: 139.8420, day: 2, type: 'museum', img: commonsImg('Utsunomiya_museum.jpg'), ticket: 'เช็คราคาที่เว็บ (⚠️ นิทรรศการ Magritte เปิด 24 ต.ค. — ไม่ทันวันที่แวะ เห็นแค่คอลเลกชันถาวร)', url: 'https://u-moa.jp/', desc: 'อาคารชั้นเดียวกลมกลืนกับป่า ใน Bunka no Mori Park — งาน Magritte, Chagall และคอลเลกชันดีไซน์ บัส ~25 นาทีจากฝั่งตะวันตกสถานี Utsunomiya',
+  { name: 'Utsunomiya Museum of Art', ja: '宇都宮美術館', area: 'tochigi', lat: 36.5730, lng: 139.8420, day: 3, type: 'museum', img: commonsImg('Utsunomiya_museum.jpg'), ticket: 'เช็คราคาที่เว็บ (⚠️ นิทรรศการ Magritte เปิด 24 ต.ค. — ไม่ทันวันที่แวะ เห็นแค่คอลเลกชันถาวร)', url: 'https://u-moa.jp/', desc: 'อาคารชั้นเดียวกลมกลืนกับป่า ใน Bunka no Mori Park — งาน Magritte, Chagall และคอลเลกชันดีไซน์ บัส ~25 นาทีจากฝั่งตะวันตกสถานี Utsunomiya',
     en: { name: 'Utsunomiya Museum of Art', ticket: 'Check prices online (⚠️ the Magritte show opens 24 Oct — after our visit, so permanent collection only)', desc: 'Single-storey building blending into the woods of Bunka no Mori Park — Magritte, Chagall and a design collection. ~25 min by bus from the west side of Utsunomiya Sta.' } },
-  { name: 'Mashiko Museum of Ceramic Art', ja: '益子陶芸美術館', area: 'tochigi', lat: 36.4550, lng: 140.1080, day: 2, type: 'museum', img: commonsImg('Mashiko_Museum_of_Ceramic_Art.JPG'), ticket: 'เช็คราคาที่เว็บ', url: 'https://www.mashiko-museum.jp/', desc: 'เมืองเครื่องปั้นดินเผามาชิโกะ งานของช่างระดับ Living National Treasure Hamada Shoji + เตาเผาโบราณ — บัส ~60 นาทีจากสถานี Utsunomiya (ไกลหน่อย เผื่อเวลาครึ่งวัน — ถ้าเลือกอันนี้อาจต้องตัดอย่างอื่นออก)',
+  { name: 'Mashiko Museum of Ceramic Art', ja: '益子陶芸美術館', area: 'tochigi', lat: 36.4550, lng: 140.1080, day: 3, type: 'museum', img: commonsImg('Mashiko_Museum_of_Ceramic_Art.JPG'), ticket: 'เช็คราคาที่เว็บ', url: 'https://www.mashiko-museum.jp/', desc: 'เมืองเครื่องปั้นดินเผามาชิโกะ งานของช่างระดับ Living National Treasure Hamada Shoji + เตาเผาโบราณ — บัส ~60 นาทีจากสถานี Utsunomiya (ไกลหน่อย เผื่อเวลาครึ่งวัน — ถ้าเลือกอันนี้อาจต้องตัดอย่างอื่นออก)',
     en: { name: 'Mashiko Museum of Ceramic Art', ticket: 'Check prices online', desc: 'In the pottery town of Mashiko — work by Living National Treasure Shoji Hamada plus historic kilns. ~60 min by bus from Utsunomiya Sta. (a half-day commitment; picking this may mean dropping something else)' } },
   // Nikko
-  { name: 'ศาลเจ้า Toshogu', ja: '日光東照宮', area: 'nikko', lat: 36.7581, lng: 139.5986, day: 3, desc: 'มรดกโลก สุสานโชกุน Tokugawa Ieyasu — แกะสลักแมวหลับ/ลิงสามตัว',
+  { name: 'ศาลเจ้า Toshogu', ja: '日光東照宮', area: 'nikko', lat: 36.7581, lng: 139.5986, day: 2, desc: 'มรดกโลก สุสานโชกุน Tokugawa Ieyasu — แกะสลักแมวหลับ/ลิงสามตัว',
     en: { name: 'Nikko Toshogu Shrine', desc: 'World Heritage mausoleum of shogun Tokugawa Ieyasu — the sleeping cat and three wise monkeys carvings' } },
-  { name: 'Nikko Toshogu Museum (Treasure Hall)', ja: '日光東照宮宝物館', area: 'nikko', lat: 36.7583, lng: 139.5990, day: 3, type: 'museum', img: commonsImg('Nikko_toshogu_yomeimon_gate_ver1.jpg'), ticket: '¥1,000 (แยกจากตั๋วศาลเจ้าหลัก)', url: 'https://www.toshogu.jp/shisetsu/houmotsu.html', desc: 'เปิดปี 2015 ฉลอง 400 ปี Toshogu — ดาบและเครื่องรบของ Ieyasu, โรงหนัง VR เล่าเรื่องประตู Yomeimon เข้าใจง่ายแม้ไม่รู้ประวัติศาสตร์มาก่อน อยู่ในคอมเพล็กซ์เดียวกับศาลเจ้า',
+  { name: 'Nikko Toshogu Museum (Treasure Hall)', ja: '日光東照宮宝物館', area: 'nikko', lat: 36.7583, lng: 139.5990, day: 2, type: 'museum', img: commonsImg('Nikko_toshogu_yomeimon_gate_ver1.jpg'), ticket: '¥1,000 (แยกจากตั๋วศาลเจ้าหลัก)', url: 'https://www.toshogu.jp/shisetsu/houmotsu.html', desc: 'เปิดปี 2015 ฉลอง 400 ปี Toshogu — ดาบและเครื่องรบของ Ieyasu, โรงหนัง VR เล่าเรื่องประตู Yomeimon เข้าใจง่ายแม้ไม่รู้ประวัติศาสตร์มาก่อน อยู่ในคอมเพล็กซ์เดียวกับศาลเจ้า',
     en: { name: 'Nikko Toshogu Museum (Treasure Hall)', ticket: '¥1,000 (separate from the main shrine ticket)', desc: "Opened 2015 for Toshogu's 400th anniversary — Ieyasu's swords and armour, plus a VR film on the Yomeimon gate that works even with no background in the history. Inside the shrine complex" } },
-  { name: 'สะพาน Shinkyo', ja: '神橋', area: 'nikko', lat: 36.7550, lng: 139.5995, day: 3, desc: 'สะพานแดงศักดิ์สิทธิ์ จุดถ่ายรูปซิกเนเจอร์',
+  { name: 'สะพาน Shinkyo', ja: '神橋', area: 'nikko', lat: 36.7550, lng: 139.5995, day: 2, desc: 'สะพานแดงศักดิ์สิทธิ์ จุดถ่ายรูปซิกเนเจอร์',
     en: { name: 'Shinkyo Bridge', desc: "Sacred vermillion bridge — Nikko's signature photo spot" } },
-  { name: 'Kanmangafuchi Abyss', ja: '憾満ヶ淵', area: 'nikko', lat: 36.7469, lng: 139.5911, day: 3, desc: 'หุบผาริมแม่น้ำ + รูปปั้นจิโซใส่หมวกแดง ~70 องค์',
+  { name: 'Kanmangafuchi Abyss', ja: '憾満ヶ淵', area: 'nikko', lat: 36.7469, lng: 139.5911, day: 2, desc: 'หุบผาริมแม่น้ำ + รูปปั้นจิโซใส่หมวกแดง ~70 องค์',
     en: { name: 'Kanmangafuchi Abyss', desc: 'Riverside gorge lined with ~70 red-capped Jizo statues' } },
-  { name: 'โค้ง Irohazaka', ja: 'いろは坂', area: 'nikko', lat: 36.7280, lng: 139.5250, day: 4, desc: 'ถนน 48 โค้งขึ้นเขา — ใบไม้แดงพีคช่วงปลาย ต.ค. รถติดให้เผื่อเวลา',
+  { name: 'โค้ง Irohazaka', ja: 'いろは坂', area: 'nikko', lat: 36.7280, lng: 139.5250, day: 2, desc: 'ถนน 48 โค้งขึ้นเขา — ใบไม้แดงพีคช่วงปลาย ต.ค. รถติดให้เผื่อเวลา',
     en: { name: 'Irohazaka Winding Road', desc: '48 hairpin bends up the mountain — autumn colour peaks in late October, so expect traffic and allow extra time' } },
-  { name: 'Akechidaira Ropeway', ja: '明智平', area: 'nikko', lat: 36.7278, lng: 139.5148, day: 4, desc: 'กระเช้าขึ้นจุดชมวิว เห็นน้ำตก Kegon + ทะเลสาบพร้อมกัน',
+  { name: 'Akechidaira Ropeway', ja: '明智平', area: 'nikko', lat: 36.7278, lng: 139.5148, day: 2, desc: 'กระเช้าขึ้นจุดชมวิว เห็นน้ำตก Kegon + ทะเลสาบพร้อมกัน',
     en: { name: 'Akechidaira Ropeway', desc: 'Ropeway to a viewpoint that takes in Kegon Falls and Lake Chuzenji at once' } },
-  { name: 'น้ำตก Kegon', ja: '華厳滝', area: 'nikko', lat: 36.7379, lng: 139.5011, day: 4, desc: 'น้ำตกสูง 97 ม. — 1 ใน 3 น้ำตกสวยสุดของญี่ปุ่น (ลิฟต์ลง ¥570)',
+  { name: 'น้ำตก Kegon', ja: '華厳滝', area: 'nikko', lat: 36.7379, lng: 139.5011, day: 2, desc: 'น้ำตกสูง 97 ม. — 1 ใน 3 น้ำตกสวยสุดของญี่ปุ่น (ลิฟต์ลง ¥570)',
     en: { name: 'Kegon Falls', desc: "97 m waterfall, one of Japan's three most famous (observation lift ¥570)" } },
-  { name: 'ทะเลสาบ Chuzenji', ja: '中禅寺湖', area: 'nikko', lat: 36.7333, lng: 139.4667, day: 4, desc: 'ทะเลสาบบนเขา 1,269 ม. เดินเล่นริมน้ำ',
+  { name: 'ทะเลสาบ Chuzenji', ja: '中禅寺湖', area: 'nikko', lat: 36.7333, lng: 139.4667, day: 2, desc: 'ทะเลสาบบนเขา 1,269 ม. เดินเล่นริมน้ำ',
     en: { name: 'Lake Chuzenji', desc: 'Mountain lake at 1,269 m — easy lakeside walking' } },
-  { name: 'น้ำตก Ryuzu', ja: '竜頭滝', area: 'nikko', lat: 36.7581, lng: 139.4451, day: 4, desc: '“น้ำตกหัวมังกร” — จุดใบไม้แดงเปลี่ยนสีเร็วสุดของ Nikko (เผื่อเวลา — เย็นนี้ต้องเดินทางต่อไป Fukushima)',
-    en: { name: 'Ryuzu Falls', desc: '"Dragon\'s head falls" — the earliest autumn colour in Nikko (watch the clock: we move on to Fukushima this evening)' } },
+  { name: 'น้ำตก Ryuzu', ja: '竜頭滝', area: 'nikko', lat: 36.7581, lng: 139.4451, day: 2, desc: '“น้ำตกหัวมังกร” — จุดใบไม้แดงเปลี่ยนสีเร็วสุดของ Nikko (อยู่ไกลสุดของสาย — ไปต่อเฉพาะถ้าลงจาก Kegon ก่อน 11:30)',
+    en: { name: 'Ryuzu Falls', desc: '"Dragon\'s head falls" — the earliest autumn colour in Nikko (furthest stop on the line; only worth it if you leave Kegon before 11:30)' } },
   // Fukushima
-  { name: 'สถานี Fukushima', ja: '福島駅', area: 'fukushima', lat: 37.7543, lng: 140.4590, day: 4, desc: 'ฐานทัพ 2 คืน — บัสขึ้นเขาออกฝั่ง West Exit',
-    en: { name: 'Fukushima Station', desc: 'Base for two nights — the mountain bus leaves from the West Exit' } },
+  { name: 'สถานี Fukushima', ja: '福島駅', area: 'fukushima', lat: 37.7543, lng: 140.4590, day: 3, desc: 'ฐานทัพ 3 คืน (22–25 ต.ค.) — บัสขึ้นเขาออกฝั่ง West Exit',
+    en: { name: 'Fukushima Station', desc: 'Base for three nights (22–25 Oct) — the mountain bus leaves from the West Exit' } },
   { name: 'Jododaira Visitor Center', ja: '浄土平', area: 'fukushima', lat: 37.7218, lng: 140.2517, day: 5, desc: 'จุดสตาร์ทเดินเขา 1,600 ม. บน Bandai-Azuma Skyline',
     en: { name: 'Jododaira Visitor Center', desc: 'Trailhead at 1,600 m on the Bandai-Azuma Skyline' } },
   { name: 'ยอด Mt. Issaikyo', ja: '一切経山', area: 'fukushima', lat: 37.7311, lng: 140.2439, day: 5, desc: 'ยอด 1,949 ม. — วิวทะเลสาบ Goshikinuma「ดวงตาแม่มด」',
@@ -165,12 +177,16 @@ const PLACES = [
     en: { name: 'Lake Goshikinuma', desc: 'Turquoise crater lake, seen from the Issaikyo summit' } },
   { name: 'Azuma-Kofuji', ja: '吾妻小富士', area: 'fukushima', lat: 37.7147, lng: 140.2588, day: 5, desc: '“ฟูจิน้อย” — เดิน 15 นาทีถึงขอบปากปล่อง อยู่ตรงข้าม Jododaira',
     en: { name: 'Azuma-Kofuji', desc: '"Little Fuji" — 15 min climb to the crater rim, directly opposite Jododaira' } },
-  { name: 'Fukushima Prefectural Museum of Art', ja: '福島県立美術館', area: 'fukushima', lat: 37.7602, lng: 140.4649, day: 6, type: 'museum', img: commonsImg('Fukushima_Prefectural_Museum_of_Art_ac.jpg'), ticket: 'คอลเลกชันถาวรมักฟรี/ราคาย่อมเยา · เช็คนิทรรศการพิเศษที่เว็บ', url: 'https://art-museum.fcs.ed.jp/', desc: 'งาน Andrew Wyeth + ภาพพิมพ์ไซโตะ คิโยชิ ตั้งในสวนกว้างริมลำธาร — ลง Iizaka Line ที่ป้าย "美術館図書館前" เดิน 2 นาที · เช้าก่อนขึ้นชินคันเซ็นกลับโตเกียว (เผื่อเวลาดี ๆ อย่าให้ตกรถ)',
-    en: { name: 'Fukushima Prefectural Museum of Art', ticket: 'Permanent collection usually free or cheap · check special exhibitions online', desc: 'Andrew Wyeth paintings and Kiyoshi Saito prints, in wide grounds beside a stream — Iizaka Line to "Bijutsukan-Toshokan-mae", 2 min walk. Morning stop before the shinkansen back to Tokyo (leave buffer, do not miss the train)' } },
-  { name: 'Iizaka Onsen', ja: '飯坂温泉', area: 'fukushima', lat: 37.8259, lng: 140.4478, day: 5, desc: 'เมืองออนเซ็นเก่าแก่ ห่างสถานี Fukushima ~25 นาที (รถไฟ Iizaka Line) — แช่ผ่อนคลายหลังลงจากเขาเย็นนี้',
-    en: { name: 'Iizaka Onsen', desc: 'Historic hot-spring town ~25 min from Fukushima Sta. on the Iizaka Line — the soak after coming down off the mountain' } },
-  { name: 'Hanamiyama Park', ja: '花見山公園', area: 'fukushima', lat: 37.7269, lng: 140.5090, day: 6, desc: 'สวนบนเนินเขา วิวเมือง+ภูเขา (ดังช่วงซากุระ แต่ฤดูใบไม้ร่วงก็สวย) — เผื่อเวลาเช้าก่อนไปสถานี',
-    en: { name: 'Hanamiyama Park', desc: 'Hillside park with city and mountain views — famous for cherry blossom but good in autumn too. Fits in the morning before heading to the station' } },
+  { name: 'Fukushima Prefectural Museum of Art', ja: '福島県立美術館', area: 'fukushima', lat: 37.7602, lng: 140.4649, day: 4, type: 'museum', img: commonsImg('Fukushima_Prefectural_Museum_of_Art_ac.jpg'), ticket: 'คอลเลกชันถาวรมักฟรี/ราคาย่อมเยา · เช็คนิทรรศการพิเศษที่เว็บ', url: 'https://art-museum.fcs.ed.jp/', desc: 'งาน Andrew Wyeth + ภาพพิมพ์ไซโตะ คิโยชิ ตั้งในสวนกว้างริมลำธาร — ลง Iizaka Line ที่ป้าย "美術館図書館前" เดิน 2 นาที · ใส่ไว้วันศุกร์ 23 ต.ค. ซึ่งเป็นวันว่าง/วันสำรองของวันเดินเขา',
+    en: { name: 'Fukushima Prefectural Museum of Art', ticket: 'Permanent collection usually free or cheap · check special exhibitions online', desc: 'Andrew Wyeth paintings and Kiyoshi Saito prints, in wide grounds beside a stream — Iizaka Line to "Bijutsukan-Toshokan-mae", 2 min walk. Slotted into Friday 23 Oct, the free day that doubles as the weather backup for the hike' } },
+  { name: 'Iizaka Onsen', ja: '飯坂温泉', area: 'fukushima', lat: 37.8259, lng: 140.4478, day: 4, desc: 'เมืองออนเซ็นเก่าแก่ ห่างสถานี Fukushima ~25 นาที (รถไฟ Iizaka Line) — แช่ได้ทั้งเย็นวันศุกร์ (23) และหลังลงจากเขาวันเสาร์ (24)',
+    en: { name: 'Iizaka Onsen', desc: 'Historic hot-spring town ~25 min from Fukushima Sta. on the Iizaka Line — good on Friday evening (23) and again after the hike on Saturday (24)' } },
+  { name: 'Hanamiyama Park', ja: '花見山公園', area: 'fukushima', lat: 37.7269, lng: 140.5090, day: 4, desc: 'สวนบนเนินเขา วิวเมือง+ภูเขา (ดังช่วงซากุระ แต่ฤดูใบไม้ร่วงก็สวย) — ไปวันศุกร์ 23 ต.ค. ได้สบาย ๆ',
+    en: { name: 'Hanamiyama Park', desc: 'Hillside park with city and mountain views — famous for cherry blossom but good in autumn too. Easy to fit into Friday 23 Oct' } },
+  { name: 'ปราสาท Tsuruga (Aizu-Wakamatsu)', ja: '鶴ヶ城', area: 'fukushima', lat: 37.4877, lng: 139.9296, day: 4, desc: 'ปราสาทหลังคากระเบื้องแดงหนึ่งเดียวในญี่ปุ่น เมืองซามูไรไอสึ — จาก Fukushima ต้องต่อ ชินคันเซ็นถึง Koriyama + Ban\'etsu West Line รวม ~2 ชม./เที่ยว (วันศุกร์ 23 ถ้าอยากไปไกล)',
+    en: { name: 'Tsuruga Castle (Aizu-Wakamatsu)', desc: "Japan's only red-tiled castle keep, in the Aizu samurai town — from Fukushima it's shinkansen to Koriyama plus the Ban'etsu West Line, about 2 hr each way (a Friday 23 Oct option if you want to go far)" } },
+  { name: 'บึง Goshiki-numa (Urabandai)', ja: '裏磐梯 五色沼', area: 'fukushima', lat: 37.6580, lng: 140.0710, day: 4, desc: 'เส้นทางเดินเลียบบึงหลากสี ~3.6 กม. เชิงภูเขาบันได (คนละที่กับ 五色沼 ที่มองจากยอด Issaikyo) — จาก Fukushima ~2 ชม./เที่ยว ผ่าน Koriyama + Inawashiro',
+    en: { name: 'Goshiki-numa Ponds (Urabandai)', desc: 'A 3.6 km trail past multi-coloured ponds at the foot of Mt. Bandai (a different place from the 五色沼 seen from the Issaikyo summit) — ~2 hr each way from Fukushima via Koriyama and Inawashiro' } },
   // Other Taniguchi works in Japan — far from this route, reference only (from architecture-history.org)
   { name: 'Ken Domon Museum of Photography', ja: '土門拳記念館', area: 'other', lat: 38.906, lng: 139.845, day: null, type: 'museum', taniguchi: true, ticket: 'เช็คราคาที่เว็บ', url: 'http://www.domonken-kinenkan.jp/', desc: '🏛 Sakata, Yamagata (1983) — ผลงานที่ Taniguchi ได้รางวัล Japan Art Academy Prize ถือเป็นงานที่คนรัก Taniguchi ยกย่องสุด แต่ไกลมาก (~4 ชม.จากโตเกียว ผ่าน Niigata) เหมาะเป็นทริปแยกต่างหาก',
     en: { name: 'Ken Domon Museum of Photography', ticket: 'Check prices online', desc: '🏛 Sakata, Yamagata (1983) — the building that won Taniguchi the Japan Art Academy Prize, and the one his admirers rate highest. Very far though (~4 hr from Tokyo via Niigata); better as its own trip' } },
@@ -211,15 +227,15 @@ const TRANSPORT = [
     { method: 'Keisei Skyliner + Shinkansen', note: 'Narita → Ueno (¥2,580) → ต่อรถไฟ/ชินคันเซ็นไป Utsunomiya', time: 'รวม ~2 ชม.', price: 7600 },
     { method: 'Tokyo Monorail + Shinkansen', note: 'กรณีลง Haneda → Hamamatsucho → Tokyo Sta. → Utsunomiya', time: 'รวม ~2 ชม. 15 น.', price: 5720 },
   ]},
-  { title: 'Utsunomiya → Nikko', day: 'DAY 2 · 21 ต.ค. (เย็น)', options: [
-    { method: 'JR Nikko Line', note: 'ออกทุก ~30-60 นาที ลงสถานี JR Nikko', time: '~45 นาที', price: 770 },
+  { title: 'เดย์ทริป Nikko ไป-กลับจาก Utsunomiya', day: 'DAY 2 · 21 ต.ค.', options: [
+    { method: 'JR Nikko Line ไป-กลับ', note: 'ออกทุก ~30-60 นาที · ขบวนแรกจาก Utsunomiya ราว 06:00 — ที่พักไม่ต้องย้าย เก็บของไว้ที่เดิมได้', time: '~45 นาที/เที่ยว', price: 1540 },
   ]},
-  { title: 'ในนิกโก้: บัสขึ้นทะเลสาบ Chuzenji', day: 'DAY 4 · 23 ต.ค.', options: [
-    { method: 'Tobu Bus — Chuzenji Onsen Free Pass 2 วัน', note: 'ขึ้นลงไม่จำกัด Nikko Sta. ⇄ Chuzenji (ผ่าน Irohazaka) คุ้มกว่าซื้อเที่ยวเดียว', time: '~50 นาที/เที่ยว', price: 2500 },
-    { method: 'บัสเที่ยวเดียว Nikko → Chuzenji Onsen', note: 'ช่วงใบไม้แดงรถติดมาก เผื่อเวลา 2 เท่า', time: '~50-90 นาที', price: 1250 },
+  { title: 'ในนิกโก้: บัสขึ้นทะเลสาบ Chuzenji', day: 'DAY 2 · 21 ต.ค.', options: [
+    { method: 'Tobu Bus — Chuzenji Onsen Free Pass 2 วัน', note: 'ขึ้นลงไม่จำกัด Nikko Sta. ⇄ Chuzenji (ผ่าน Irohazaka) — วันเดียวก็ยังคุ้มถ้าแวะ Akechidaira + Kegon + Ryuzu', time: '~50 นาที/เที่ยว', price: 2500 },
+    { method: 'บัสเที่ยวเดียว Nikko → Chuzenji Onsen', note: 'ช่วงใบไม้แดงรถติดมาก เผื่อเวลา 2 เท่า — ขึ้นบัสก่อน 09:00 จะรอดที่สุด', time: '~50-90 นาที', price: 1250 },
   ]},
-  { title: 'Nikko → Fukushima', day: 'DAY 4 · 23 ต.ค. (เย็น)', options: [
-    { method: 'JR Nikko Line + Shinkansen (เปลี่ยนที่ Utsunomiya)', note: 'Nikko → Utsunomiya (¥770) → Yamabiko ไป Fukushima (~¥6,500) — วันเดินทางยาว ให้ออกจาก Chuzenji ไม่เกิน 15:00', time: '~2 ชม. 15 น.', price: 7270 },
+  { title: 'Utsunomiya → Fukushima', day: 'DAY 3 · 22 ต.ค. (บ่าย)', options: [
+    { method: 'Tohoku Shinkansen (Yamabiko)', note: 'ขึ้นตรงจาก Utsunomiya ไม่ต้องย้อนกลับโตเกียว — เช็คเอาท์เช้า ฝากกระเป๋าไว้ล็อกเกอร์ แล้วเที่ยว Oya ก่อนได้', time: '~55 นาที', price: 6500 },
   ]},
   { title: 'วันเดินเขา: Fukushima ⇄ Jododaira', day: 'DAY 5 · 24 ต.ค.', options: [
     { method: 'Jododaira Sky Access — คอร์สนักเดินเขา', note: 'ออก Fukushima West Exit 08:30 · ถึง Jododaira 09:30 · รถกลับ 15:00 · ถึงสถานี 16:00 · จองภายใน 15:00 วันก่อน', time: '5.5 ชม. ที่ Jododaira', price: 13000 },
@@ -238,7 +254,7 @@ const TRANSPORT = [
 ];
 
 /* เส้นทางรถไฟหลักที่ใช้เทียบกับ JR EAST PASS (¥30,000) */
-const RAIL_MAIN_TOTAL = 3070 + 5020 + 770 + 7270 + 8810 + 3070; // ~¥28,010... exclude N'EX x2 if Skyliner
+const RAIL_MAIN_TOTAL = 3070 + 5020 + 1540 + 6500 + 8810 + 3070; // N'EX + Tokyo→Utsunomiya + เดย์ทริป Nikko + Utsunomiya→Fukushima + Fukushima→Tokyo + N'EX กลับ
 
 /* ---------- events (ยืนยันวันที่จริงปี 2026 แล้ว — อัปเดต ก.ค. 2026) ---------- */
 const EVENTS = [
@@ -333,8 +349,8 @@ const STAYS = [
     searchQuery: 'Utsunomiya Station, Tochigi, Japan',
     lat: 36.5591, lng: 139.8986,
     pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1392269349368841909?adults=4&children=0&infants=0&pets=0&check_in=2026-10-20&check_out=2026-10-22' },
-    note: 'ขอให้อยู่ฝั่งเดียวกับสถานี — วัน 22 ต.ค. ต้องลากกระเป๋าขึ้นชินคันเซ็นไป Fukushima ต่อ',
-    en: { city: 'Utsunomiya', station: 'JR Utsunomiya Sta. (shinkansen + JR Nikko Line)', note: 'Stay on the station side — on 22 Oct we drag luggage onto the shinkansen to Fukushima' },
+    note: 'พัก 2 คืนไม่ต้องย้าย — 21 ต.ค. เป็นเดย์ทริป Nikko ไป-กลับ · 22 ต.ค. เช็คเอาท์แล้วขึ้นชินคันเซ็นไป Fukushima ตอนบ่าย ขอให้อยู่ฝั่งเดียวกับสถานี',
+    en: { city: 'Utsunomiya', station: 'JR Utsunomiya Sta. (shinkansen + JR Nikko Line)', note: 'Two nights, no moving — 21 Oct is a Nikko day trip and back · on 22 Oct we check out and take the afternoon shinkansen to Fukushima, so stay on the station side' },
   },
   {
     id: 'fukushima', city: 'Fukushima', ja: '福島', area: 'fukushima',
@@ -343,7 +359,7 @@ const STAYS = [
     searchQuery: 'Fukushima Station, Fukushima, Japan',
     lat: 37.7543, lng: 140.4590,
     pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1500308318751323061?adults=4&children=0&infants=0&pets=0&check_in=2026-10-22&check_out=2026-10-25' },
-    note: 'คืนนี้สำคัญสุด — วันเดินเขาต้องออกจากที่พักก่อน 08:15 ให้ทัน Sky Access ที่ West Exit',
+    note: 'เข้าพักบ่าย 22 ต.ค. · คืนที่สำคัญสุดคือคืนศุกร์ — เช้าเสาร์ต้องออกจากที่พักก่อน 08:15 ให้ทัน Sky Access ที่ West Exit',
     en: { city: 'Fukushima', station: 'JR Fukushima Sta. — mountain bus leaves the West Exit at 08:30', note: 'The most important location of the trip: on hiking day we must leave by 08:15 to catch Sky Access at the West Exit' },
   },
   {
@@ -384,7 +400,7 @@ STAYS.forEach((s) => {
   } else {
     PLACES.push({
       name: `ที่พัก ${s.city}`, ja: s.ja, area: s.area, lat: s.lat, lng: s.lng,
-      day: s.id === 'utsunomiya' ? 1 : 4, type: 'stay', stayId: s.id, url: s.pick.url,
+      day: s.id === 'utsunomiya' ? 1 : 3, type: 'stay', stayId: s.id, url: s.pick.url,
       desc: `🛏 ${s.nights} คืน · ${s.checkIn} → ${s.checkOut} · 4 คน — ${s.station} · หมุดปักที่สถานี ไม่ใช่ตำแหน่งบ้านจริง`,
       en: { name: `${s.en.city} stay`, desc: `🛏 ${s.nights} nights · ${s.checkIn} → ${s.checkOut} · 4 guests — ${s.en.station} · pin is on the station, not the actual listing address` },
     });
