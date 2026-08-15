@@ -61,38 +61,100 @@ function commonsImg(file, width) {
   return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=${width || 480}`;
 }
 
-/* ---------- itinerary (default — user can edit/reset in the app) ---------- */
+/* ---------- itinerary (default — user can edit/reset in the app) ----------
+   แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
+   ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
+const ITINERARY_VERSION = 2;
+
 const DEFAULT_ITINERARY = [
   { day: 1, date: 'อ. 20 ต.ค.', area: 'tochigi', title: 'Narita → Utsunomiya รวดเดียว', items: [
-    'Narita → Tokyo Sta. (N\'EX ~60 นาที) หรือ Skyliner ลง Ueno', 'ต่อชินคันเซ็นไป Utsunomiya ทันที (~50 นาทีจาก Tokyo Sta.)', 'เช็คอิน Airbnb Utsunomiya (พัก 2 คืน ไม่ต้องย้ายอีก)', 'เย็น: ตะลุยเกี๊ยวซ่า — เมืองหลวงเกี๊ยวซ่าของญี่ปุ่น' ] },
+    { t: '08:00', act: 'ถึง Narita — ตม. / รับกระเป๋า / เติมเงิน Suica', note: 'เวลาเป็นสมมติฐาน ปรับตามไฟลท์จริง', cost: 0 },
+    { t: '09:30', act: "N'EX → Tokyo Sta.", note: '~60 นาที · หรือ Skyliner ลง Ueno แล้วต่อชินคันเซ็นที่ Ueno ก็ได้', cost: 3070 },
+    { t: '11:00', act: 'Tohoku Shinkansen → Utsunomiya', note: '~50 นาที · ขบวน Yamabiko/Nasuno', cost: 5020 },
+    { t: '12:00', act: 'ถึง Utsunomiya · ฝากกระเป๋า / เช็คอิน Airbnb', note: 'พัก 2 คืน ไม่ต้องย้ายอีก', cost: 0 },
+    { t: '13:00', act: 'ข้าวเที่ยงเกี๊ยวซ่า — Kirasse', note: 'ลานรวมร้านเกี๊ยวซ่า สั่งได้หลายร้านในที่เดียว', cost: 1200 },
+    { t: '15:00', act: 'เดินเมือง + ศาลเจ้า Utsunomiya Futaarayama', note: 'พักผ่อนแก้ jet lag ไม่ต้องอัดแน่น', cost: 0 },
+    { t: '18:30', act: 'เย็น: เกี๊ยวซ่าร้านดัง (Minmin / Masashi)', note: 'ต่อคิวได้ ไปก่อนเวลาจะดีกว่า', cost: 1500 },
+  ]},
   { day: 2, date: 'พ. 21 ต.ค.', area: 'nikko', title: 'เดย์ทริป Nikko (ไป-กลับ ไม่ย้ายที่พัก)', items: [
-    '07:00 ออกจาก Utsunomiya — JR Nikko Line ~45 นาที (ซื้อตั๋วบัส Chuzenji ที่ Nikko เลย)',
-    '08:15 ขึ้นบัสไป Chuzenji ก่อน — ขึ้นเช้าเพื่อหนีรถติด Irohazaka ช่วงใบไม้แดง',
-    'Akechidaira Ropeway → น้ำตก Kegon → ทะเลสาบ Chuzenji (ถ้าเวลาเหลือค่อยต่อน้ำตก Ryuzu)',
-    '13:30 ลงมาศาลเจ้า Toshogu + Treasure Hall — ปิด 17:00 ขายตั๋วถึงราว 16:30',
-    'ปิดท้าย: สะพาน Shinkyo / Kanmangafuchi ถ้าแดดยังอยู่',
-    '17:30 กลับ Utsunomiya — เกี๊ยวซ่ารอบสอง 🥟' ] },
+    { t: '06:50', act: 'ซื้อข้าวเช้าที่เซเว่นหน้าสถานี', note: 'กินบนรถไฟ ประหยัดเวลา', cost: 500 },
+    { t: '07:15', act: 'JR Nikko Line: Utsunomiya → Nikko', note: '~45 นาที', cost: 770 },
+    { t: '08:15', act: 'ถึง Nikko · ซื้อบัตรบัส Chuzenji', note: 'Tobu Bus 2-day free pass — คุ้มถ้าแวะหลายจุด', cost: 2500 },
+    { t: '08:30', act: 'บัสขึ้นโค้ง Irohazaka → Akechidaira Ropeway', note: '⚠️ ขึ้นเช้าเพื่อหนีรถติดใบไม้แดง · กระเช้าไป-กลับ ~¥1,000', cost: 1000 },
+    { t: '09:45', act: 'น้ำตก Kegon + ลิฟต์ลงจุดชมวิว', note: 'ลิฟต์ ¥570', cost: 570 },
+    { t: '11:00', act: 'ทะเลสาบ Chuzenji + ข้าวเที่ยงริมทะเลสาบ', note: 'ถ้าลงจาก Kegon ก่อน 11:30 ค่อยต่อน้ำตก Ryuzu', cost: 1200 },
+    { t: '13:30', act: 'ลงมาศาลเจ้า Toshogu', note: 'ปิด 17:00 ขายตั๋วถึงราว 16:30 · ค่าเข้าประมาณ ¥1,600 เช็คหน้างาน', cost: 1600 },
+    { t: '14:45', act: 'Toshogu Treasure Hall (โรงหนัง VR)', note: 'ตั๋วแยกจากศาลเจ้า', cost: 1000 },
+    { t: '16:00', act: 'สะพาน Shinkyo / Kanmangafuchi Abyss', note: 'ข้ามสะพาน ~¥300 · Kanmangafuchi เดินฟรี', cost: 300 },
+    { t: '17:15', act: 'JR Nikko Line กลับ Utsunomiya', note: '', cost: 770 },
+    { t: '18:30', act: 'เย็น: เกี๊ยวซ่ารอบสอง 🥟', note: '', cost: 1500 },
+  ]},
   { day: 3, date: 'พฤ. 22 ต.ค.', area: 'fukushima', title: 'Utsunomiya ครึ่งวัน → ย้ายเข้า Fukushima', items: [
-    'เช็คเอาท์ ฝากกระเป๋าไว้ล็อกเกอร์สถานี Utsunomiya',
-    'เช้า: Oya History Museum (เหมืองหินใต้ดิน · บัส ~30 นาที) — หรือสลับเป็นพิพิธภัณฑ์ในเมือง + ศาลเจ้า Futaarayama',
-    '~13:30 ชินคันเซ็น Utsunomiya → Fukushima (~55 นาที)',
-    'บ่าย: เช็คอิน Airbnb Fukushima · เดินสำรวจทางไป West Exit ให้ชัวร์ก่อนวันเดินเขา' ] },
-  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'Fukushima แบบสบาย ๆ (เป็นวันสำรองของวันเดินเขาด้วย)', items: [
-    '⚠️ เช็คพยากรณ์อากาศวันพรุ่งนี้ก่อน — ถ้าเสาร์ 24 อากาศแย่ ให้สลับมาเดินเขาวันนี้แทน',
-    'Fukushima Prefectural Museum of Art (ลง Iizaka Line ป้าย 美術館図書館前)',
-    'Hanamiyama Park — วิวเมืองกับภูเขา',
-    'ทางเลือกเที่ยวไกล: Tsuruga Castle (Aizu-Wakamatsu) หรือบึง Goshiki-numa ที่ Urabandai — ไป-กลับกินเวลา 4-5 ชม. บนรถ',
-    'เย็น: Iizaka Onsen แช่น้ำร้อนเตรียมขา' ] },
+    { t: '08:30', act: 'เช็คเอาท์ · ฝากกระเป๋าล็อกเกอร์สถานี Utsunomiya', note: 'ล็อกเกอร์ใบใหญ่ ~¥700', cost: 700 },
+    { t: '09:00', act: 'บัสไป Oya (จากฝั่งตะวันตกสถานี)', note: '~30 นาที', cost: 460 },
+    { t: '09:45', act: 'Oya History Museum — เหมืองหินใต้ดิน', note: 'ข้างในเย็น ~8°C พกเสื้อคลุม · ค่าเข้าประมาณ ¥800', cost: 800 },
+    { t: '11:30', act: 'บัสกลับตัวเมือง', note: 'ทางเลือก: ข้ามช่วงนี้แล้วไปพิพิธภัณฑ์ในเมือง + ศาลเจ้าแทน', cost: 460 },
+    { t: '12:15', act: 'ข้าวเที่ยงแถวสถานี · รับกระเป๋า', note: '', cost: 1200 },
+    { t: '13:30', act: 'ชินคันเซ็น Utsunomiya → Fukushima', note: '~55 นาที · Yamabiko', cost: 6500 },
+    { t: '14:40', act: 'ถึง Fukushima · เช็คอิน Airbnb (3 คืน)', note: '', cost: 0 },
+    { t: '16:00', act: 'เดินสำรวจทาง West Exit + ซื้อเสบียงเดินเขา', note: 'ให้รู้ทางก่อนเช้าวันเสาร์ จะได้ไม่หลง', cost: 1500 },
+    { t: '18:30', act: 'เย็น: อาหารท้องถิ่นฟุกุชิมะ', note: '', cost: 1500 },
+  ]},
+  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'Fukushima วันสบาย (สำรองไว้เดินเขาได้)', items: [
+    { t: '08:00', act: '⚠️ เช็คพยากรณ์อากาศของวันพรุ่งนี้', note: 'ถ้าเสาร์ 24 อากาศแย่ ให้สลับมาเดินเขาวันนี้แทนทั้งวัน', cost: 0 },
+    { t: '09:30', act: 'Fukushima Prefectural Museum of Art', note: 'Iizaka Line ลงป้าย 美術館図書館前 เดิน 2 นาที · ค่าเข้า+ค่ารถรวม ~¥800', cost: 800 },
+    { t: '12:00', act: 'ข้าวเที่ยง', note: '', cost: 1200 },
+    { t: '13:30', act: 'Hanamiyama Park', note: 'สวนบนเนิน วิวเมือง+ภูเขา · มีบัสตามฤดูกาล', cost: 500 },
+    { t: '16:00', act: 'Iizaka Onsen — แช่น้ำร้อนเตรียมขา', note: 'Iizaka Line ~25 นาที · ค่ารถไป-กลับ + ออนเซ็นรวม ~¥1,500', cost: 1500 },
+    { t: '19:00', act: 'เย็น: กินให้อิ่ม นอนเร็ว', note: 'พรุ่งนี้ตื่นตี 6', cost: 1500 },
+    { t: '—', act: 'ทางเลือกเที่ยวไกล: Tsuruga Castle (Aizu) หรือบึง Goshiki-numa (Urabandai)', note: 'ไป-กลับกินเวลาบนรถ 4-5 ชม. — เลือกอย่างใดอย่างหนึ่งแทนโปรแกรมข้างบนทั้งวัน', cost: 0 },
+  ]},
   { day: 5, date: 'ส. 24 ต.ค.', area: 'fukushima', title: '⛰ เดินเขา Mt. Issaikyo', items: [
-    'เช้ามืด: ซื้อเสบียงที่เซเว่นหน้าสถานี', '08:30 บัส Sky Access → Jododaira → ยอด Issaikyo (1,949 ม.)', 'วิว「ดวงตาแม่มด」Goshikinuma + Azuma-Kofuji', 'กลับถึงเมือง 17:00 → แช่ออนเซ็น Iizaka Onsen' ] },
+    { t: '07:00', act: 'ตื่น · ซื้อเสบียงเพิ่มที่เซเว่น', note: 'น้ำ 1.5 ลิตร + ข้าวกล่อง + snack ฉุกเฉิน', cost: 1000 },
+    { t: '08:15', act: 'ถึง Fukushima Sta. West Exit', note: 'เข้าห้องน้ำให้เรียบร้อย เตรียม QR จองรถ', cost: 0 },
+    { t: '08:30', act: 'Sky Access ออกเดินทาง → Jododaira', note: 'จองล่วงหน้า ไป-กลับ ¥13,000 · จองภายใน 15:00 ของวันก่อน', cost: 13000 },
+    { t: '09:30', act: 'ถึง Jododaira · เช็ค Visitor Center', note: 'ถามลม เส้นทาง น้ำแข็ง และประกาศภูเขาไฟทุกครั้ง', cost: 0 },
+    { t: '09:40', act: 'เริ่มเดิน: Wetland → Sugadaira Shelter', note: 'ชันช่วงแรก เดินช้า ๆ วอร์มขา', cost: 0 },
+    { t: '11:20', act: 'ถึงยอด 1,949 ม. · วิว Goshikinuma「ดวงตาแม่มด」', note: 'ถ่ายรูป 15-20 นาที ไม่ลงไปริมทะเลสาบ', cost: 0 },
+    { t: '12:30', act: 'พักกลางวันใกล้ shelter', note: 'ถ้าลมแรงอย่ากินบนยอด', cost: 0 },
+    { t: '12:50', act: 'แยกไป Kamanuma → Ubagahara', note: 'เดินตามป้าย Jododaira ห้ามออกนอกทาง', cost: 0 },
+    { t: '14:10', act: 'กลับถึง Jododaira · ซื้อของ/ห้องน้ำ', note: 'เหลือ buffer อย่างน้อย 40 นาที', cost: 500 },
+    { t: '15:00', act: 'รถออกตรงเวลา → ถึง Fukushima 16:00', note: 'รถไม่รอคนกลับช้า', cost: 0 },
+    { t: '17:00', act: 'Iizaka Onsen + ข้าวเย็นฉลอง 🍜', note: '', cost: 2300 },
+  ]},
   { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', title: 'Fukushima → Tokyo — นัดเพื่อนตอนเย็น 🍽', items: [
-    'เช้า: เก็บที่ยังไม่ได้ไปจากวันศุกร์ (ถ้าเวลาเหลือ)', 'สาย: เช็คเอาท์ → ชินคันเซ็นไป Tokyo (~95 นาที)', 'บ่าย: เช็คอินโรงแรมโตเกียว พักผ่อน', 'ค่ำ: 🍽 นัดกินข้าวกับเพื่อนในเมือง' ] },
-  { day: 7, date: 'จ. 26 ต.ค.', area: 'tokyo', title: 'Asakusa + Ueno', items: [
-    'Asakusa — วัด Sensoji + ถนน Nakamise', 'Ueno Park / Ameyoko + Gallery of Hōryū-ji Treasures (Taniguchi)', 'National Museum of Western Art + Sumida Hokusai Museum', 'เย็น: Akihabara' ] },
+    { t: '09:00', act: 'เก็บของ · เช็คเอาท์', note: '', cost: 0 },
+    { t: '10:00', act: 'ของฝากฟุกุชิมะ (พีช/แอปเปิลอบแห้ง)', note: 'ในสถานีมีครบ ไม่ต้องเดินไกล', cost: 1500 },
+    { t: '11:30', act: 'Tohoku Shinkansen (Yamabiko) → Tokyo Sta.', note: '~95 นาที', cost: 8810 },
+    { t: '13:15', act: 'ถึง Tokyo · เดินทางไปเช็คอิน Airbnb', note: 'ค่ารถในเมือง ~¥800', cost: 800 },
+    { t: '15:00', act: 'พักผ่อน / เดินสำรวจย่านที่พัก', note: 'เก็บแรงไว้มื้อเย็น', cost: 0 },
+    { t: '18:30', act: '🍽 นัดกินข้าวกับเพื่อน', note: 'นัดร้านล่วงหน้า วันอาทิตย์ร้านดังเต็มเร็ว', cost: 4000 },
+  ]},
+  { day: 7, date: 'จ. 26 ต.ค.', area: 'tokyo', title: 'Asakusa + Ueno + Ryogoku', items: [
+    { t: '08:30', act: 'Asakusa — วัด Sensoji + ถนน Nakamise', note: 'ไปเช้าคนน้อย ถ่ายรูปสวย', cost: 0 },
+    { t: '10:30', act: 'ข้ามแม่น้ำไป Sumida Hokusai Museum (Ryogoku)', note: 'อาคาร SANAA + งานโฮคุไซ', cost: 1000 },
+    { t: '12:00', act: 'ข้าวเที่ยงแถว Ryogoku', note: 'ย่านซูโม่ — มีจังโกะนาเบะ', cost: 1200 },
+    { t: '13:30', act: 'Ueno — Tokyo National Museum + Gallery of Hōryū-ji Treasures', note: 'ตั๋วเดียวเข้าได้ทั้งสอง (Taniguchi 1999) · นิทรรศการ Genji + Daitokuji ก็อยู่ที่นี่', cost: 1000 },
+    { t: '15:30', act: 'National Museum of Western Art — นิทรรศการ Turner', note: 'คอลเลกชันถาวรฟรี · นิทรรศการพิเศษจ่ายแยก ~¥2,000', cost: 2000 },
+    { t: '17:30', act: 'Ameyoko — ของกินริมทาง', note: '', cost: 1000 },
+    { t: '19:00', act: 'เย็น: Akihabara', note: '', cost: 1500 },
+  ]},
   { day: 8, date: 'อ. 27 ต.ค.', area: 'tokyo', title: 'Harajuku — Shibuya — Shinjuku', items: [
-    'ศาลเจ้า Meiji Jingu + Harajuku (Takeshita St.)', 'Nezu Museum (สวนญี่ปุ่น + Kengo Kuma)', 'Shibuya — แยกไฟแดง + Shibuya Sky', 'เย็น: Shinjuku (Omoide Yokocho)' ] },
+    { t: '09:00', act: 'ศาลเจ้า Meiji Jingu', note: 'ป่ากลางเมือง เดินสบาย เข้าฟรี', cost: 0 },
+    { t: '11:00', act: 'Harajuku — Takeshita St.', note: '', cost: 1500 },
+    { t: '12:30', act: 'ข้าวเที่ยงย่าน Omotesando', note: '', cost: 1200 },
+    { t: '14:00', act: 'Nezu Museum (Kengo Kuma + สวนญี่ปุ่น)', note: 'เดิน 8 นาทีจากสถานี Omotesando', cost: 1500 },
+    { t: '16:00', act: 'Shibuya — แยกไฟแดง + Shibuya Sky', note: 'Shibuya Sky ต้องจองรอบล่วงหน้า ~¥2,500', cost: 2500 },
+    { t: '18:30', act: 'เย็น: Shinjuku — Omoide Yokocho', note: '', cost: 3000 },
+  ]},
   { day: 9, date: 'พ. 28 ต.ค.', area: 'tokyo', title: 'Ginza ช้อปปิ้ง → เดินทางกลับ ✈ 17:00', items: [
-    'เช้า: Ginza + GINZA SIX (Taniguchi) + Don Quijote/drugstore', '~13:30 ออกจากโรงแรมไปสนามบิน', 'ถึงสนามบินก่อน 15:00', 'บินกลับ 17:00' ] },
+    { t: '08:30', act: 'Ginza + GINZA SIX (Taniguchi) + สวนดาดฟ้า', note: 'ร้านส่วนใหญ่เปิด 10:00-11:00 — ช่วงแรกเดินชมอาคารก่อน', cost: 0 },
+    { t: '10:30', act: 'Don Quijote / drugstore — ของฝากรอบสุดท้าย', note: 'พกพาสปอร์ตไว้ทำ tax-free', cost: 5000 },
+    { t: '12:00', act: 'ข้าวเที่ยง + กลับไปเอากระเป๋า', note: '', cost: 1200 },
+    { t: '13:30', act: "ออกจากที่พัก → สนามบิน (N'EX)", note: '~60 นาที · เผื่อเวลาให้ถึงก่อน 15:00', cost: 3070 },
+    { t: '15:00', act: 'ถึงสนามบิน · เช็คอิน + คืนภาษี', note: '', cost: 0 },
+    { t: '17:00', act: 'บินกลับ ✈', note: '', cost: 0 },
+  ]},
 ];
 
 /* ---------- map places ---------- */

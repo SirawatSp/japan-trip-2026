@@ -61,9 +61,17 @@
   <div class="section-head">
     <span class="section-ja jp">旅程</span>
     <h2>แผนรายวัน</h2>
-    <p class="section-desc">แก้ไขได้ทุกช่อง — พิมพ์แล้วบันทึกอัตโนมัติ (และซิงค์ข้ามอุปกรณ์ถ้าตั้งค่าไว้) · กด 📍 เพื่อดูหมุดวันนั้นบนแผนที่</p>
+    <p class="section-desc">ตารางเวลา–กิจกรรม–ราคา แก้ได้ทุกช่อง พิมพ์แล้วบันทึกอัตโนมัติ · ราคาเป็นค่าประมาณต่อคน เช็คจริงก่อนเดินทาง · กด 📍 เพื่อดูหมุดวันนั้นบนแผนที่</p>
+  </div>
+  <div class="itinerary-update" id="itinerary-update" hidden>
+    <span><strong>มีแผนเริ่มต้นชุดใหม่</strong> — แผนในเครื่องนี้ยังเป็นชุดเก่า (ก่อนปรับเป็นเดย์ทริป Nikko + ตารางเวลา/ราคา)</span>
+    <span class="itinerary-update-actions">
+      <button class="btn-mini" id="load-new-plan">โหลดแผนใหม่ทับ</button>
+      <button class="btn-mini" id="keep-my-plan">ใช้ของเดิมต่อ</button>
+    </span>
   </div>
   <div class="itinerary-grid" id="itinerary-grid"></div>
+  <div class="plan-total" id="plan-total"></div>
   <div class="itinerary-actions">
     <button id="add-day-btn" class="btn">＋ เพิ่มวันใหม่</button>
     <button id="reset-itinerary-btn" class="btn-mini">↺ รีเซ็ตเป็นแผนเริ่มต้น</button>

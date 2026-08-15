@@ -43,7 +43,7 @@ TripSync.init((remote) => {
   if (remote.planned) planned = remote.planned;
   if (remote.expenses) expenses = remote.expenses;
   if (typeof remote.rate === 'number') rate = remote.rate;
-  if (remote.itinerary) itinerary = remote.itinerary;
+  if (remote.itinerary) itinerary = normalizeItinerary(remote.itinerary);
   if (remote.stays) stays = remote.stays;
   if (typeof remote.stayCap === 'number') stayCap = remote.stayCap;
   store.save('jt26_shopping', shopping);
@@ -81,13 +81,31 @@ TripSync.init((remote) => {
   }
 })();
 
-/* ============ itinerary (fully editable) ============ */
+/* ============ itinerary (fully editable timetable) ============ */
+/* รูปแบบเก่าเก็บรายการเป็นสตริง — แปลงเป็น { t, act, note, cost } ให้อัตโนมัติ */
+function normalizeItem(item) {
+  if (typeof item === 'string') {
+    const m = item.match(/^\s*(\d{1,2}[:.]\d{2})\s*(.*)$/);
+    return m ? { t: m[1].replace('.', ':'), act: m[2], note: '', cost: 0 }
+             : { t: '', act: item, note: '', cost: 0 };
+  }
+  return { t: item.t || '', act: item.act || '', note: item.note || '', cost: +item.cost || 0 };
+}
+function normalizeItinerary(list) {
+  return (Array.isArray(list) ? list : []).map((d) => ({ ...d, items: (d.items || []).map(normalizeItem) }));
+}
+itinerary = normalizeItinerary(itinerary);
+
+const dayCost = (d) => d.items.reduce((sum, i) => sum + (+i.cost || 0), 0);
+const tripPlanCost = () => itinerary.reduce((sum, d) => sum + dayCost(d), 0);
+
 function renderItinerary() {
   $('#itinerary-grid').innerHTML = itinerary.map((d, di) => `
     <article class="day-card" data-area="${d.area}">
       <div class="day-card-head">
         <span class="day-no">DAY ${d.day}</span>
         <div class="day-card-actions">
+          <span class="day-cost mono" title="รวมราคาประมาณของวันนี้">${yen(dayCost(d))}</span>
           <button class="icon-btn day-map-btn" data-idx="${di}" title="ดูหมุดวันนี้บนแผนที่" aria-label="ดูบนแผนที่">📍</button>
           <button class="icon-btn day-del-btn" data-idx="${di}" title="ลบวันนี้ทั้งวัน" aria-label="ลบวันนี้">✕</button>
         </div>
@@ -99,17 +117,59 @@ function renderItinerary() {
         </select>
       </div>
       <input class="day-title-input" data-idx="${di}" value="${esc(d.title)}" aria-label="หัวข้อของวันนี้">
-      <ul class="day-items">
+
+      <div class="day-table" role="table">
+        <div class="day-tr day-th" role="row"><span>เวลา</span><span>กิจกรรม / รายละเอียด</span><span>¥</span><span></span></div>
         ${d.items.map((item, ii) => `
-        <li>
-          <input class="day-item-input" data-idx="${di}" data-item="${ii}" value="${esc(item)}" aria-label="รายการ">
-          <button class="icon-btn item-del-btn" data-idx="${di}" data-item="${ii}" aria-label="ลบรายการนี้">✕</button>
-        </li>`).join('')}
-      </ul>
-      <button class="btn-mini add-item-btn" data-idx="${di}">＋ เพิ่มรายการ</button>
+        <div class="day-tr" role="row">
+          <input class="day-t-input mono" data-idx="${di}" data-item="${ii}" value="${esc(item.t)}" placeholder="09:00" aria-label="เวลา">
+          <div class="day-act-cell">
+            <input class="day-act-input" data-idx="${di}" data-item="${ii}" value="${esc(item.act)}" placeholder="กิจกรรม" aria-label="กิจกรรม">
+            <input class="day-note-input" data-idx="${di}" data-item="${ii}" value="${esc(item.note)}" placeholder="+ รายละเอียด / หมายเหตุ" aria-label="รายละเอียด">
+          </div>
+          <input class="day-cost-input mono" type="number" min="0" step="100" data-idx="${di}" data-item="${ii}" value="${item.cost || ''}" placeholder="0" aria-label="ราคาประมาณ">
+          <button class="icon-btn item-del-btn" data-idx="${di}" data-item="${ii}" aria-label="ลบแถวนี้">✕</button>
+        </div>`).join('')}
+      </div>
+
+      <div class="day-card-foot">
+        <button class="btn-mini add-item-btn" data-idx="${di}">＋ เพิ่มแถว</button>
+        <button class="btn-mini day-budget-btn" data-idx="${di}" title="บันทึกยอดรวมของวันนี้เป็นรายจ่าย">＋งบ ${yen(dayCost(d))}</button>
+      </div>
     </article>`).join('');
+
+  $('#plan-total').innerHTML = `รวมราคาประมาณจากแผนรายวันทั้งหมด
+    <strong class="mono">${yen(tripPlanCost())}</strong>
+    <span class="thb">≈ ${baht(tripPlanCost() * rate)}</span>
+    <span class="plan-total-note">ค่าโดยประมาณต่อคน (ยังไม่รวมที่พัก) · ยอดนี้ยังไม่ถูกนับเข้างบจนกว่าจะกด「＋งบ」ในแต่ละวัน</span>`;
 }
+
+/* แจ้งเตือนเมื่อแผนเริ่มต้นในโค้ดใหม่กว่าที่บันทึกไว้ในเครื่อง — ไม่ทับของผู้ใช้เอง */
+function checkItineraryVersion() {
+  const savedV = store.load('jt26_itinerary_v', 0);
+  const hasSaved = localStorage.getItem('jt26_itinerary') !== null;
+  const banner = $('#itinerary-update');
+  if (!hasSaved) { store.save('jt26_itinerary_v', ITINERARY_VERSION); banner.hidden = true; return; }
+  banner.hidden = savedV >= ITINERARY_VERSION;
+}
+
+$('#itinerary-update').addEventListener('click', (e) => {
+  if (e.target.closest('#load-new-plan')) {
+    if (!confirm('โหลดแผนเริ่มต้นชุดใหม่ทับของเดิม? การแก้ไขที่ทำไว้เองจะหายไป')) return;
+    itinerary = normalizeItinerary(structuredClone(DEFAULT_ITINERARY));
+    store.save('jt26_itinerary_v', ITINERARY_VERSION);
+    persistAll();
+    renderItinerary();
+  } else if (!e.target.closest('#keep-my-plan')) {
+    return;
+  } else {
+    store.save('jt26_itinerary_v', ITINERARY_VERSION);
+  }
+  checkItineraryVersion();
+});
+
 renderItinerary();
+checkItineraryVersion();
 
 /* ============ ที่พัก (Airbnb) ============ */
 let mapReady = false;
@@ -470,9 +530,28 @@ $('#itinerary-grid').addEventListener('click', (e) => {
 
   const addItemBtn = e.target.closest('.add-item-btn');
   if (addItemBtn) {
-    itinerary[+addItemBtn.dataset.idx].items.push('รายการใหม่');
+    itinerary[+addItemBtn.dataset.idx].items.push({ t: '', act: 'รายการใหม่', note: '', cost: 0 });
     persistAll();
     renderItinerary();
+    return;
+  }
+
+  const dayBudgetBtn = e.target.closest('.day-budget-btn');
+  if (dayBudgetBtn) {
+    const d = itinerary[+dayBudgetBtn.dataset.idx];
+    const amount = dayCost(d);
+    if (!amount) return;
+    expenses.push({
+      name: `แผน DAY ${d.day} — ${d.title}`.slice(0, 80),
+      amount,
+      cat: 'ตั๋วเข้าชม/กิจกรรม',
+      day: DAY_OPTIONS[d.day] || DAY_OPTIONS[0],
+    });
+    persistAll();
+    dayBudgetBtn.classList.add('added');
+    dayBudgetBtn.textContent = '✓ เข้างบแล้ว';
+    renderBudget();
+    renderExpenses();
     return;
   }
 
@@ -487,27 +566,33 @@ $('#itinerary-grid').addEventListener('click', (e) => {
 $('#itinerary-grid').addEventListener('change', (e) => {
   const idx = +e.target.dataset.idx;
   if (Number.isNaN(idx)) return;
+  const ii = +e.target.dataset.item;
   if (e.target.matches('.day-date-input')) itinerary[idx].date = e.target.value;
   else if (e.target.matches('.day-area-select')) itinerary[idx].area = e.target.value;
   else if (e.target.matches('.day-title-input')) itinerary[idx].title = e.target.value;
-  else if (e.target.matches('.day-item-input')) itinerary[idx].items[+e.target.dataset.item] = e.target.value;
+  else if (e.target.matches('.day-t-input')) itinerary[idx].items[ii].t = e.target.value;
+  else if (e.target.matches('.day-act-input')) itinerary[idx].items[ii].act = e.target.value;
+  else if (e.target.matches('.day-note-input')) itinerary[idx].items[ii].note = e.target.value;
+  else if (e.target.matches('.day-cost-input')) itinerary[idx].items[ii].cost = +e.target.value || 0;
   else return;
   persistAll();
-  if (e.target.matches('.day-area-select')) renderItinerary();
+  if (e.target.matches('.day-area-select') || e.target.matches('.day-cost-input')) renderItinerary();
 });
 
 $('#add-day-btn').addEventListener('click', () => {
   const nextDay = itinerary.length ? Math.max(...itinerary.map((d) => d.day)) + 1 : 1;
-  itinerary.push({ day: nextDay, date: 'วันที่ใหม่', area: 'tokyo', title: 'แผนวันใหม่', items: ['รายการใหม่'] });
+  itinerary.push({ day: nextDay, date: 'วันที่ใหม่', area: 'tokyo', title: 'แผนวันใหม่', items: [{ t: '', act: 'รายการใหม่', note: '', cost: 0 }] });
   persistAll();
   renderItinerary();
 });
 
 $('#reset-itinerary-btn').addEventListener('click', () => {
   if (!confirm('รีเซ็ตแผนรายวันทั้งหมดกลับเป็นค่าเริ่มต้น? การแก้ไขทั้งหมดจะหายไป')) return;
-  itinerary = structuredClone(DEFAULT_ITINERARY);
+  itinerary = normalizeItinerary(structuredClone(DEFAULT_ITINERARY));
+  store.save('jt26_itinerary_v', ITINERARY_VERSION);
   persistAll();
   renderItinerary();
+  checkItineraryVersion();
 });
 
 refreshMap();
