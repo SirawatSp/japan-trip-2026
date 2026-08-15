@@ -23,6 +23,9 @@ let planned = store.load('jt26_planned', DEFAULT_BUDGET);
 let expenses = store.load('jt26_expenses', []);
 let rate = store.load('jt26_rate', TRIP.defaultRate);
 let itinerary = store.load('jt26_itinerary', DEFAULT_ITINERARY);
+/* ที่พัก: { [stayId]: { thb: ราคาต่อคืนทั้งหลัง, url: ลิงก์ที่จองจริง } } + เพดานต่อคน/คืน */
+let stays = store.load('jt26_stays', {});
+let stayCap = store.load('jt26_staycap', STAY_CAP_PER_PERSON_THB);
 
 function persistAll() {
   store.save('jt26_shopping', shopping);
@@ -30,7 +33,9 @@ function persistAll() {
   store.save('jt26_expenses', expenses);
   store.save('jt26_rate', rate);
   store.save('jt26_itinerary', itinerary);
-  TripSync.push({ shopping, planned, expenses, rate, itinerary });
+  store.save('jt26_stays', stays);
+  store.save('jt26_staycap', stayCap);
+  TripSync.push({ shopping, planned, expenses, rate, itinerary, stays, stayCap });
 }
 
 TripSync.init((remote) => {
@@ -39,17 +44,22 @@ TripSync.init((remote) => {
   if (remote.expenses) expenses = remote.expenses;
   if (typeof remote.rate === 'number') rate = remote.rate;
   if (remote.itinerary) itinerary = remote.itinerary;
+  if (remote.stays) stays = remote.stays;
+  if (typeof remote.stayCap === 'number') stayCap = remote.stayCap;
   store.save('jt26_shopping', shopping);
   store.save('jt26_planned', planned);
   store.save('jt26_expenses', expenses);
   store.save('jt26_rate', rate);
   store.save('jt26_itinerary', itinerary);
+  store.save('jt26_stays', stays);
+  store.save('jt26_staycap', stayCap);
   $('#rate-input').value = rate;
   $('#exp-cat').innerHTML = planned.map((b) => `<option>${esc(b.cat)}</option>`).join('');
   renderShopping();
   renderBudget();
   renderExpenses();
   renderItinerary();
+  renderStays();
 });
 
 /* ============ countdown ============ */
@@ -101,6 +111,128 @@ function renderItinerary() {
 }
 renderItinerary();
 
+/* ============ ที่พัก (Airbnb) ============ */
+let mapReady = false;
+const stayOf = (id) => stays[id] || {};
+const capPerNight = () => stayCap * STAY_GUESTS;              // ฿ ต่อคืน ทั้งหลัง
+const stayNightly = (id) => +stayOf(id).thb || 0;             // ฿ ต่อคืน ทั้งหลัง
+const stayTotalThb = (s) => stayNightly(s.id) * s.nights;
+const stayLink = (s) => stayOf(s.id).url || (s.pick && s.pick.url) || '';
+const staysTotalThb = () => STAYS.reduce((sum, s) => sum + stayTotalThb(s), 0);
+const staysTotalYen = () => (rate > 0 ? staysTotalThb() / rate : 0);
+const stayNightsTotal = () => STAYS.reduce((sum, s) => sum + s.nights, 0);
+
+/* บล็อกราคาที่โผล่ใน popup ของหมุดที่พัก */
+function stayPopupBlock(p) {
+  const s = STAYS.find((x) => x.id === p.stayId);
+  if (!s) return '';
+  const nightly = stayNightly(s.id);
+  const priceLine = nightly
+    ? `${baht(nightly)}/${mt('stayNights').replace(/s$/, '')} · ${baht(nightly / STAY_GUESTS)}${mt('stayPerPerson')} ${nightly > capPerNight() ? '⚠️' : '✓'}`
+    : mt('stayNoPrice');
+  const link = stayLink(s) || airbnbSearch(p.query || s.searchQuery, s.checkIn, s.checkOut, capPerNight());
+  return `<div class="popup-ticket">🛏 ${s.checkIn} → ${s.checkOut} · ${s.nights} ${mt('stayNights')} · ${esc(priceLine)}</div>
+    <a class="popup-link" href="${esc(link)}" target="_blank" rel="noopener">${mt('stayBook')} ↗</a>`;
+}
+
+function renderStays() {
+  const cap = capPerNight();
+  $('#stay-cap-input').value = stayCap;
+  $('#stay-cap-calc').innerHTML = `× ${STAY_GUESTS} คน = <strong class="mono">${baht(cap)}</strong> ต่อคืนทั้งหลัง
+    <span class="thb">(≈ ${yen(rate > 0 ? cap / rate : 0)}/คืน)</span> · รวมเพดานทั้งทริป ${stayNightsTotal()} คืน = <strong class="mono">${baht(cap * stayNightsTotal())}</strong>`;
+
+  $('#stay-grid').innerHTML = STAYS.map((s) => {
+    const nightly = stayNightly(s.id);
+    const over = nightly > cap;
+    const perPerson = nightly / STAY_GUESTS;
+    const search = airbnbSearch(s.searchQuery, s.checkIn, s.checkOut, cap);
+    const picked = stayOf(s.id).url;
+    return `
+    <article class="stay-card" data-area="${s.area}">
+      <div class="stay-head">
+        <div>
+          <h3>${esc(s.city)} <span class="jp">${esc(s.ja)}</span></h3>
+          <div class="stay-dates mono">${esc(s.checkIn)} → ${esc(s.checkOut)} · ${s.nights} คืน · ${s.days}</div>
+        </div>
+        <span class="stay-badge ${s.pick || picked ? 'has-pick' : ''}">${s.pick || picked ? '★ มีตัวเลือกแล้ว' : 'ยังไม่เลือก'}</span>
+      </div>
+      <div class="stay-station">🚉 ${esc(s.station)}</div>
+      <p class="stay-note">${esc(s.note)}</p>
+
+      ${s.candidates ? `<div class="stay-cands">
+        ${s.candidates.map((c) => `
+        <div class="stay-cand">
+          <div class="stay-cand-head"><strong>${esc(c.name)}</strong> <span class="jp">${esc(c.ja)}</span></div>
+          <div class="stay-cand-why">${esc(c.why)}</div>
+          <a class="p-link" href="${esc(airbnbSearch(c.query, s.checkIn, s.checkOut, cap))}" target="_blank" rel="noopener">ค้นหาย่านนี้ใน Airbnb ↗</a>
+        </div>`).join('')}
+      </div>` : ''}
+
+      <div class="stay-links">
+        ${s.pick ? `<a class="btn-mini" href="${esc(s.pick.url)}" target="_blank" rel="noopener">↗ ${esc(s.pick.label)}</a>` : ''}
+        ${picked ? `<a class="btn-mini" href="${esc(picked)}" target="_blank" rel="noopener">↗ ลิงก์ที่บันทึกไว้</a>` : ''}
+        <a class="btn-mini" href="${esc(search)}" target="_blank" rel="noopener">🔍 ค้นหาที่กรองไว้แล้ว (4 คน · ห้องน้ำ 1+ · ≤${baht(cap)}/คืน)</a>
+      </div>
+
+      <div class="stay-inputs">
+        <label>ราคา ฿/คืน (ทั้งหลัง)
+          <input type="number" class="stay-price mono" data-stay="${s.id}" min="0" step="100" value="${nightly || ''}" placeholder="กรอกราคาที่เห็นใน Airbnb">
+        </label>
+        <label>ลิงก์ห้องที่เลือก (ถ้ามี)
+          <input type="url" class="stay-url" data-stay="${s.id}" value="${esc(picked || '')}" placeholder="วางลิงก์ Airbnb ที่นี่">
+        </label>
+      </div>
+
+      <div class="stay-verdict ${nightly ? (over ? 'over' : 'ok') : 'empty'}">
+        ${nightly
+          ? `${over ? '⚠️ เกินเพดาน' : '✓ อยู่ในเพดาน'} — <span class="mono">${baht(perPerson)}</span>/คน/คืน
+             · รวม ${s.nights} คืน <span class="mono">${baht(stayTotalThb(s))}</span>
+             <span class="thb">(≈ ${yen(rate > 0 ? stayTotalThb(s) / rate : 0)})</span>
+             ${over ? `· เกินไป <span class="mono">${baht(perPerson - stayCap)}</span>/คน/คืน` : `· เหลืออีก <span class="mono">${baht(stayCap - perPerson)}</span>/คน/คืน`}`
+          : 'ยังไม่ได้กรอกราคา — เปิดลิงก์ด้านบนไปดูราคาจริงแล้วกรอกกลับมา'}
+      </div>
+    </article>`;
+  }).join('');
+
+  const totalThb = staysTotalThb();
+  const totalYen = staysTotalYen();
+  const capTotal = cap * stayNightsTotal();
+  const priced = STAYS.filter((s) => stayNightly(s.id) > 0);
+  const filled = priced.length;
+  const pricedNights = priced.reduce((sum, s) => sum + s.nights, 0);
+  const stayBudget = planned.find((b) => b.cat === STAY_BUDGET_CAT);
+  $('#stay-total').innerHTML = `
+    <div class="sum-block"><span class="sum-label">กรอกราคาแล้ว</span><strong>${filled}/${STAYS.length} ที่พัก</strong><span class="sum-label">${stayNightsTotal()} คืน</span></div>
+    <div class="sum-block"><span class="sum-label">รวมค่าที่พัก</span><strong>${baht(totalThb)}</strong><span class="sum-label thb">≈ ${yen(totalYen)}</span></div>
+    <div class="sum-block"><span class="sum-label">ตกคนละ (ทั้งทริป)</span><strong>${baht(totalThb / STAY_GUESTS)}</strong><span class="sum-label">${pricedNights ? baht(totalThb / STAY_GUESTS / pricedNights) + '/คืน (เฉลี่ยจาก ' + pricedNights + ' คืนที่กรอกแล้ว)' : '—'}</span></div>
+    <div class="sum-block"><span class="sum-label">${totalThb > capTotal ? 'เกินเพดานรวม' : 'ต่ำกว่าเพดานรวม'}</span><strong class="${totalThb > capTotal ? 'b-over' : ''}">${baht(Math.abs(capTotal - totalThb))}</strong><span class="sum-label">เพดาน ${baht(capTotal)}</span></div>
+    ${stayBudget ? `<div class="sum-block"><span class="sum-label">เทียบงบที่ตั้งไว้</span><strong class="${totalYen > stayBudget.planned ? 'b-over' : ''}">${yen(stayBudget.planned)}</strong><span class="sum-label">${totalYen > stayBudget.planned ? 'ค่าที่พักจริงเกินงบหมวดนี้' : 'ยอดนี้ไหลเข้าหมวด「ที่พัก」ให้แล้ว'}</span></div>` : ''}`;
+
+  /* หมุดที่พักบนแผนที่ต้องโชว์ราคาล่าสุดด้วย */
+  if (mapReady) {
+    markers.forEach((m) => { if (m._place.type === 'stay') m.setPopupContent(popupHtml(m._place)); });
+  }
+}
+
+$('#stay-cap-input').addEventListener('change', (e) => {
+  stayCap = +e.target.value || STAY_CAP_PER_PERSON_THB;
+  persistAll();
+  renderStays();
+});
+
+$('#stay-grid').addEventListener('change', (e) => {
+  const priceInput = e.target.closest('.stay-price');
+  const urlInput = e.target.closest('.stay-url');
+  const id = (priceInput || urlInput || {}).dataset && (priceInput || urlInput).dataset.stay;
+  if (!id) return;
+  stays[id] = stays[id] || {};
+  if (priceInput) stays[id].thb = +priceInput.value || 0;
+  if (urlInput) stays[id].url = urlInput.value.trim();
+  persistAll();
+  renderStays();
+  renderBudget();
+});
+
 /* ============ map ============ */
 const map = L.map('leaflet-map', { scrollWheelZoom: false });
 
@@ -146,8 +278,9 @@ function popupHtml(p) {
     <div class="popup-title">${esc(placeName(p))}</div>
     <div class="popup-ja">${esc(p.ja)}</div>
     <div class="popup-desc">${esc(placeDesc(p))}</div>
-    <span class="popup-day">${dayLabel(p)} · ${areaLabel(p.area)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}
+    <span class="popup-day">${dayLabel(p)} · ${areaLabel(p.area)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}${p.type === 'stay' ? ' <span class="popup-tag popup-tag-stay">🛏</span>' : ''}
     ${placeTicket(p) ? `<div class="popup-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
+    ${p.type === 'stay' ? stayPopupBlock(p) : ''}
     <a class="popup-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener">${p.url ? mt('official') : mt('search')} ↗</a>
     <a class="popup-link" href="${esc(gmapsUrl(p))}" target="_blank" rel="noopener">${mt('directions')} ↗</a>`;
 }
@@ -158,6 +291,8 @@ const markers = PLACES.map((p) => {
   m._place = p;
   return m;
 });
+
+mapReady = true;
 
 const routeLine = L.polyline(ROUTE, {
   color: '#2b2118', weight: 2.5, dashArray: '7 7', opacity: .55,
@@ -172,7 +307,8 @@ function placeMatches(p) {
     : p.area === activeArea;
   const typeOk = activeType === 'all'
     || (activeType === 'museum' && p.type === 'museum')
-    || (activeType === 'taniguchi' && p.taniguchi === true);
+    || (activeType === 'taniguchi' && p.taniguchi === true)
+    || (activeType === 'stay' && p.type === 'stay');
   return areaOk && typeOk;
 }
 
@@ -461,6 +597,7 @@ $('#shop-list').addEventListener('click', (e) => {
 function spentByCat(cat) {
   let s = expenses.filter((x) => x.cat === cat).reduce((a, x) => a + x.amount, 0);
   if (cat === 'ช้อปปิ้ง') s += shoppingTotals().bought;
+  if (cat === STAY_BUDGET_CAT) s += staysTotalYen();
   return s;
 }
 
@@ -546,6 +683,7 @@ $('#expense-list').addEventListener('click', (e) => {
   renderExpenses();
 });
 
+renderStays();
 renderShopping();
 renderExpenses();
 renderBudget();

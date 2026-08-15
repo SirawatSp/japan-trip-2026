@@ -39,18 +39,20 @@ const MAP_UI = {
   th: {
     sectionDesc: 'หมุดทุกจุดที่จะไป แยกสีตามพื้นที่ · คลิกชื่อสถานที่ในลิสต์เพื่อซูมไป',
     all: 'ทั้งหมด', other: 'อื่นๆ ทั่วญี่ปุ่น', route: 'เส้นทางหลัก',
-    allTypes: 'ทุกประเภท', museum: '🏛 เฉพาะพิพิธภัณฑ์', taniguchi: '✏️ งาน Yoshio Taniguchi',
+    allTypes: 'ทุกประเภท', museum: '🏛 เฉพาะพิพิธภัณฑ์', taniguchi: '✏️ งาน Yoshio Taniguchi', stay: '🛏 ที่พัก',
     empty: 'ไม่มีสถานที่ตามตัวกรองนี้',
     outsideTrip: 'นอกแผนทริป',
     official: 'เว็บทางการ', search: 'ค้นหา', directions: 'เปิดใน Google Maps',
+    stayNights: 'คืน', stayNoPrice: 'ยังไม่ได้กรอกราคา', stayBook: 'เปิดใน Airbnb', stayPerPerson: '/คน/คืน',
   },
   en: {
     sectionDesc: 'Every pin on the trip, coloured by area · click a place in the list to zoom to it',
     all: 'All areas', other: 'Elsewhere in Japan', route: 'Main route',
-    allTypes: 'All types', museum: '🏛 Museums only', taniguchi: '✏️ Yoshio Taniguchi works',
+    allTypes: 'All types', museum: '🏛 Museums only', taniguchi: '✏️ Yoshio Taniguchi works', stay: '🛏 Stays',
     empty: 'No places match this filter',
     outsideTrip: 'Not on the trip route',
     official: 'Official site', search: 'Search', directions: 'Open in Google Maps',
+    stayNights: 'nights', stayNoPrice: 'no price entered yet', stayBook: 'Open in Airbnb', stayPerPerson: '/person/night',
   },
 };
 
@@ -301,6 +303,93 @@ const DEFAULT_SHOPPING = [
   { name: 'เกี๊ยวซ่าแช่แข็ง Utsunomiya (ของฝากโทจิกิ)', price: 1000, qty: 1, cat: 'ของฝาก', bought: false },
   { name: 'ลูกพีช/แอปเปิลอบแห้ง Fukushima', price: 800, qty: 2, cat: 'ของฝาก', bought: false },
 ];
+
+/* ============================================================
+   ที่พัก — Airbnb, 4 คน, 8 คืน
+   เพดานงบ: ฿1,200/คน/คืน → ฿4,800/คืน ต่อทั้งหลัง (แก้ได้ในหน้าเว็บ)
+   ราคาจริงต้องเปิดลิงก์ไปดูใน Airbnb แล้วกรอกกลับมาเอง
+   ============================================================ */
+const STAY_GUESTS = 4;
+const STAY_CAP_PER_PERSON_THB = 1200;
+const STAY_BUDGET_CAT = 'ที่พัก (8 คืน)';
+
+/* สร้างลิงก์ค้นหา Airbnb ที่กรองไว้แล้ว: 4 คน · วันที่ตามช่วงพัก · ห้องน้ำ 1+ · ทั้งหลัง · เพดานราคา/คืน */
+function airbnbSearch(query, checkIn, checkOut, maxPerNightThb) {
+  const p = new URLSearchParams({
+    adults: String(STAY_GUESTS), children: '0', infants: '0', pets: '0',
+    checkin: checkIn, checkout: checkOut,
+    min_bathrooms: '1',
+    currency: 'THB', price_max: String(Math.round(maxPerNightThb)),
+    search_type: 'filter_change',
+  });
+  return `https://th.airbnb.com/s/${encodeURIComponent(query)}/homes?${p}&room_types%5B%5D=Entire%20home%2Fapt`;
+}
+
+const STAYS = [
+  {
+    id: 'utsunomiya', city: 'Utsunomiya', ja: '宇都宮', area: 'tochigi',
+    checkIn: '2026-10-20', checkOut: '2026-10-22', nights: 2, days: 'DAY 1–2',
+    station: 'JR Utsunomiya Sta. (ชินคันเซ็น + JR Nikko Line)',
+    searchQuery: 'Utsunomiya Station, Tochigi, Japan',
+    lat: 36.5591, lng: 139.8986,
+    pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1392269349368841909?adults=4&children=0&infants=0&pets=0&check_in=2026-10-20&check_out=2026-10-22' },
+    note: 'ขอให้อยู่ฝั่งเดียวกับสถานี — วัน 22 ต.ค. ต้องลากกระเป๋าขึ้นชินคันเซ็นไป Fukushima ต่อ',
+    en: { city: 'Utsunomiya', station: 'JR Utsunomiya Sta. (shinkansen + JR Nikko Line)', note: 'Stay on the station side — on 22 Oct we drag luggage onto the shinkansen to Fukushima' },
+  },
+  {
+    id: 'fukushima', city: 'Fukushima', ja: '福島', area: 'fukushima',
+    checkIn: '2026-10-22', checkOut: '2026-10-25', nights: 3, days: 'DAY 3–5',
+    station: 'JR Fukushima Sta. — บัสขึ้นเขาออกฝั่ง West Exit 08:30',
+    searchQuery: 'Fukushima Station, Fukushima, Japan',
+    lat: 37.7543, lng: 140.4590,
+    pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1500308318751323061?adults=4&children=0&infants=0&pets=0&check_in=2026-10-22&check_out=2026-10-25' },
+    note: 'คืนนี้สำคัญสุด — วันเดินเขาต้องออกจากที่พักก่อน 08:15 ให้ทัน Sky Access ที่ West Exit',
+    en: { city: 'Fukushima', station: 'JR Fukushima Sta. — mountain bus leaves the West Exit at 08:30', note: 'The most important location of the trip: on hiking day we must leave by 08:15 to catch Sky Access at the West Exit' },
+  },
+  {
+    id: 'tokyo', city: 'Tokyo', ja: '東京', area: 'tokyo',
+    checkIn: '2026-10-25', checkOut: '2026-10-28', nights: 3, days: 'DAY 6–8',
+    station: 'เลือกได้หลายย่าน — ดูตัวเลือกด้านล่าง',
+    searchQuery: 'Ueno, Taito City, Tokyo, Japan',
+    lat: 35.7141, lng: 139.7774,
+    note: 'ยังไม่มีลิสต์ที่เลือกไว้ — กดลิงก์ค้นหาที่กรองไว้แล้ว (4 คน · 25–28 ต.ค. · ห้องน้ำ 1+ · ทั้งหลัง) แล้วกรอกราคา/ลิงก์กลับมา',
+    en: { city: 'Tokyo', station: 'Several districts work — see the options below', note: 'No listing picked yet — use the pre-filtered search links (4 guests · 25–28 Oct · 1+ bathroom · entire place), then paste the price and link back here' },
+    /* ย่านที่แนะนำ: ต้องรับชินคันเซ็นจาก Fukushima + ไปสนามบินวันสุดท้าย + ตรงกับแผน Day 7-9 */
+    candidates: [
+      { name: 'Ueno / Okachimachi', ja: '上野・御徒町', lat: 35.7141, lng: 139.7774, query: 'Ueno, Taito City, Tokyo, Japan',
+        why: 'ชินคันเซ็นจาก Fukushima ลงที่ Ueno ได้เลย + Skyliner ตรงไป Narita + Day 7 เดินเที่ยว Ueno/Asakusa ได้จากที่พัก',
+        whyEn: 'The shinkansen from Fukushima stops here, the Skyliner runs straight to Narita, and Day 7 (Ueno/Asakusa) starts at the door' },
+      { name: 'Asakusa / Kuramae', ja: '浅草・蔵前', lat: 35.7118, lng: 139.7967, query: 'Asakusa, Taito City, Tokyo, Japan',
+        why: 'ห้องใหญ่ราคาถูกที่สุดในบรรดาย่านนี้ + Asakusa Line ต่อ Haneda ได้ตรง · Day 7 อยู่ในย่านพอดี',
+        whyEn: 'Biggest rooms for the money of the four, direct Asakusa Line to Haneda, and Day 7 is right here' },
+      { name: 'Nippori / Nishi-Nippori', ja: '日暮里・西日暮里', lat: 35.7280, lng: 139.7710, query: 'Nippori, Arakawa City, Tokyo, Japan',
+        why: 'Skyliner จอด ถึง Narita 36 นาที + JR Yamanote ครบ · เงียบและถูกกว่าฝั่ง Ueno',
+        whyEn: 'Skyliner stop (Narita in 36 min) plus the full Yamanote line; quieter and cheaper than Ueno proper' },
+      { name: 'Shinjuku / Shin-Okubo', ja: '新宿・新大久保', lat: 35.6896, lng: 139.7006, query: 'Shinjuku City, Tokyo, Japan',
+        why: 'N\'EX ไป Narita ขึ้นที่ Shinjuku ได้ + Day 8 จบที่ Shinjuku พอดี · แลกมาด้วยราคาที่สูงกว่า',
+        whyEn: "N'EX to Narita departs from Shinjuku and Day 8 ends here — but expect to pay more" },
+    ],
+  },
+];
+
+/* หมุดที่พักบนแผนที่ — ตำแหน่งเป็นสถานี/ย่านโดยประมาณ ไม่ใช่พิกัดบ้านจริง */
+STAYS.forEach((s) => {
+  if (s.candidates) {
+    s.candidates.forEach((c) => PLACES.push({
+      name: `ที่พัก Tokyo (ตัวเลือก): ${c.name}`, ja: c.ja, area: s.area, lat: c.lat, lng: c.lng,
+      day: 6, type: 'stay', stayId: s.id, query: c.query,
+      desc: `🛏 ย่านที่พักที่แนะนำสำหรับ 25–28 ต.ค. (3 คืน · 4 คน) — ${c.why} · หมุดปักที่สถานี ไม่ใช่ตำแหน่งบ้านจริง`,
+      en: { name: `Tokyo stay (option): ${c.name}`, desc: `🛏 Suggested district for 25–28 Oct (3 nights · 4 guests) — ${c.whyEn} · pin is on the station, not an actual listing address` },
+    }));
+  } else {
+    PLACES.push({
+      name: `ที่พัก ${s.city}`, ja: s.ja, area: s.area, lat: s.lat, lng: s.lng,
+      day: s.id === 'utsunomiya' ? 1 : 4, type: 'stay', stayId: s.id, url: s.pick.url,
+      desc: `🛏 ${s.nights} คืน · ${s.checkIn} → ${s.checkOut} · 4 คน — ${s.station} · หมุดปักที่สถานี ไม่ใช่ตำแหน่งบ้านจริง`,
+      en: { name: `${s.en.city} stay`, desc: `🛏 ${s.nights} nights · ${s.checkIn} → ${s.checkOut} · 4 guests — ${s.en.station} · pin is on the station, not the actual listing address` },
+    });
+  }
+});
 
 /* ---------- budget categories (planned, JPY) ---------- */
 const DEFAULT_BUDGET = [

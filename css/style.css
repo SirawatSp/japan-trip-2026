@@ -240,6 +240,76 @@ body {
 .add-item-btn { margin-top: .6rem; }
 .itinerary-actions { display: flex; align-items: center; gap: .9rem; margin-top: 1.2rem; }
 
+/* ---------- ที่พัก (stays) ---------- */
+.stay-cap {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .7rem;
+  padding: .8rem 1.1rem; margin-bottom: 1.1rem; font-size: .9rem;
+}
+.stay-cap input {
+  width: 110px; font-family: var(--font-mono); font-size: .95rem; font-weight: 600;
+  border: 1.5px solid var(--line); border-radius: 8px; padding: .3rem .55rem;
+  background: var(--paper); color: var(--ink);
+}
+.stay-cap-calc { color: var(--ink-soft); font-size: .84rem; }
+.stay-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 1rem; }
+.stay-card {
+  background: var(--card); border: 1px solid var(--line);
+  border-top: 4px solid var(--pin, var(--ink));
+  border-radius: 14px; padding: 1rem 1.1rem; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: .55rem;
+}
+.stay-card[data-area="tokyo"] { --pin: var(--tokyo); }
+.stay-card[data-area="tochigi"] { --pin: var(--tochigi); }
+.stay-card[data-area="fukushima"] { --pin: var(--fukushima); }
+.stay-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .6rem; }
+.stay-head h3 { font-size: 1.12rem; }
+.stay-dates { font-size: .76rem; color: var(--ink-soft); margin-top: .1rem; }
+.stay-badge {
+  flex-shrink: 0; font-size: .68rem; font-weight: 700; border-radius: 999px;
+  padding: .15rem .6rem; background: var(--paper-deep); color: var(--ink-soft);
+}
+.stay-badge.has-pick { background: var(--fukushima); color: #fff; }
+.stay-station { font-size: .82rem; font-weight: 600; }
+.stay-note { font-size: .8rem; color: var(--ink-soft); }
+.stay-cands { display: flex; flex-direction: column; gap: .45rem; }
+.stay-cand {
+  border: 1px dashed var(--line); border-radius: 10px; padding: .5rem .7rem;
+  background: var(--paper);
+}
+.stay-cand-head { font-size: .86rem; }
+.stay-cand-why { font-size: .76rem; color: var(--ink-soft); margin: .15rem 0 .2rem; }
+.stay-links { display: flex; flex-wrap: wrap; gap: .4rem; }
+.stay-links .btn-mini { text-decoration: none; }
+.stay-inputs { display: flex; flex-wrap: wrap; gap: .6rem; }
+.stay-inputs label {
+  flex: 1 1 150px; display: flex; flex-direction: column; gap: .2rem;
+  font-size: .74rem; font-weight: 600; color: var(--ink-soft);
+}
+.stay-inputs input {
+  font-family: var(--font-body); font-size: .86rem;
+  border: 1.5px solid var(--line); border-radius: 8px; padding: .35rem .6rem;
+  background: var(--paper); color: var(--ink); width: 100%;
+}
+.stay-inputs input:focus { outline: none; border-color: var(--ink); }
+.stay-verdict {
+  font-size: .8rem; border-radius: 9px; padding: .45rem .7rem; margin-top: auto;
+  background: var(--paper-deep); color: var(--ink-soft);
+}
+.stay-verdict.ok { background: rgba(62, 92, 70, .12); color: var(--fukushima); font-weight: 600; }
+.stay-verdict.over { background: rgba(199, 62, 46, .12); color: var(--accent); font-weight: 600; }
+.stay-total {
+  display: flex; flex-wrap: wrap; gap: 1.4rem; padding: 1rem 1.2rem; margin-top: 1.1rem;
+}
+.stay-alert {
+  margin-top: 1.1rem; padding: .85rem 1.1rem; font-size: .84rem; line-height: 1.6;
+  background: rgba(199, 62, 46, .08); border: 1px solid rgba(199, 62, 46, .35);
+  border-left: 4px solid var(--accent); border-radius: 10px; color: var(--ink);
+}
+.stay-alert ul { margin: .4rem 0 0 1.1rem; }
+.stay-alert li { margin-top: .2rem; }
+.popup-tag-stay { background: var(--tochigi); }
+#type-filters .chip[data-type="stay"].active { background: var(--tochigi); border-color: var(--tochigi); }
+
 /* ---------- map ---------- */
 .section-wide { max-width: 1280px; }
 .map-filters { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; padding-left: .15rem; }

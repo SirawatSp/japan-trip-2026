@@ -17,6 +17,7 @@
     <a href="#top" class="nav-logo"><span class="jp">秋の旅</span><span class="nav-logo-sub">JPN 2026</span></a>
     <div class="nav-links">
       <a href="#itinerary">แผนรายวัน</a>
+      <a href="#stay">ที่พัก</a>
       <a href="#map">แผนที่</a>
       <a href="#transport">การเดินทาง</a>
       <a href="#hike">เดินเขา</a>
@@ -69,6 +70,31 @@
   </div>
 </section>
 
+<!-- ============ STAY ============ -->
+<section class="section" id="stay">
+  <div class="section-head">
+    <span class="section-ja jp">宿</span>
+    <h2>ที่พัก — Airbnb 4 คน 8 คืน</h2>
+    <p class="section-desc">กดลิงก์ไปดูราคาจริงใน Airbnb แล้วกรอกกลับมา → ระบบเช็คให้ว่าเกินเพดาน ฿1,200/คน/คืน ไหม และส่งยอดเข้างบหมวด「ที่พัก」ให้เอง · หมุดที่พักอยู่บนแผนที่ด้านล่าง (กรอง「🛏 ที่พัก」)</p>
+  </div>
+  <div class="stay-cap card">
+    <label for="stay-cap-input">เพดานงบต่อคน/คืน <span class="mono">฿</span></label>
+    <input type="number" id="stay-cap-input" min="0" step="50" class="mono">
+    <span class="stay-cap-calc" id="stay-cap-calc"></span>
+  </div>
+  <div class="stay-grid" id="stay-grid"></div>
+  <div class="stay-alert">
+    <strong>⚠️ ที่พักช่วง 22–23 ต.ค. ชนกับแผนรายวัน:</strong>
+    การแบ่งที่พักนี้เข้า Fukushima ตั้งแต่ 22 ต.ค. แต่แผนรายวันตอนนี้ยังอยู่ Nikko วันที่ 22 (Toshogu) และ 23 (Chuzenji/Kegon)
+    ซึ่งห่างจาก Fukushima ประมาณ 2 ชม. 15 นาทีต่อเที่ยว — ไป-กลับสองวันคือเสียเวลาเดินทางเกือบ 9 ชั่วโมง เลือกทางใดทางหนึ่ง:
+    <ul>
+      <li><strong>ยึดที่พักตามนี้</strong> → ย้าย Nikko ไปเป็นเดย์ทริปจาก Utsunomiya วันที่ 21 ต.ค. (JR Nikko Line ~45 นาที) แล้วตัด/ย่อ Chuzenji ลง</li>
+      <li><strong>ยึดแผนรายวันเดิม</strong> → เลื่อนเช็คอิน Fukushima เป็น 23 ต.ค. (2 คืน) และต่อคืน Utsunomiya/Nikko วันที่ 22 อีก 1 คืน</li>
+    </ul>
+  </div>
+  <div class="stay-total card" id="stay-total"></div>
+</section>
+
 <!-- ============ MAP ============ -->
 <section class="section section-wide" id="map">
   <div class="section-head">
@@ -93,6 +119,7 @@
     <button class="chip active" data-type="all">ทุกประเภท</button>
     <button class="chip" data-type="museum">🏛 เฉพาะพิพิธภัณฑ์</button>
     <button class="chip" data-type="taniguchi">✏️ งาน Yoshio Taniguchi</button>
+    <button class="chip" data-type="stay">🛏 ที่พัก</button>
   </div>
   <div class="map-layout">
     <div id="leaflet-map" role="application" aria-label="แผนที่สถานที่ท่องเที่ยว"></div>
