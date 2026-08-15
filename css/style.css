@@ -303,6 +303,12 @@ body {
   text-decoration: none; margin-top: .2rem;
 }
 .p-link:hover { text-decoration: underline; }
+.p-link + .p-link { margin-left: .7rem; }
+
+/* map language switch */
+.lang-toggle { display: inline-flex; gap: .3rem; margin-left: auto; }
+.lang-toggle .chip { padding: .35rem .8rem; letter-spacing: .02em; }
+.lang-toggle .chip.active { background: var(--tokyo); border-color: var(--tokyo); color: #fff; }
 
 .pin-marker { background: transparent; border: none; }
 .pin-marker svg { filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }

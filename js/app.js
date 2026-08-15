@@ -103,10 +103,25 @@ renderItinerary();
 
 /* ============ map ============ */
 const map = L.map('leaflet-map', { scrollWheelZoom: false });
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+/* base layers — English-labelled tiles by default, local (Japanese) names as an option */
+const TILE_EN = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles &copy; Esri — Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC',
+  maxZoom: 18,
+});
+const TILE_LOCAL = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   maxZoom: 18,
-}).addTo(map);
+});
+
+/* ---------- map language (EN default, persisted) ---------- */
+let mapLang = store.load('jt26_maplang', 'en');
+(mapLang === 'en' ? TILE_EN : TILE_LOCAL).addTo(map);
+const mt = (key) => MAP_UI[mapLang][key];
+const areaLabel = (area) => (mapLang === 'en' ? AREA_LABELS_EN : AREA_LABELS)[area];
+const placeName = (p) => (mapLang === 'en' && p.en ? p.en.name : p.name);
+const placeDesc = (p) => (mapLang === 'en' && p.en ? p.en.desc : p.desc);
+const placeTicket = (p) => (mapLang === 'en' && p.en && p.en.ticket ? p.en.ticket : p.ticket);
 
 function pinIcon(color) {
   return L.divIcon({
@@ -118,19 +133,28 @@ function pinIcon(color) {
   });
 }
 
-const dayLabel = (p) => (p.day ? `DAY ${p.day}` : 'นอกแผนทริป');
-const searchUrl = (p) => `https://www.google.com/search?q=${encodeURIComponent(p.name + ' ' + p.ja)}`;
+const dayLabel = (p) => (p.day ? `DAY ${p.day}` : mt('outsideTrip'));
+/* search in the map language: EN name for English, Thai name + kanji for Thai */
+const searchUrl = (p) => (mapLang === 'en'
+  ? `https://www.google.com/search?q=${encodeURIComponent(placeName(p) + ' Japan')}&hl=en`
+  : `https://www.google.com/search?q=${encodeURIComponent(p.name + ' ' + p.ja)}`);
+const gmapsUrl = (p) => `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}&hl=${mapLang}`;
+
+function popupHtml(p) {
+  return `
+    ${p.img ? `<img class="popup-img" src="${esc(p.img)}" alt="${esc(placeName(p))}" loading="lazy">` : ''}
+    <div class="popup-title">${esc(placeName(p))}</div>
+    <div class="popup-ja">${esc(p.ja)}</div>
+    <div class="popup-desc">${esc(placeDesc(p))}</div>
+    <span class="popup-day">${dayLabel(p)} · ${areaLabel(p.area)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}
+    ${placeTicket(p) ? `<div class="popup-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
+    <a class="popup-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener">${p.url ? mt('official') : mt('search')} ↗</a>
+    <a class="popup-link" href="${esc(gmapsUrl(p))}" target="_blank" rel="noopener">${mt('directions')} ↗</a>`;
+}
 
 const markers = PLACES.map((p) => {
   const m = L.marker([p.lat, p.lng], { icon: pinIcon(AREA_COLORS[p.area]) });
-  m.bindPopup(`
-    ${p.img ? `<img class="popup-img" src="${esc(p.img)}" alt="${esc(p.name)}" loading="lazy">` : ''}
-    <div class="popup-title">${esc(p.name)}</div>
-    <div class="popup-ja">${esc(p.ja)}</div>
-    <div class="popup-desc">${esc(p.desc)}</div>
-    <span class="popup-day">${dayLabel(p)} · ${AREA_LABELS[p.area]}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}
-    ${p.ticket ? `<div class="popup-ticket">🎫 ${esc(p.ticket)}</div>` : ''}
-    <a class="popup-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener">${p.url ? 'เว็บทางการ' : 'ค้นหา'} ↗</a>`);
+  m.bindPopup(popupHtml(p));
   m._place = p;
   return m;
 });
@@ -176,28 +200,56 @@ function renderPlaceList() {
     <div class="place-item" data-area="${p.area}" data-lat="${p.lat}" data-lng="${p.lng}">
       ${p.img ? `<img class="place-thumb" src="${esc(p.img)}" alt="" loading="lazy">` : ''}
       <div class="place-item-body">
-        <div class="p-name">${esc(p.name)} <span class="popup-ja">${esc(p.ja)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️</span>' : ''}</div>
-        <div class="p-meta">${dayLabel(p)} · ${AREA_LABELS[p.area]} — ${esc(p.desc)}</div>
-        ${p.ticket ? `<div class="p-ticket">🎫 ${esc(p.ticket)}</div>` : ''}
-        <a class="p-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${p.url ? 'เว็บทางการ' : 'ค้นหา'} ↗</a>
+        <div class="p-name">${esc(placeName(p))} <span class="popup-ja">${esc(p.ja)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️</span>' : ''}</div>
+        <div class="p-meta">${dayLabel(p)} · ${areaLabel(p.area)} — ${esc(placeDesc(p))}</div>
+        ${placeTicket(p) ? `<div class="p-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
+        <a class="p-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${p.url ? mt('official') : mt('search')} ↗</a>
+        <a class="p-link" href="${esc(gmapsUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${mt('directions')} ↗</a>
       </div>
-    </div>`).join('') || '<p class="empty-note">ไม่มีสถานที่ตามตัวกรองนี้</p>';
+    </div>`).join('') || `<p class="empty-note">${mt('empty')}</p>`;
 }
 
 $('#map-filters').addEventListener('click', (e) => {
   const btn = e.target.closest('button.chip');
-  if (!btn) return;
+  if (!btn || !btn.dataset.filter) return; // ignore the language toggle sharing this row
   activeArea = btn.dataset.filter;
-  document.querySelectorAll('#map-filters button.chip').forEach((b) => b.classList.toggle('active', b === btn));
+  document.querySelectorAll('#map-filters button.chip[data-filter]').forEach((b) => b.classList.toggle('active', b === btn));
   refreshMap();
 });
 $('#route-toggle').addEventListener('change', refreshMap);
 
+/* ---------- map language switch (EN ⇄ ไทย) ---------- */
+function applyMapLang() {
+  const ui = MAP_UI[mapLang];
+  document.querySelector('#map .section-desc').textContent = ui.sectionDesc;
+  $('#map-filters [data-filter="all"]').textContent = ui.all;
+  const otherChip = $('#map-filters [data-filter="other"]');
+  otherChip.innerHTML = `<span class="dot" data-area="other"></span>${esc(ui.other)}`;
+  $('#route-toggle').parentElement.lastChild.textContent = ' ' + ui.route;
+  $('#type-filters [data-type="all"]').textContent = ui.allTypes;
+  $('#type-filters [data-type="museum"]').textContent = ui.museum;
+  $('#type-filters [data-type="taniguchi"]').textContent = ui.taniguchi;
+  document.querySelectorAll('#map-lang button').forEach((b) =>
+    b.classList.toggle('active', b.dataset.lang === mapLang));
+  markers.forEach((m) => m.setPopupContent(popupHtml(m._place)));
+  renderPlaceList();
+}
+
+$('#map-lang').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-lang]');
+  if (!btn || btn.dataset.lang === mapLang) return;
+  mapLang = btn.dataset.lang;
+  store.save('jt26_maplang', mapLang);
+  if (mapLang === 'en') { map.removeLayer(TILE_LOCAL); TILE_EN.addTo(map); }
+  else { map.removeLayer(TILE_EN); TILE_LOCAL.addTo(map); }
+  applyMapLang();
+});
+
 $('#type-filters').addEventListener('click', (e) => {
   const btn = e.target.closest('button.chip');
-  if (!btn) return;
+  if (!btn || !btn.dataset.type) return;
   activeType = btn.dataset.type;
-  document.querySelectorAll('#type-filters button.chip').forEach((b) => b.classList.toggle('active', b === btn));
+  document.querySelectorAll('#type-filters button.chip[data-type]').forEach((b) => b.classList.toggle('active', b === btn));
   refreshMap();
 });
 
@@ -216,7 +268,7 @@ function jumpMapToDay(day) {
   document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
   if (!dayPlaces.length) return;
   activeArea = 'all';
-  document.querySelectorAll('#map-filters button.chip').forEach((b) =>
+  document.querySelectorAll('#map-filters button.chip[data-filter]').forEach((b) =>
     b.classList.toggle('active', b.dataset.filter === 'all'));
   refreshMap();
   setTimeout(() => {
@@ -283,6 +335,7 @@ $('#reset-itinerary-btn').addEventListener('click', () => {
 });
 
 refreshMap();
+applyMapLang();
 
 /* ============ transport ============ */
 (function renderTransport() {
