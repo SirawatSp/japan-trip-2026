@@ -236,19 +236,50 @@ $('#stay-grid').addEventListener('change', (e) => {
 /* ============ map ============ */
 const map = L.map('leaflet-map', { scrollWheelZoom: false });
 
-/* base layers — English-labelled tiles by default, local (Japanese) names as an option */
-const TILE_EN = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-  attribution: 'Tiles &copy; Esri — Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC',
-  maxZoom: 18,
-});
-const TILE_LOCAL = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  maxZoom: 18,
-});
+/* ---------- base maps ----------
+   ป้ายชื่อบนตัวแผนที่มาจาก tile server ไม่ใช่โค้ดเรา — OSM ใช้ชื่อท้องถิ่น (ญี่ปุ่น) เสมอ
+   จึงต้องสลับไปใช้ tile ของ Esri ที่ป้ายเป็นอังกฤษ มีให้เลือก 2 แบบเผื่อบางโซนอ่านยาก */
+const ESRI_ATTR = 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>';
+const BASEMAPS = {
+  'en-street': {
+    label: 'EN · Street',
+    make: () => L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      { attribution: ESRI_ATTR + ' — Esri, HERE, Garmin, USGS, NGA', maxZoom: 19 }),
+  },
+  'en-light': {
+    label: 'EN · Light',
+    make: () => L.layerGroup([
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        { attribution: ESRI_ATTR + ' — Esri, HERE, Garmin', maxZoom: 16, maxNativeZoom: 16 }),
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 16, maxNativeZoom: 16 }),
+    ]),
+  },
+  'local': {
+    label: '日本語 · OSM',
+    make: () => L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 19 }),
+  },
+};
+Object.values(BASEMAPS).forEach((b) => { b.layer = b.make(); });
 
 /* ---------- map language (EN default, persisted) ---------- */
 let mapLang = store.load('jt26_maplang', 'en');
-(mapLang === 'en' ? TILE_EN : TILE_LOCAL).addTo(map);
+let basemapKey = store.load('jt26_basemap', mapLang === 'en' ? 'en-street' : 'local');
+if (!BASEMAPS[basemapKey]) basemapKey = 'en-street';
+
+function setBasemap(key, remember = true) {
+  if (!BASEMAPS[key]) return;
+  Object.entries(BASEMAPS).forEach(([k, b]) => {
+    if (k !== key && map.hasLayer(b.layer)) map.removeLayer(b.layer);
+  });
+  if (!map.hasLayer(BASEMAPS[key].layer)) BASEMAPS[key].layer.addTo(map);
+  basemapKey = key;
+  if (remember) store.save('jt26_basemap', key);
+  document.querySelectorAll('#basemap-picker button').forEach((b) =>
+    b.classList.toggle('active', b.dataset.basemap === key));
+}
+setBasemap(basemapKey, false);
 const mt = (key) => MAP_UI[mapLang][key];
 const areaLabel = (area) => (mapLang === 'en' ? AREA_LABELS_EN : AREA_LABELS)[area];
 const placeName = (p) => (mapLang === 'en' && p.en ? p.en.name : p.name);
@@ -367,17 +398,26 @@ function applyMapLang() {
   $('#type-filters [data-type="taniguchi"]').textContent = ui.taniguchi;
   document.querySelectorAll('#map-lang button').forEach((b) =>
     b.classList.toggle('active', b.dataset.lang === mapLang));
+  document.querySelectorAll('#basemap-picker button').forEach((b) =>
+    b.classList.toggle('active', b.dataset.basemap === basemapKey));
   markers.forEach((m) => m.setPopupContent(popupHtml(m._place)));
   renderPlaceList();
 }
+
+$('#basemap-picker').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-basemap]');
+  if (!btn) return;
+  setBasemap(btn.dataset.basemap);
+});
 
 $('#map-lang').addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-lang]');
   if (!btn || btn.dataset.lang === mapLang) return;
   mapLang = btn.dataset.lang;
   store.save('jt26_maplang', mapLang);
-  if (mapLang === 'en') { map.removeLayer(TILE_LOCAL); TILE_EN.addTo(map); }
-  else { map.removeLayer(TILE_EN); TILE_LOCAL.addTo(map); }
+  /* สลับภาษา = สลับ tile ให้ตรงกันด้วย แต่ถ้าผู้ใช้เลือก basemap เองไว้แล้วก็เคารพตัวเลือกนั้น */
+  if (mapLang === 'en' && basemapKey === 'local') setBasemap('en-street');
+  else if (mapLang === 'th' && basemapKey !== 'local') setBasemap('local');
   applyMapLang();
 });
 
