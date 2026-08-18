@@ -83,13 +83,27 @@ TripSync.init((remote) => {
 
 /* ============ itinerary (fully editable timetable) ============ */
 /* รูปแบบเก่าเก็บรายการเป็นสตริง — แปลงเป็น { t, act, note, cost } ให้อัตโนมัติ */
+const TAG_HINTS = [
+  ['nature', /เดินเขา|ทะเลสาบ|บึง|น้ำตก|ภูเขา|ยอด|สวน|หุบเขา|ป่า|Goshiki|Chuzenji|Kegon|Irohazaka|Akechidaira|Ryuzu|Jododaira|Issaikyo|Hibara|Inawashiro|Urabandai|Hanamiyama|Shinobu|แอปเปิล|แปะก๊วย/i],
+  ['move',   /ชินคันเซ็น|รถไฟ|บัส|สนามบิน|บินกลับ|เช็คอิน|เช็คเอาท์|ล็อกเกอร์|ออกจาก|กลับ|ถึง |Shinkansen|Line|N'EX|Skyliner|Sky Access|Monorail/i],
+  ['food',   /ข้าว|กิน|เกี๊ยวซ่า|ราเมง|คาเฟ่|เสบียง|มื้อ|อาหาร/i],
+  ['other',  /เช็คพยากรณ์|เตรียมของ|พัก|ตื่น|นอน|ทางเลือก|อาบน้ำ/i],
+];
+function guessTag(text) {
+  for (const [tag, re] of TAG_HINTS) if (re.test(text)) return tag;
+  return 'city';
+}
 function normalizeItem(item) {
   if (typeof item === 'string') {
     const m = item.match(/^\s*(\d{1,2}[:.]\d{2})\s*(.*)$/);
-    return m ? { t: m[1].replace('.', ':'), act: m[2], note: '', cost: 0 }
-             : { t: '', act: item, note: '', cost: 0 };
+    const base = m ? { t: m[1].replace('.', ':'), act: m[2] } : { t: '', act: item };
+    return { ...base, note: '', cost: 0, tag: guessTag(base.act) };
   }
-  return { t: item.t || '', act: item.act || '', note: item.note || '', cost: +item.cost || 0 };
+  const act = item.act || '';
+  return {
+    t: item.t || '', act, note: item.note || '', cost: +item.cost || 0,
+    tag: ITEM_TAGS[item.tag] ? item.tag : guessTag(act + ' ' + (item.note || '')),
+  };
 }
 function normalizeItinerary(list) {
   return (Array.isArray(list) ? list : []).map((d) => ({ ...d, items: (d.items || []).map(normalizeItem) }));
@@ -97,6 +111,20 @@ function normalizeItinerary(list) {
 itinerary = normalizeItinerary(itinerary);
 
 const dayCost = (d) => d.items.reduce((sum, i) => sum + (+i.cost || 0), 0);
+function tagCounts(items) {
+  const c = {};
+  items.forEach((i) => { c[i.tag] = (c[i.tag] || 0) + 1; });
+  return c;
+}
+function tagBar(items) {
+  const c = tagCounts(items);
+  const total = items.length || 1;
+  const segs = ITEM_TAG_KEYS.filter((k) => c[k]).map((k) =>
+    `<span class="tag-seg" style="width:${(c[k] / total) * 100}%;background:${ITEM_TAGS[k].color}" title="${ITEM_TAGS[k].th} ${c[k]}"></span>`).join('');
+  const counts = ITEM_TAG_KEYS.filter((k) => c[k]).map((k) =>
+    `<span class="tag-count" title="${ITEM_TAGS[k].th}">${ITEM_TAGS[k].icon} ${c[k]}</span>`).join('');
+  return `<div class="tag-bar">${segs}</div><div class="tag-counts">${counts}</div>`;
+}
 const tripPlanCost = () => itinerary.reduce((sum, d) => sum + dayCost(d), 0);
 
 function renderItinerary() {
@@ -117,12 +145,18 @@ function renderItinerary() {
         </select>
       </div>
       <input class="day-title-input" data-idx="${di}" value="${esc(d.title)}" aria-label="หัวข้อของวันนี้">
+      ${tagBar(d.items)}
 
       <div class="day-table" role="table">
         <div class="day-tr day-th" role="row"><span>เวลา</span><span>กิจกรรม / รายละเอียด</span><span>¥</span><span></span></div>
         ${d.items.map((item, ii) => `
         <div class="day-tr" role="row">
-          <input class="day-t-input mono" data-idx="${di}" data-item="${ii}" value="${esc(item.t)}" placeholder="09:00" aria-label="เวลา">
+          <div class="day-time-cell">
+            <input class="day-t-input mono" data-idx="${di}" data-item="${ii}" value="${esc(item.t)}" placeholder="09:00" aria-label="เวลา">
+            <select class="day-tag-select" data-idx="${di}" data-item="${ii}" data-tag="${item.tag}" aria-label="ประเภทกิจกรรม" title="${ITEM_TAGS[item.tag].th}">
+              ${ITEM_TAG_KEYS.map((k) => `<option value="${k}" ${k === item.tag ? 'selected' : ''}>${ITEM_TAGS[k].icon}</option>`).join('')}
+            </select>
+          </div>
           <div class="day-act-cell">
             <input class="day-act-input" data-idx="${di}" data-item="${ii}" value="${esc(item.act)}" placeholder="กิจกรรม" aria-label="กิจกรรม">
             <input class="day-note-input" data-idx="${di}" data-item="${ii}" value="${esc(item.note)}" placeholder="+ รายละเอียด / หมายเหตุ" aria-label="รายละเอียด">
@@ -137,6 +171,12 @@ function renderItinerary() {
         <button class="btn-mini day-budget-btn" data-idx="${di}" title="บันทึกยอดรวมของวันนี้เป็นรายจ่าย">＋งบ ${yen(dayCost(d))}</button>
       </div>
     </article>`).join('');
+
+  const allItems = itinerary.flatMap((d) => d.items);
+  const allCounts = tagCounts(allItems);
+  $('#plan-legend').innerHTML = ITEM_TAG_KEYS.map((k) =>
+    `<span class="legend-item"><span class="legend-dot" style="background:${ITEM_TAGS[k].color}"></span>${ITEM_TAGS[k].icon} ${ITEM_TAGS[k].th} <strong>${allCounts[k] || 0}</strong></span>`).join('')
+    + `<span class="legend-note">นับจากจำนวนรายการในตาราง — เปลี่ยนป้ายของแต่ละแถวได้จากช่องไอคอนข้างเวลา</span>`;
 
   $('#plan-total').innerHTML = `รวมราคาประมาณจากแผนรายวันทั้งหมด
     <strong class="mono">${yen(tripPlanCost())}</strong>
@@ -530,7 +570,7 @@ $('#itinerary-grid').addEventListener('click', (e) => {
 
   const addItemBtn = e.target.closest('.add-item-btn');
   if (addItemBtn) {
-    itinerary[+addItemBtn.dataset.idx].items.push({ t: '', act: 'รายการใหม่', note: '', cost: 0 });
+    itinerary[+addItemBtn.dataset.idx].items.push({ t: '', act: 'รายการใหม่', note: '', cost: 0, tag: 'other' });
     persistAll();
     renderItinerary();
     return;
@@ -574,14 +614,15 @@ $('#itinerary-grid').addEventListener('change', (e) => {
   else if (e.target.matches('.day-act-input')) itinerary[idx].items[ii].act = e.target.value;
   else if (e.target.matches('.day-note-input')) itinerary[idx].items[ii].note = e.target.value;
   else if (e.target.matches('.day-cost-input')) itinerary[idx].items[ii].cost = +e.target.value || 0;
+  else if (e.target.matches('.day-tag-select')) itinerary[idx].items[ii].tag = e.target.value;
   else return;
   persistAll();
-  if (e.target.matches('.day-area-select') || e.target.matches('.day-cost-input')) renderItinerary();
+  if (e.target.matches('.day-area-select') || e.target.matches('.day-cost-input') || e.target.matches('.day-tag-select')) renderItinerary();
 });
 
 $('#add-day-btn').addEventListener('click', () => {
   const nextDay = itinerary.length ? Math.max(...itinerary.map((d) => d.day)) + 1 : 1;
-  itinerary.push({ day: nextDay, date: 'วันที่ใหม่', area: 'tokyo', title: 'แผนวันใหม่', items: [{ t: '', act: 'รายการใหม่', note: '', cost: 0 }] });
+  itinerary.push({ day: nextDay, date: 'วันที่ใหม่', area: 'tokyo', title: 'แผนวันใหม่', items: [{ t: '', act: 'รายการใหม่', note: '', cost: 0, tag: 'other' }] });
   persistAll();
   renderItinerary();
 });
