@@ -64,7 +64,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 3;
+const ITINERARY_VERSION = 4;
 
 const DEFAULT_ITINERARY = [
   { day: 1, date: 'อ. 20 ต.ค.', area: 'tochigi', title: 'Narita → Utsunomiya รวดเดียว', items: [
@@ -89,18 +89,18 @@ const DEFAULT_ITINERARY = [
     { t: '17:15', act: 'JR Nikko Line กลับ Utsunomiya', note: '', cost: 770 },
     { t: '18:30', act: 'เย็น: เกี๊ยวซ่ารอบสอง 🥟', note: '', cost: 1500 },
   ]},
-  { day: 3, date: 'พฤ. 22 ต.ค.', area: 'fukushima', title: 'Utsunomiya ครึ่งวัน → ย้ายเข้า Fukushima', items: [
+  { day: 3, date: 'พฤ. 22 ต.ค.', area: 'fukushima', title: 'ครึ่งวัน ① — Utsunomiya ครึ่งเช้า → เข้า Fukushima', items: [
     { t: '08:30', act: 'เช็คเอาท์ · ฝากกระเป๋าล็อกเกอร์สถานี Utsunomiya', note: 'ล็อกเกอร์ใบใหญ่ ~¥700', cost: 700 },
-    { t: '09:00', act: 'บัสไป Oya (จากฝั่งตะวันตกสถานี)', note: '~30 นาที', cost: 460 },
-    { t: '09:45', act: 'Oya History Museum — เหมืองหินใต้ดิน', note: 'ข้างในเย็น ~8°C พกเสื้อคลุม · ค่าเข้าประมาณ ¥800', cost: 800 },
-    { t: '11:30', act: 'บัสกลับตัวเมือง', note: 'ทางเลือก: ข้ามช่วงนี้แล้วไปพิพิธภัณฑ์ในเมือง + ศาลเจ้าแทน', cost: 460 },
-    { t: '12:15', act: 'ข้าวเที่ยงแถวสถานี · รับกระเป๋า', note: '', cost: 1200 },
-    { t: '13:30', act: 'ชินคันเซ็น Utsunomiya → Fukushima', note: '~55 นาที · Yamabiko', cost: 6500 },
-    { t: '14:40', act: 'ถึง Fukushima · เช็คอิน Airbnb (3 คืน)', note: '', cost: 0 },
-    { t: '16:00', act: 'เดินสำรวจทาง West Exit + ซื้อเสบียงเดินเขา', note: 'ให้รู้ทางก่อนเช้าวันเสาร์ จะได้ไม่หลง', cost: 1500 },
-    { t: '18:30', act: '🥟 เย็น: เกี๊ยวซ่าจานกลม (円盤餃子) ของขึ้นชื่อเมืองนี้', note: 'ร้านดังมีหลายเจ้ารอบสถานี — บางร้านหมดเร็ว ไปก่อน 19:00', cost: 1500 },
+    { t: '09:00', act: 'บัสไป Oya (ฝั่งตะวันตกสถานี)', note: '~30 นาที', cost: 460 },
+    { t: '09:45', act: 'Oya History Museum — เหมืองหินใต้ดิน', note: 'ข้างในเย็น ~8°C พกเสื้อคลุม · ค่าเข้าประมาณ ¥800 · ถ้าไม่อยากรีบ ตัดอันนี้ออกแล้วเดินเมือง+ศาลเจ้า Futaarayama แทนได้', cost: 800 },
+    { t: '11:30', act: 'บัสกลับตัวเมือง · รับกระเป๋า', note: '', cost: 460 },
+    { t: '12:15', act: 'ข้าวเที่ยงแถวสถานี Utsunomiya', note: '', cost: 1200 },
+    { t: '13:30', act: '🚄 ชินคันเซ็น Utsunomiya → Fukushima', note: '~55 นาที · Yamabiko', cost: 6500 },
+    { t: '14:40', act: 'ถึง Fukushima · เช็คอิน Airbnb (3 คืน)', note: 'ครึ่งบ่ายที่เหลือเอาไว้ตั้งหลัก อย่าอัดโปรแกรม', cost: 0 },
+    { t: '16:00', act: 'เดินย่านสถานี · ซื้อเสบียงวันเดินเขา · เดินดูทาง West Exit', note: 'ให้รู้ทางก่อนเช้าวันเสาร์ จะได้ไม่หลง · เผื่อซื้อถุงมือ/หมวกที่ยังขาด', cost: 1500 },
+    { t: '18:00', act: '🥟 เย็น: เกี๊ยวซ่าจานกลม (円盤餃子)', note: 'ของขึ้นชื่อประจำเมือง — ร้านดังรอบสถานีมีหลายเจ้า บางร้านหมดเร็ว ไปก่อน 19:00', cost: 1500 },
   ]},
-  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'Fukushima เต็มวัน (สำรองไว้เดินเขาได้)', items: [
+  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'เต็มวัน ① — ฟุกุชิมะสายเหนือ + light-up แปะก๊วย', items: [
     { t: '08:00', act: '⚠️ เช็คพยากรณ์อากาศของวันพรุ่งนี้', note: 'ถ้าเสาร์ 24 อากาศแย่ ให้สลับมาเดินเขาวันนี้แทนทั้งวัน แล้วยกโปรแกรมข้างล่างไปวันเสาร์', cost: 0 },
     { t: '09:00', act: '🍎 เก็บแอปเปิลตาม Fruit Line (Azuma Orchard)', note: 'ต.ค. คือฤดูแอปเปิล Fuji — โทรจองสวนล่วงหน้า · บัส/แท็กซี่จากสถานี', cost: 1500 },
     { t: '11:30', act: 'Fukushima Prefectural Museum of Art', note: 'Iizaka Line ลงป้าย 美術館図書館前 เดิน 2 นาที · Andrew Wyeth + ภาพพิมพ์ไซโตะ คิโยชิ', cost: 800 },
@@ -111,7 +111,7 @@ const DEFAULT_ITINERARY = [
     { t: '—', act: '🔁 ทางเลือกแบบไปไกล (แทนทั้งวัน): บึง Goshiki-numa @ Urabandai', note: 'ชินคันเซ็น→Koriyama, Ban\'etsu West→Inawashiro, บัส 30 นาที ¥790 · เดินเส้นราบ ~3.5 กม. ใบไม้พีคกลาง ต.ค.–ต้น พ.ย.', cost: 0 },
     { t: '—', act: '🔁 ทางเลือกแบบไปไกล (แทนทั้งวัน): Tsuruga Castle + Ouchi-juku @ Aizu', note: 'Fukushima→Aizu-Wakamatsu ~2 ชม./เที่ยว · ถ้าจะต่อ Ouchi-juku ต้องบวก Aizu Railway 40 นาที + บัส 20 นาที = เต็มวันจริง ๆ', cost: 0 },
   ]},
-  { day: 5, date: 'ส. 24 ต.ค.', area: 'fukushima', title: '⛰ เดินเขา Mt. Issaikyo', items: [
+  { day: 5, date: 'ส. 24 ต.ค.', area: 'fukushima', title: 'เต็มวัน ② — ⛰ เดินเขา Mt. Issaikyo', items: [
     { t: '07:00', act: 'ตื่น · ซื้อเสบียงเพิ่มที่เซเว่น', note: 'น้ำ 1.5 ลิตร + ข้าวกล่อง + snack ฉุกเฉิน', cost: 1000 },
     { t: '08:15', act: 'ถึง Fukushima Sta. West Exit', note: 'เข้าห้องน้ำให้เรียบร้อย เตรียม QR จองรถ', cost: 0 },
     { t: '08:30', act: 'Sky Access ออกเดินทาง → Jododaira', note: 'จองล่วงหน้า ไป-กลับ ¥13,000 · จองภายใน 15:00 ของวันก่อน', cost: 13000 },
@@ -124,12 +124,14 @@ const DEFAULT_ITINERARY = [
     { t: '15:00', act: 'รถออกตรงเวลา → ถึง Fukushima 16:00', note: 'รถไม่รอคนกลับช้า', cost: 0 },
     { t: '17:00', act: 'Iizaka Onsen + ข้าวเย็นฉลอง 🍜', note: 'ถ้าวันศุกร์ยังไม่ได้ไป Sabakoyu (~¥200) คืนนี้เก็บได้ · หรือแช่ยาว ๆ ที่เรียวกังแบบ day-use', cost: 2300 },
   ]},
-  { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', title: 'Fukushima → Tokyo — นัดเพื่อนตอนเย็น 🍽', items: [
-    { t: '09:00', act: 'เก็บของ · เช็คเอาท์', note: '', cost: 0 },
-    { t: '10:00', act: 'ของฝากฟุกุชิมะ (พีช/แอปเปิลอบแห้ง)', note: 'ในสถานีมีครบ ไม่ต้องเดินไกล', cost: 1500 },
-    { t: '11:30', act: 'Tohoku Shinkansen (Yamabiko) → Tokyo Sta.', note: '~95 นาที', cost: 8810 },
-    { t: '13:15', act: 'ถึง Tokyo · เดินทางไปเช็คอิน Airbnb', note: 'ค่ารถในเมือง ~¥800', cost: 800 },
-    { t: '15:00', act: 'พักผ่อน / เดินสำรวจย่านที่พัก', note: 'เก็บแรงไว้มื้อเย็น', cost: 0 },
+  { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', title: 'ครึ่งวัน ② — เช้าฟุกุชิมะ → ถึง Tokyo บ่าย 3 · เย็นนัดเพื่อน 🍽', items: [
+    { t: '08:00', act: 'เช็คเอาท์ · ฝากกระเป๋าล็อกเกอร์สถานี Fukushima', note: 'เอาของหนักลงก่อน จะได้เที่ยวเช้าตัวเบา', cost: 700 },
+    { t: '09:00', act: 'Hanamiyama Park — วิวเมือง + เทือกอาซุมะ', note: 'บัสจากสถานี ~20 นาที · ถ้าขายังล้าจากวันเดินเขา สลับเป็น Mt. Shinobu (เดินจากสถานีได้) หรือนั่งชิลในคาเฟ่แทน', cost: 500 },
+    { t: '11:00', act: 'กลับสถานี · ของฝากฟุกุชิมะ', note: 'พีช/แอปเปิลอบแห้ง เหล้าสาเก ขนมประจำจังหวัด — ในสถานีมีครบ', cost: 1500 },
+    { t: '12:00', act: 'ข้าวเที่ยงในสถานี · รับกระเป๋า', note: 'เผื่อเวลาขึ้นชานชาลา 15 นาที', cost: 1200 },
+    { t: '13:20', act: '🚄 Tohoku Shinkansen (Yamabiko) → Tokyo', note: '~95 นาที · จองที่นั่งล่วงหน้าเพราะวันอาทิตย์คนกลับเยอะ', cost: 8810 },
+    { t: '15:00', act: 'ถึง Tokyo Sta. → ไปเช็คอิน Airbnb', note: 'ค่ารถในเมือง ~¥800 · ถึงที่พักราวบ่าย 4 กำลังดี ไม่ค่ำ', cost: 800 },
+    { t: '16:30', act: 'อาบน้ำ พักขา เดินสำรวจย่านที่พัก', note: '', cost: 0 },
     { t: '18:30', act: '🍽 นัดกินข้าวกับเพื่อน', note: 'นัดร้านล่วงหน้า วันอาทิตย์ร้านดังเต็มเร็ว', cost: 4000 },
   ]},
   { day: 7, date: 'จ. 26 ต.ค.', area: 'tokyo', title: 'Asakusa + Ueno + Ryogoku', items: [
@@ -448,7 +450,7 @@ const STAYS = [
     searchQuery: 'Fukushima Station, Fukushima, Japan',
     lat: 37.7543, lng: 140.4590,
     pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1500308318751323061?adults=4&children=0&infants=0&pets=0&check_in=2026-10-22&check_out=2026-10-25' },
-    note: 'เข้าพักบ่าย 22 ต.ค. · คืนที่สำคัญสุดคือคืนศุกร์ — เช้าเสาร์ต้องออกจากที่พักก่อน 08:15 ให้ทัน Sky Access ที่ West Exit',
+    note: 'อยู่ 4 วัน 3 คืน แบบ ครึ่งวัน–เต็มวัน–เต็มวัน–ครึ่งวัน · เข้าพักบ่าย 22 ต.ค. · คืนที่สำคัญสุดคือคืนศุกร์ เพราะเช้าเสาร์ต้องออกก่อน 08:15 ให้ทัน Sky Access ที่ West Exit · เช้าอาทิตย์เช็คเอาท์แล้วขึ้นชินคันเซ็น 13:20 ถึงโตเกียวบ่าย 3',
     en: { city: 'Fukushima', station: 'JR Fukushima Sta. — mountain bus leaves the West Exit at 08:30', note: 'The most important location of the trip: on hiking day we must leave by 08:15 to catch Sky Access at the West Exit' },
   },
   {
