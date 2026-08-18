@@ -657,6 +657,28 @@ applyMapLang();
 
   $('#rail-total').textContent = yen(RAIL_MAIN_TOTAL);
 
+  /* คุ้มไหมถ้าเช่ารถช่วง Fukushima */
+  const c = CAR_PLAN;
+  const carTotal = c.carPerDay * c.days + c.fuel + c.parking;
+  const carEach = carTotal / c.guests;
+  const publicEach = c.publicHike + c.publicLake;
+  const saveEach = publicEach - carEach;
+  $('#car-note').innerHTML = `
+    <h3>🚗 คุ้มไหมถ้าเช่ารถ ${c.days} วันตอนอยู่ Fukushima (23–24 ต.ค.)?</h3>
+    <table class="mini-table">
+      <tr><td>ค่ารถ ${c.days} วัน (รถกลาง/แวกอน พอ 4 คน + กระเป๋า)</td><td class="mono">${yen(c.carPerDay * c.days)}</td></tr>
+      <tr><td>น้ำมัน (Urabandai ไป-กลับ + ขึ้น Skyline)</td><td class="mono">${yen(c.fuel)}</td></tr>
+      <tr><td>ที่จอดนอกที่พัก (Jododaira ฯลฯ)</td><td class="mono">${yen(c.parking)}</td></tr>
+      <tr><td><strong>รวมต่อคัน</strong></td><td class="mono"><strong>${yen(carTotal)}</strong></td></tr>
+      <tr><td><strong>หาร ${c.guests} คน</strong></td><td class="mono"><strong>${yen(carEach)}/คน</strong></td></tr>
+      <tr><td>ถ้าไม่เช่ารถ: Sky Access ${yen(c.publicHike)} + ค่ารถวันทะเลสาบ ~${yen(c.publicLake)}</td><td class="mono">${yen(publicEach)}/คน</td></tr>
+    </table>
+    <p><strong>เช่ารถถูกกว่าประมาณ ${yen(saveEach)} ต่อคน (≈ ${baht(saveEach * rate)})</strong>
+    และที่พัก Fukushima มีที่จอดรถอยู่แล้ว จึงไม่มีค่าจอดรายคืนเพิ่ม</p>
+    <p class="note">⚠️ เงื่อนไขก่อนตัดสินใจ: ต้องมี<strong>ใบขับขี่สากลแบบอนุสัญญาเจนีวา 1949</strong> (ทำที่กรมการขนส่งฯ ใช้ได้ 1 ปี) พร้อมใบขับขี่ไทยตัวจริง · ญี่ปุ่นขับเลนซ้าย พวงมาลัยขวา ·
+    Bandai-Azuma Skyline และ Lake Line ไม่มีค่าผ่านทาง แต่ทางโค้งเยอะและ<strong>ประตูอาจปิดกลางคืน 17:00–07:00</strong> ถ้าเสี่ยงถนนลื่น ·
+    ปลาย ต.ค. บนเขา 1,600 ม. อาจมีน้ำแข็งช่วงเช้ามืด · จองรถล่วงหน้าเพราะเป็นเสาร์-อาทิตย์ฤดูใบไม้แดง · ยืนยันกับเจ้าของ Airbnb ว่าที่จอดฟรีและรถขนาดไหนเข้าได้</p>`;
+
   $('#transport-list').addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-mini');
     if (!btn || btn.classList.contains('added')) return;

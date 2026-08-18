@@ -361,6 +361,19 @@ const TRANSPORT = [
   ]},
 ];
 
+
+/* ---------- เช่ารถที่ Fukushima (23–24 ต.ค.) เทียบกับไปด้วยขนส่งสาธารณะ ----------
+   ราคาประมาณการช่วง high season ใบไม้เปลี่ยนสี — เช็คราคาจริงตอนจอง */
+const CAR_PLAN = {
+  days: 2,                 // รับรถเช้า 23 คืนรถเย็น 24
+  guests: 4,               // 4 คน
+  carPerDay: 11000,        // รถกลาง/แวกอน พอสำหรับ 4 คน + กระเป๋า
+  fuel: 4000,              // Urabandai ไป-กลับ + ขึ้น Skyline
+  parking: 1500,           // Jododaira ~¥500 + เผื่อจุดอื่น (ที่พักมีที่จอดอยู่แล้ว)
+  publicHike: 13000,       // Sky Access ต่อคน
+  publicLake: 8300,        // ค่ารถวันทะเลสาบ Urabandai ต่อคน
+};
+
 /* เส้นทางรถไฟหลักที่ใช้เทียบกับ JR EAST PASS (¥30,000) */
 const RAIL_MAIN_TOTAL = 3070 + 5020 + 1540 + 6500 + 8810 + 3070; // N'EX + Tokyo→Utsunomiya + เดย์ทริป Nikko + Utsunomiya→Fukushima + Fukushima→Tokyo + N'EX กลับ
 
