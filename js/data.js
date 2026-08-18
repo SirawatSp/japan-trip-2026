@@ -64,7 +64,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 2;
+const ITINERARY_VERSION = 3;
 
 const DEFAULT_ITINERARY = [
   { day: 1, date: 'อ. 20 ต.ค.', area: 'tochigi', title: 'Narita → Utsunomiya รวดเดียว', items: [
@@ -98,16 +98,18 @@ const DEFAULT_ITINERARY = [
     { t: '13:30', act: 'ชินคันเซ็น Utsunomiya → Fukushima', note: '~55 นาที · Yamabiko', cost: 6500 },
     { t: '14:40', act: 'ถึง Fukushima · เช็คอิน Airbnb (3 คืน)', note: '', cost: 0 },
     { t: '16:00', act: 'เดินสำรวจทาง West Exit + ซื้อเสบียงเดินเขา', note: 'ให้รู้ทางก่อนเช้าวันเสาร์ จะได้ไม่หลง', cost: 1500 },
-    { t: '18:30', act: 'เย็น: อาหารท้องถิ่นฟุกุชิมะ', note: '', cost: 1500 },
+    { t: '18:30', act: '🥟 เย็น: เกี๊ยวซ่าจานกลม (円盤餃子) ของขึ้นชื่อเมืองนี้', note: 'ร้านดังมีหลายเจ้ารอบสถานี — บางร้านหมดเร็ว ไปก่อน 19:00', cost: 1500 },
   ]},
-  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'Fukushima วันสบาย (สำรองไว้เดินเขาได้)', items: [
-    { t: '08:00', act: '⚠️ เช็คพยากรณ์อากาศของวันพรุ่งนี้', note: 'ถ้าเสาร์ 24 อากาศแย่ ให้สลับมาเดินเขาวันนี้แทนทั้งวัน', cost: 0 },
-    { t: '09:30', act: 'Fukushima Prefectural Museum of Art', note: 'Iizaka Line ลงป้าย 美術館図書館前 เดิน 2 นาที · ค่าเข้า+ค่ารถรวม ~¥800', cost: 800 },
-    { t: '12:00', act: 'ข้าวเที่ยง', note: '', cost: 1200 },
-    { t: '13:30', act: 'Hanamiyama Park', note: 'สวนบนเนิน วิวเมือง+ภูเขา · มีบัสตามฤดูกาล', cost: 500 },
-    { t: '16:00', act: 'Iizaka Onsen — แช่น้ำร้อนเตรียมขา', note: 'Iizaka Line ~25 นาที · ค่ารถไป-กลับ + ออนเซ็นรวม ~¥1,500', cost: 1500 },
-    { t: '19:00', act: 'เย็น: กินให้อิ่ม นอนเร็ว', note: 'พรุ่งนี้ตื่นตี 6', cost: 1500 },
-    { t: '—', act: 'ทางเลือกเที่ยวไกล: Tsuruga Castle (Aizu) หรือบึง Goshiki-numa (Urabandai)', note: 'ไป-กลับกินเวลาบนรถ 4-5 ชม. — เลือกอย่างใดอย่างหนึ่งแทนโปรแกรมข้างบนทั้งวัน', cost: 0 },
+  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'Fukushima เต็มวัน (สำรองไว้เดินเขาได้)', items: [
+    { t: '08:00', act: '⚠️ เช็คพยากรณ์อากาศของวันพรุ่งนี้', note: 'ถ้าเสาร์ 24 อากาศแย่ ให้สลับมาเดินเขาวันนี้แทนทั้งวัน แล้วยกโปรแกรมข้างล่างไปวันเสาร์', cost: 0 },
+    { t: '09:00', act: '🍎 เก็บแอปเปิลตาม Fruit Line (Azuma Orchard)', note: 'ต.ค. คือฤดูแอปเปิล Fuji — โทรจองสวนล่วงหน้า · บัส/แท็กซี่จากสถานี', cost: 1500 },
+    { t: '11:30', act: 'Fukushima Prefectural Museum of Art', note: 'Iizaka Line ลงป้าย 美術館図書館前 เดิน 2 นาที · Andrew Wyeth + ภาพพิมพ์ไซโตะ คิโยชิ', cost: 800 },
+    { t: '13:00', act: '🥟 ข้าวเที่ยง: เกี๊ยวซ่าจานกลม (円盤餃子)', note: 'ของขึ้นชื่อเมืองนี้ — เรียงเป็นวงบนกระทะกลม ก้นกรอบติดกันเป็นแผ่น', cost: 1200 },
+    { t: '15:00', act: '♨️ Iizaka Onsen — โรงอาบน้ำ Sabakoyu', note: 'Iizaka Line ~20-25 นาที (~¥370/เที่ยว) · ค่าเข้าโรงอาบน้ำ ~¥200 · ลองไข่เรเดียมด้วย', cost: 950 },
+    { t: '17:30', act: '🍂 Azuma Sports Park — light-up อุโมงค์แปะก๊วย', note: 'เปิดไฟ 17:00–20:00 ช่วงปลาย ต.ค.–กลาง พ.ย. (เช็คว่าปิดวันอังคารไหม) · แถวแปะก๊วย 116 ต้น ยาว 520 ม. · ค่ารถ ~¥500 — ถ้าเหนื่อยตัดอันนี้ออกได้', cost: 500 },
+    { t: '19:30', act: 'กลับที่พัก · เตรียมของวันเดินเขา นอนเร็ว', note: 'พรุ่งนี้ตื่น 07:00', cost: 1200 },
+    { t: '—', act: '🔁 ทางเลือกแบบไปไกล (แทนทั้งวัน): บึง Goshiki-numa @ Urabandai', note: 'ชินคันเซ็น→Koriyama, Ban\'etsu West→Inawashiro, บัส 30 นาที ¥790 · เดินเส้นราบ ~3.5 กม. ใบไม้พีคกลาง ต.ค.–ต้น พ.ย.', cost: 0 },
+    { t: '—', act: '🔁 ทางเลือกแบบไปไกล (แทนทั้งวัน): Tsuruga Castle + Ouchi-juku @ Aizu', note: 'Fukushima→Aizu-Wakamatsu ~2 ชม./เที่ยว · ถ้าจะต่อ Ouchi-juku ต้องบวก Aizu Railway 40 นาที + บัส 20 นาที = เต็มวันจริง ๆ', cost: 0 },
   ]},
   { day: 5, date: 'ส. 24 ต.ค.', area: 'fukushima', title: '⛰ เดินเขา Mt. Issaikyo', items: [
     { t: '07:00', act: 'ตื่น · ซื้อเสบียงเพิ่มที่เซเว่น', note: 'น้ำ 1.5 ลิตร + ข้าวกล่อง + snack ฉุกเฉิน', cost: 1000 },
@@ -120,7 +122,7 @@ const DEFAULT_ITINERARY = [
     { t: '12:50', act: 'แยกไป Kamanuma → Ubagahara', note: 'เดินตามป้าย Jododaira ห้ามออกนอกทาง', cost: 0 },
     { t: '14:10', act: 'กลับถึง Jododaira · ซื้อของ/ห้องน้ำ', note: 'เหลือ buffer อย่างน้อย 40 นาที', cost: 500 },
     { t: '15:00', act: 'รถออกตรงเวลา → ถึง Fukushima 16:00', note: 'รถไม่รอคนกลับช้า', cost: 0 },
-    { t: '17:00', act: 'Iizaka Onsen + ข้าวเย็นฉลอง 🍜', note: '', cost: 2300 },
+    { t: '17:00', act: 'Iizaka Onsen + ข้าวเย็นฉลอง 🍜', note: 'ถ้าวันศุกร์ยังไม่ได้ไป Sabakoyu (~¥200) คืนนี้เก็บได้ · หรือแช่ยาว ๆ ที่เรียวกังแบบ day-use', cost: 2300 },
   ]},
   { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', title: 'Fukushima → Tokyo — นัดเพื่อนตอนเย็น 🍽', items: [
     { t: '09:00', act: 'เก็บของ · เช็คเอาท์', note: '', cost: 0 },
@@ -249,6 +251,21 @@ const PLACES = [
     en: { name: 'Tsuruga Castle (Aizu-Wakamatsu)', desc: "Japan's only red-tiled castle keep, in the Aizu samurai town — from Fukushima it's shinkansen to Koriyama plus the Ban'etsu West Line, about 2 hr each way (a Friday 23 Oct option if you want to go far)" } },
   { name: 'บึง Goshiki-numa (Urabandai)', ja: '裏磐梯 五色沼', area: 'fukushima', lat: 37.6580, lng: 140.0710, day: 4, desc: 'เส้นทางเดินเลียบบึงหลากสี ~3.6 กม. เชิงภูเขาบันได (คนละที่กับ 五色沼 ที่มองจากยอด Issaikyo) — จาก Fukushima ~2 ชม./เที่ยว ผ่าน Koriyama + Inawashiro',
     en: { name: 'Goshiki-numa Ponds (Urabandai)', desc: 'A 3.6 km trail past multi-coloured ponds at the foot of Mt. Bandai (a different place from the 五色沼 seen from the Issaikyo summit) — ~2 hr each way from Fukushima via Koriyama and Inawashiro' } },
+  // Fukushima — เพิ่มจากข้อมูลเว็บเที่ยวฟุกุชิมะ (fukushima.travel / f-kankou.jp / welovefukushima) สำหรับช่วงปลาย ต.ค.
+  { name: 'Azuma Sports Park — อุโมงค์แปะก๊วย', ja: 'あづま総合運動公園 銀杏並木', area: 'fukushima', lat: 37.7317, lng: 140.3852, day: 4, desc: '🍂 แถวแปะก๊วย 116 ต้น ยาว 520 ม. เป็นอุโมงค์สีเหลือง · พีคปลาย ต.ค.–กลาง พ.ย. และมี light-up ช่วง 17:00–20:00 เริ่มราว 20 ต.ค. (บางปีปิดวันอังคาร — เช็คปีจริง) · หมุดโดยประมาณ บัสจากสถานี Fukushima ~30 นาที',
+    en: { name: 'Azuma Sports Park — ginkgo avenue', desc: '🍂 116 ginkgo trees forming a 520 m yellow tunnel · peaks late Oct to mid Nov with an evening light-up around 17:00–20:00 starting about 20 Oct (some years closed Tuesdays — check the actual year) · approximate pin, ~30 min by bus from Fukushima Sta.' } },
+  { name: 'Fruit Line — เก็บแอปเปิล (Azuma Orchard)', ja: 'フルーツライン りんご狩り', area: 'fukushima', lat: 37.7830, lng: 140.4060, day: 4, desc: '🍎 ถนนสวนผลไม้ของเมืองฟุกุชิมะ — เดือน ต.ค. เป็นฤดูแอปเปิล (พันธุ์ Fuji) เก็บเองกินได้ในสวน · หมุดโดยประมาณ ควรโทรจองสวนก่อน',
+    en: { name: 'Fruit Line — apple picking (Azuma Orchard)', desc: "🍎 Fukushima City's orchard road — October is apple season (Fuji), pick-your-own and eat in the orchard · approximate pin, call the orchard ahead" } },
+  { name: 'Mt. Shinobu (ชินโนบุยามะ)', ja: '信夫山', area: 'fukushima', lat: 37.7690, lng: 140.4680, day: 4, desc: '⛰ ภูเขาเตี้ยกลางเมือง เดินขึ้นได้จากสถานี Fukushima — วิวเมืองกับเทือกอาซุมะ เหมาะเป็นตัวเลือกเบา ๆ ถ้าขาล้าจากวันเดินเขา',
+    en: { name: 'Mt. Shinobu', desc: '⛰ A low hill in the middle of the city, walkable from Fukushima Sta. — city and Azuma-range views, an easy option if your legs are tired from the hike' } },
+  { name: 'Sabakoyu — โรงอาบน้ำเก่าแก่ Iizaka', ja: '鯖湖湯', area: 'fukushima', lat: 37.8262, lng: 140.4470, day: 4, ticket: 'ค่าเข้าประมาณ ¥200 · รถไฟ Iizaka Line เที่ยวละ ~¥370', desc: '♨️ โรงอาบน้ำสาธารณะไม้เก่าแก่ที่สุดแห่งหนึ่งของญี่ปุ่นใน Iizaka Onsen (บูรณะปี 1993) น้ำร้อนจัดแบบท้องถิ่น · แถวนั้นมี "ไข่เรเดียม" ต้มน้ำแร่ และร้าน Gyoza Terui เกี๊ยวซ่าจานกลม',
+    en: { name: 'Sabakoyu bathhouse (Iizaka)', ticket: 'Around ¥200 entry · Iizaka Line ~¥370 each way', desc: '♨️ One of Japan\'s oldest wooden public bathhouses, in Iizaka Onsen (rebuilt 1993) — properly hot local-style water · nearby: "radium eggs" boiled in the spring water and Gyoza Terui for disc gyoza' } },
+  { name: 'เกี๊ยวซ่าจานกลม (Enban Gyoza)', ja: '円盤餃子', area: 'fukushima', lat: 37.7545, lng: 140.4620, day: 3, desc: '🥟 ของขึ้นชื่อเมืองฟุกุชิมะ — เกี๊ยวซ่าเรียงเป็นวงกลมบนกระทะกลม ทอดจนก้นติดกันเป็นแผ่น กรอบกว่าเกี๊ยวซ่าทั่วไป มีร้านกว่าสิบร้านในเมือง (ร้านดังอีกสาขาอยู่ที่ Iizaka Onsen) · หมุดคือย่านรอบสถานี',
+    en: { name: 'Enban Gyoza (disc gyoza)', desc: "🥟 Fukushima City's signature dish — gyoza arranged in a circle on a round hotplate and fried until the bases fuse into one crisp disc. A dozen-plus shops in the city (another famous one is out at Iizaka Onsen) · pin marks the station area" } },
+  { name: 'Ouchi-juku', ja: '大内宿', area: 'fukushima', lat: 37.3306, lng: 139.8593, day: 4, desc: '🏘 หมู่บ้านบ้านหลังคาฟางสมัยเอโดะ — จาก Aizu-Wakamatsu นั่ง Aizu Railway ถึง Yunokami-Onsen ~40 นาที + บัส ~20 นาที · รวมจาก Fukushima ไปกลับเกือบทั้งวัน (ทางเลือกวันศุกร์เท่านั้น)',
+    en: { name: 'Ouchi-juku', desc: '🏘 Edo-era thatched-roof post town — from Aizu-Wakamatsu take the Aizu Railway to Yunokami-Onsen (~40 min) plus a ~20 min bus · from Fukushima it eats most of a day, so Friday only' } },
+  { name: 'Nihonmatsu Kasumigajo — เทศกาลตุ๊กตาเบญจมาศ', ja: '二本松 霞ヶ城 菊人形', area: 'fukushima', lat: 37.5947, lng: 140.4310, day: 4, ticket: 'ค่าเข้างานเช็คหน้างาน · ชินคันเซ็นจาก Fukushima ~15 นาที', desc: '🌼 งานตุ๊กตาดอกเบญจมาศบนซากปราสาท Kasumigajo จัดกลาง ต.ค.–กลาง พ.ย. ทุกปี (ทันช่วงทริปพอดี) — ช่างฝีมือใช้ดอกไม้ถึงหมื่นดอกต่อตัว · เดินจากสถานี Nihonmatsu ~20 นาที',
+    en: { name: 'Nihonmatsu Kasumigajo — Chrysanthemum Doll Festival', ticket: 'Check entry fee on site · ~15 min by shinkansen from Fukushima', desc: '🌼 Chrysanthemum doll festival on the Kasumigajo castle ruins, held mid-Oct to mid-Nov every year (right inside our window) — artisans use up to 10,000 blooms per figure · ~20 min walk from Nihonmatsu Sta.' } },
   // Other Taniguchi works in Japan — far from this route, reference only (from architecture-history.org)
   { name: 'Ken Domon Museum of Photography', ja: '土門拳記念館', area: 'other', lat: 38.906, lng: 139.845, day: null, type: 'museum', taniguchi: true, ticket: 'เช็คราคาที่เว็บ', url: 'http://www.domonken-kinenkan.jp/', desc: '🏛 Sakata, Yamagata (1983) — ผลงานที่ Taniguchi ได้รางวัล Japan Art Academy Prize ถือเป็นงานที่คนรัก Taniguchi ยกย่องสุด แต่ไกลมาก (~4 ชม.จากโตเกียว ผ่าน Niigata) เหมาะเป็นทริปแยกต่างหาก',
     en: { name: 'Ken Domon Museum of Photography', ticket: 'Check prices online', desc: '🏛 Sakata, Yamagata (1983) — the building that won Taniguchi the Japan Art Academy Prize, and the one his admirers rate highest. Very far though (~4 hr from Tokyo via Niigata); better as its own trip' } },
@@ -336,7 +353,13 @@ const EVENTS = [
   { title: 'ใบไม้เปลี่ยนสี Bandai-Azuma Skyline / Jododaira', area: 'fukushima', dateText: 'พีคต้น–กลาง ต.ค. · ปลายเดือนยังเก็บตกได้ที่ระดับล่าง', status: 'hit',
     desc: 'ถนนสวยติดอันดับญี่ปุ่น — วันเดินเขาจะได้วิวใบไม้เปลี่ยนสีระหว่างทางขึ้นเต็ม ๆ', url: 'https://fukushima.travel/destination/bandai-azuma-skyline/189' },
   { title: 'Nihonmatsu Chrysanthemum Doll Festival (菊人形)', area: 'fukushima', dateText: 'กลาง ต.ค. – กลาง พ.ย. ✓', status: 'hit',
-    desc: 'เทศกาลตุ๊กตาดอกเบญจมาศที่ปราสาท Kasumigajo, Nihonmatsu — นั่งชินคันเซ็นจาก Fukushima แค่ ~15 นาที + บัส', url: 'https://fukushima.travel/blogs/the-guide-to-every-fukushima-festival-in-2026/169' },
+    desc: 'เทศกาลตุ๊กตาดอกเบญจมาศบนซากปราสาท Kasumigajo — จัดกลาง ต.ค.–กลาง พ.ย. ต่อเนื่องมากว่า 60 ปี ช่างใช้ดอกไม้ถึง 10,000 ดอกต่อตุ๊กตาหนึ่งตัว · ชินคันเซ็นจาก Fukushima ~15 นาที แล้วเดินจากสถานี Nihonmatsu ~20 นาที', url: 'https://fukushima.travel/blogs/the-guide-to-every-fukushima-festival-in-2026/169' },
+  { title: 'Light-up อุโมงค์แปะก๊วย @ Azuma Sports Park (Fukushima City)', area: 'fukushima', dateText: 'ประมาณ 20 ต.ค. – กลาง พ.ย. · 17:00–20:00 ✓ ตรงคืนที่พัก Fukushima (22–24 ต.ค.)', status: 'hit',
+    desc: 'แถวแปะก๊วย 116 ต้น ยาว 520 ม. เปิดไฟกลางคืน — บางปีปิดวันอังคาร และวันเริ่มขยับตามสีใบไม้ ให้เช็คประกาศปี 2026 ก่อนไป', url: 'https://www.f-kankou.jp/en/experience/trip-ideas/426/' },
+  { title: 'เก็บแอปเปิล Fuji ตาม Fruit Line (Fukushima City)', area: 'fukushima', dateText: 'ฤดูแอปเปิลตลอดเดือน ต.ค. ✓', status: 'hit',
+    desc: 'สวนผลไม้ริม Fruit Line เปิดให้เก็บแอปเปิลเองช่วง ต.ค. (พันธุ์ Fuji ปลายฤดู) — ควรจองสวนล่วงหน้า เหมาะกับเช้าวันศุกร์ 23 ต.ค.', url: 'https://fukushima.travel/destination/pick-your-own-fruit-in-fukushima-city/91' },
+  { title: 'ใบไม้เปลี่ยนสี Goshiki-numa / Urabandai', area: 'fukushima', dateText: 'พีคกลาง ต.ค. – ต้น พ.ย. ✓ ตรงทริป', status: 'hit',
+    desc: 'บึงหลากสีเชิงภูเขาบันได เส้นทางเดินราบ ~3.5 กม. — จาก Fukushima ต้องต่อชินคันเซ็นถึง Koriyama แล้วนั่ง Ban\'etsu West Line ไป Inawashiro + บัส ~30 นาที (¥790)', url: 'https://www.fukushima.travel/destination/goshiki-numa-ponds/13' },
   // --- นิทรรศการพิเศษตามพิพิธภัณฑ์ที่ปักหมุดไว้ (เช็ควันจริงแล้ว) ---
   { title: '特別展「源氏物語」The Tale of Genji @ Tokyo National Museum', area: 'tokyo', dateText: '14 ต.ค. – 6 ธ.ค. 2026 ✓ ทันทั้ง Day 1 และ Day 8', status: 'hit',
     desc: 'นิทรรศการภาพวาด/ต้นฉบับที่เกี่ยวกับ Tale of Genji ครบรอบพิเศษ — จัดคู่กับ Gallery of Hōryū-ji Treasures ที่ปักหมุดไว้แล้ว ไปได้ทั้ง Day 1 และตอนกลับ Day 8', url: 'https://www.tnm.jp/modules/r_free_page/index.php?id=1255' },
@@ -365,7 +388,11 @@ const EVENT_SOURCES = [
   { name: 'GO TOKYO (ทางการ)', url: 'https://www.gotokyo.org/en/story/guide/the-best-festivals-in-tokyo-and-japan/index.html' },
   { name: 'Visit Tochigi', url: 'https://www.visit-tochigi.com/' },
   { name: 'Visit Nikko — Festivals', url: 'https://www.visitnikko.jp/en/things-to-do/festivals-and-events/' },
+  { name: 'Fukushima Travel (ทางการจังหวัด)', url: 'https://fukushima.travel/' },
   { name: 'Fukushima Travel — Festival Guide 2026', url: 'https://fukushima.travel/blogs/the-guide-to-every-fukushima-festival-in-2026/169' },
+  { name: 'Fukushima Travel — ใบไม้เปลี่ยนสี 10 อันดับ', url: 'https://fukushima.travel/blogs/top-10-places-to-see-autumn-leaves-in-fukushima/87' },
+  { name: 'We Love Fukushima', url: 'https://welovefukushima.com/' },
+  { name: 'Fukushima City Guide (f-kankou ทางการเมือง)', url: 'https://www.f-kankou.jp/en/' },
   { name: 'Walker+ (ญี่ปุ่น)', url: 'https://www.walkerplus.com/event_list/ar0300/' },
 ];
 
