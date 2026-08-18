@@ -64,7 +64,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 4;
+const ITINERARY_VERSION = 5;
 
 const DEFAULT_ITINERARY = [
   { day: 1, date: 'อ. 20 ต.ค.', area: 'tochigi', title: 'Narita → Utsunomiya รวดเดียว', items: [
@@ -99,17 +99,24 @@ const DEFAULT_ITINERARY = [
     { t: '14:40', act: 'ถึง Fukushima · เช็คอิน Airbnb (3 คืน)', note: 'ครึ่งบ่ายที่เหลือเอาไว้ตั้งหลัก อย่าอัดโปรแกรม', cost: 0 },
     { t: '16:00', act: 'เดินย่านสถานี · ซื้อเสบียงวันเดินเขา · เดินดูทาง West Exit', note: 'ให้รู้ทางก่อนเช้าวันเสาร์ จะได้ไม่หลง · เผื่อซื้อถุงมือ/หมวกที่ยังขาด', cost: 1500 },
     { t: '18:00', act: '🥟 เย็น: เกี๊ยวซ่าจานกลม (円盤餃子)', note: 'ของขึ้นชื่อประจำเมือง — ร้านดังรอบสถานีมีหลายเจ้า บางร้านหมดเร็ว ไปก่อน 19:00', cost: 1500 },
+    { t: '—', act: '🔁 ถ้ายังมีแรงเย็นนี้: light-up อุโมงค์แปะก๊วย @ Azuma Sports Park', note: 'เปิดไฟ 17:00–20:00 ช่วงปลาย ต.ค.–กลาง พ.ย. · บัสจากสถานี ~30 นาที — เก็บวันนี้ได้ถ้าไม่อยากเบียดวันศุกร์', cost: 500 },
   ]},
-  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'เต็มวัน ① — ฟุกุชิมะสายเหนือ + light-up แปะก๊วย', items: [
-    { t: '08:00', act: '⚠️ เช็คพยากรณ์อากาศของวันพรุ่งนี้', note: 'ถ้าเสาร์ 24 อากาศแย่ ให้สลับมาเดินเขาวันนี้แทนทั้งวัน แล้วยกโปรแกรมข้างล่างไปวันเสาร์', cost: 0 },
-    { t: '09:00', act: '🍎 เก็บแอปเปิลตาม Fruit Line (Azuma Orchard)', note: 'ต.ค. คือฤดูแอปเปิล Fuji — โทรจองสวนล่วงหน้า · บัส/แท็กซี่จากสถานี', cost: 1500 },
-    { t: '11:30', act: 'Fukushima Prefectural Museum of Art', note: 'Iizaka Line ลงป้าย 美術館図書館前 เดิน 2 นาที · Andrew Wyeth + ภาพพิมพ์ไซโตะ คิโยชิ', cost: 800 },
-    { t: '13:00', act: '🥟 ข้าวเที่ยง: เกี๊ยวซ่าจานกลม (円盤餃子)', note: 'ของขึ้นชื่อเมืองนี้ — เรียงเป็นวงบนกระทะกลม ก้นกรอบติดกันเป็นแผ่น', cost: 1200 },
-    { t: '15:00', act: '♨️ Iizaka Onsen — โรงอาบน้ำ Sabakoyu', note: 'Iizaka Line ~20-25 นาที (~¥370/เที่ยว) · ค่าเข้าโรงอาบน้ำ ~¥200 · ลองไข่เรเดียมด้วย', cost: 950 },
-    { t: '17:30', act: '🍂 Azuma Sports Park — light-up อุโมงค์แปะก๊วย', note: 'เปิดไฟ 17:00–20:00 ช่วงปลาย ต.ค.–กลาง พ.ย. (เช็คว่าปิดวันอังคารไหม) · แถวแปะก๊วย 116 ต้น ยาว 520 ม. · ค่ารถ ~¥500 — ถ้าเหนื่อยตัดอันนี้ออกได้', cost: 500 },
-    { t: '19:30', act: 'กลับที่พัก · เตรียมของวันเดินเขา นอนเร็ว', note: 'พรุ่งนี้ตื่น 07:00', cost: 1200 },
-    { t: '—', act: '🔁 ทางเลือกแบบไปไกล (แทนทั้งวัน): บึง Goshiki-numa @ Urabandai', note: 'ชินคันเซ็น→Koriyama, Ban\'etsu West→Inawashiro, บัส 30 นาที ¥790 · เดินเส้นราบ ~3.5 กม. ใบไม้พีคกลาง ต.ค.–ต้น พ.ย.', cost: 0 },
-    { t: '—', act: '🔁 ทางเลือกแบบไปไกล (แทนทั้งวัน): Tsuruga Castle + Ouchi-juku @ Aizu', note: 'Fukushima→Aizu-Wakamatsu ~2 ชม./เที่ยว · ถ้าจะต่อ Ouchi-juku ต้องบวก Aizu Railway 40 นาที + บัส 20 นาที = เต็มวันจริง ๆ', cost: 0 },
+  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'เต็มวัน ① — ธรรมชาติแบบชิว: ทะเลสาบ Urabandai', items: [
+    { t: '07:00', act: '⚠️ เช็คพยากรณ์อากาศของวันพรุ่งนี้ก่อนออก', note: 'ถ้าเสาร์ 24 อากาศแย่ ให้สลับ — เดินเขาวันนี้ แล้วยกวันทะเลสาบไปวันเสาร์แทน (ทะเลสาบเที่ยวได้แม้ฟ้าปิด)', cost: 0 },
+    { t: '07:40', act: 'ซื้อข้าวเช้า/น้ำที่สถานี Fukushima', note: '', cost: 600 },
+    { t: '08:10', act: '🚄 ชินคันเซ็น Fukushima → Koriyama', note: '~13 นาที ~¥2,600 · ประหยัดได้: รถไฟธรรมดาสาย Tohoku ~50 นาที ¥860 (ออกเช้ากว่านี้ ~1 ชม.)', cost: 2600 },
+    { t: '08:50', act: '🚃 Ban\'etsu West Line → สถานี Inawashiro', note: '~35 นาที · ขบวนห่างกันพอสมควร เช็ครอบก่อนวันเดินทาง', cost: 770 },
+    { t: '09:40', act: '🚌 บัส Bandai Toto → ป้าย Goshikinuma Iriguchi', note: '~30 นาที ¥790 · บัสสายนี้วิ่งต่อไป Urabandai Kogen-eki ปลายอีกฝั่งของเส้นทางเดิน', cost: 790 },
+    { t: '10:15', act: '🥾 เดินเส้น Goshiki-numa — บึงห้าสี 3.6 กม.', note: 'ทางราบ ไม่ต้องปีน ใช้เวลา 80–90 นาที · เดินจาก Goshikinuma Iriguchi ไปออก Urabandai Kogen-eki ผ่าน Bishamon-numa บึงใหญ่สุดที่มองเห็นภูเขาบันได · ใบไม้พีคกลาง ต.ค.–ต้น พ.ย.', cost: 0 },
+    { t: '12:00', act: 'ข้าวเที่ยงแถว Urabandai Kogen', note: 'ร้านอาหาร/คาเฟ่อยู่รวมกันแถวปลายทางเดิน', cost: 1200 },
+    { t: '13:00', act: '🚤 ล่องเรือทะเลสาบ Hibara ~35 นาที', note: 'เปิดปลาย เม.ย.–ต้น พ.ย. — ปลาย ต.ค. ยังทัน · ~¥1,500 · วิวใบไม้เปลี่ยนสีจากกลางทะเลสาบที่เดินไม่ถึง', cost: 1500 },
+    { t: '14:00', act: 'นั่งชิลริมทะเลสาบ · คาเฟ่ · ร้านของฝาก', note: 'วันนี้ตั้งใจให้เหลือเวลาไม่ต้องรีบ — ต่างจากวันเดินเขาที่มีเดดไลน์รถ', cost: 800 },
+    { t: '15:10', act: '🚌 บัสกลับสถานี Inawashiro', note: 'เช็ครอบบัสเที่ยวสุดท้ายตั้งแต่ตอนลงรถขามา', cost: 790 },
+    { t: '16:10', act: '🚃🚄 Inawashiro → Koriyama → Fukushima', note: 'รวม ~1 ชม. 15 นาที', cost: 3370 },
+    { t: '17:40', act: '♨️ ถึงเมือง — เลือกอย่างใดอย่างหนึ่งตามแรงที่เหลือ', note: 'A) Iizaka Onsen + Sabakoyu (~¥200 + ค่ารถ) · B) light-up อุโมงค์แปะก๊วย Azuma Sports Park (17:00–20:00) · C) กลับที่พักเลย เตรียมของวันเดินเขา', cost: 950 },
+    { t: '19:30', act: '🥟 ข้าวเย็น · เตรียมของวันเดินเขา นอนเร็ว', note: 'พรุ่งนี้ตื่น 07:00', cost: 1200 },
+    { t: '—', act: '🔁 ถ้าไม่อยากเดินทางไกล: ทะเลสาบ Inawashiro อย่างเดียว', note: 'ลงสถานี Inawashiro แล้วบัสสั้น ๆ ไปริมทะเลสาบ — ตัดช่วง Urabandai ออก ประหยัดทั้งเวลาและเงิน · ปลาย ต.ค. หงส์อพยพเริ่มมา', cost: 0 },
+    { t: '—', act: '🔁 ถ้ามีรถ/บัสฤดูกาล: แวะหุบเขา Nakatsugawa บน Bandai Lake Line', note: 'จุดใบไม้แดงดังของ Urabandai — ต่อจาก Lake Hibara ได้ถ้าขับรถเอง', cost: 0 },
   ]},
   { day: 5, date: 'ส. 24 ต.ค.', area: 'fukushima', title: 'เต็มวัน ② — ⛰ เดินเขา Mt. Issaikyo', items: [
     { t: '07:00', act: 'ตื่น · ซื้อเสบียงเพิ่มที่เซเว่น', note: 'น้ำ 1.5 ลิตร + ข้าวกล่อง + snack ฉุกเฉิน', cost: 1000 },
@@ -126,7 +133,8 @@ const DEFAULT_ITINERARY = [
   ]},
   { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', title: 'ครึ่งวัน ② — เช้าฟุกุชิมะ → ถึง Tokyo บ่าย 3 · เย็นนัดเพื่อน 🍽', items: [
     { t: '08:00', act: 'เช็คเอาท์ · ฝากกระเป๋าล็อกเกอร์สถานี Fukushima', note: 'เอาของหนักลงก่อน จะได้เที่ยวเช้าตัวเบา', cost: 700 },
-    { t: '09:00', act: 'Hanamiyama Park — วิวเมือง + เทือกอาซุมะ', note: 'บัสจากสถานี ~20 นาที · ถ้าขายังล้าจากวันเดินเขา สลับเป็น Mt. Shinobu (เดินจากสถานีได้) หรือนั่งชิลในคาเฟ่แทน', cost: 500 },
+    { t: '09:00', act: 'Hanamiyama Park — วิวเมือง + เทือกอาซุมะ', note: 'บัสจากสถานี ~20 นาที · ขาล้าจากวันเดินเขาก็ยังไหว เดินไม่ชัน', cost: 500 },
+    { t: '—', act: '🔁 สลับเช้าวันนี้เป็นอย่างอื่นได้: เก็บแอปเปิล Fruit Line / Fukushima Prefectural Museum of Art / Mt. Shinobu', note: 'เก็บแอปเปิลต้องโทรจองสวนก่อน · พิพิธภัณฑ์ลง Iizaka Line ป้าย 美術館図書館前 · Mt. Shinobu เดินจากสถานีได้เลยถ้าขี้เกียจเดินทาง', cost: 0 },
     { t: '11:00', act: 'กลับสถานี · ของฝากฟุกุชิมะ', note: 'พีช/แอปเปิลอบแห้ง เหล้าสาเก ขนมประจำจังหวัด — ในสถานีมีครบ', cost: 1500 },
     { t: '12:00', act: 'ข้าวเที่ยงในสถานี · รับกระเป๋า', note: 'เผื่อเวลาขึ้นชานชาลา 15 นาที', cost: 1200 },
     { t: '13:20', act: '🚄 Tohoku Shinkansen (Yamabiko) → Tokyo', note: '~95 นาที · จองที่นั่งล่วงหน้าเพราะวันอาทิตย์คนกลับเยอะ', cost: 8810 },
@@ -268,6 +276,12 @@ const PLACES = [
     en: { name: 'Ouchi-juku', desc: '🏘 Edo-era thatched-roof post town — from Aizu-Wakamatsu take the Aizu Railway to Yunokami-Onsen (~40 min) plus a ~20 min bus · from Fukushima it eats most of a day, so Friday only' } },
   { name: 'Nihonmatsu Kasumigajo — เทศกาลตุ๊กตาเบญจมาศ', ja: '二本松 霞ヶ城 菊人形', area: 'fukushima', lat: 37.5947, lng: 140.4310, day: 4, ticket: 'ค่าเข้างานเช็คหน้างาน · ชินคันเซ็นจาก Fukushima ~15 นาที', desc: '🌼 งานตุ๊กตาดอกเบญจมาศบนซากปราสาท Kasumigajo จัดกลาง ต.ค.–กลาง พ.ย. ทุกปี (ทันช่วงทริปพอดี) — ช่างฝีมือใช้ดอกไม้ถึงหมื่นดอกต่อตัว · เดินจากสถานี Nihonmatsu ~20 นาที',
     en: { name: 'Nihonmatsu Kasumigajo — Chrysanthemum Doll Festival', ticket: 'Check entry fee on site · ~15 min by shinkansen from Fukushima', desc: '🌼 Chrysanthemum doll festival on the Kasumigajo castle ruins, held mid-Oct to mid-Nov every year (right inside our window) — artisans use up to 10,000 blooms per figure · ~20 min walk from Nihonmatsu Sta.' } },
+  { name: 'ทะเลสาบ Hibara (Urabandai)', ja: '桧原湖', area: 'fukushima', lat: 37.6900, lng: 140.0400, day: 4, ticket: 'เรือชมวิวรอบละ ~35 นาที ~¥1,500 · เปิดปลาย เม.ย.–ต้น พ.ย.', desc: '🚤 ทะเลสาบใหญ่สุดของ Urabandai เกิดจากภูเขาบันไดระเบิดปี 1888 — มีเรือชมวิวแล่นอ้อมเกาะเล็กเกาะน้อย ~35 นาที (ปิดต้น พ.ย. ไปเดือนนี้ยังทัน) · ริมทะเลสาบมีคาเฟ่และร้านของฝาก นั่งชิลได้',
+    en: { name: 'Lake Hibara (Urabandai)', ticket: 'Sightseeing boat ~35 min, about ¥1,500 · runs late April to early November', desc: "🚤 Urabandai's largest lake, formed by Mt. Bandai's 1888 eruption — a ~35 min boat loop around its many small islands (season ends early Nov, so late Oct still works) · cafes and shops along the shore for an easy sit-down" } },
+  { name: 'ทะเลสาบ Inawashiro', ja: '猪苗代湖', area: 'fukushima', lat: 37.4667, lng: 140.0917, day: 4, desc: '🦢 ทะเลสาบใหญ่อันดับ 4 ของญี่ปุ่น น้ำใสจนเรียก "กระจกสวรรค์" — ตัวเลือกที่ชิลและใกล้กว่า Urabandai (เดินจากสถานี Inawashiro + บัสสั้น ๆ) · ปลาย ต.ค.–พ.ย. หงส์อพยพเริ่มทยอยมาที่หาด Shirakaba (เช็คช่วงเวลาก่อน)',
+    en: { name: 'Lake Inawashiro', desc: '🦢 Japan\'s fourth-largest lake, clear enough to be called the "Heavenly Mirror" — the closer, calmer alternative to Urabandai (short bus from Inawashiro Sta.) · migrating swans start arriving at Shirakaba beach from late Oct into Nov (worth checking timing first)' } },
+  { name: 'หุบเขา Nakatsugawa (Bandai Lake Line)', ja: '中津川渓谷', area: 'fukushima', lat: 37.6250, lng: 140.1050, day: 4, desc: '🍁 หุบเขาลำธารบนถนน Bandai-Azuma Lake Line — จุดใบไม้แดงชื่อดังของ Urabandai มีจุดชมวิวริมถนนและทางเดินลงลำธารสั้น ๆ · หมุดโดยประมาณ ต้องมีรถหรือบัสตามฤดูกาล',
+    en: { name: 'Nakatsugawa Valley (Bandai Lake Line)', desc: '🍁 A stream gorge on the Bandai-Azuma Lake Line — one of Urabandai\'s best-known autumn spots, with a roadside lookout and a short path down to the water · approximate pin; needs a car or a seasonal bus' } },
   // Other Taniguchi works in Japan — far from this route, reference only (from architecture-history.org)
   { name: 'Ken Domon Museum of Photography', ja: '土門拳記念館', area: 'other', lat: 38.906, lng: 139.845, day: null, type: 'museum', taniguchi: true, ticket: 'เช็คราคาที่เว็บ', url: 'http://www.domonken-kinenkan.jp/', desc: '🏛 Sakata, Yamagata (1983) — ผลงานที่ Taniguchi ได้รางวัล Japan Art Academy Prize ถือเป็นงานที่คนรัก Taniguchi ยกย่องสุด แต่ไกลมาก (~4 ชม.จากโตเกียว ผ่าน Niigata) เหมาะเป็นทริปแยกต่างหาก',
     en: { name: 'Ken Domon Museum of Photography', ticket: 'Check prices online', desc: '🏛 Sakata, Yamagata (1983) — the building that won Taniguchi the Japan Art Academy Prize, and the one his admirers rate highest. Very far though (~4 hr from Tokyo via Niigata); better as its own trip' } },
