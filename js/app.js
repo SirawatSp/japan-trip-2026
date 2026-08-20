@@ -433,14 +433,17 @@ let activeArea = 'all';
 let activeType = 'all'; // 'all' | 'museum' | 'taniguchi'
 
 function placeMatches(p) {
+  /* ตัวกรองที่รวมสถานที่นอกเส้นทางทริปไว้ด้วย จึงต้องยอมให้ area 'other' ผ่าน */
+  const includesNationwide = activeType === 'taniguchi' || activeType === 'spot';
   const areaOk = activeArea === 'all'
-    ? (activeType === 'taniguchi' ? true : p.area !== 'other')
+    ? (includesNationwide ? true : p.area !== 'other')
     : p.area === activeArea;
   const typeOk = activeType === 'all'
     || (activeType === 'museum' && p.type === 'museum')
     || (activeType === 'taniguchi' && p.taniguchi === true)
     || (activeType === 'stay' && p.type === 'stay')
-    || (activeType === 'car' && p.type === 'car');
+    || (activeType === 'car' && p.type === 'car')
+    || (activeType === 'spot' && p.type === 'spot');
   return areaOk && typeOk;
 }
 
@@ -795,6 +798,97 @@ applyMapLang();
     renderBudget();
     renderExpenses();
   });
+})();
+
+
+/* ============ คลังสถานที่จากการค้นคว้า ============ */
+(function renderSpots() {
+  const grid = $('#spot-grid');
+  if (!grid) return;
+
+  const FIT_LABEL = {
+    good:    { th: 'เข้ากรอบ 21–25 ต.ค.', cls: 'fit-good' },
+    stretch: { th: 'ไปได้แต่ฝืน',          cls: 'fit-stretch' },
+    no:      { th: 'อยู่นอกกรอบทริป',      cls: 'fit-no' },
+  };
+  const fitOf = (sp) => FIT_LABEL[sp.fit || 'good'];
+  /* รูปจริงตามฤดู: ลิงก์ค้นรูป ไม่ฝังภาพที่ยืนยันต้นทางไม่ได้ */
+  const photoUrl = (sp) => 'https://www.google.com/search?tbm=isch&q=' +
+    encodeURIComponent(sp.photoQuery || `${sp.ja} 紅葉 10月`);
+
+  let activeBase = 'all';
+
+  const counts = RESEARCH_SPOTS.reduce((a, sp) => { a[sp.base] = (a[sp.base] || 0) + 1; return a; }, {});
+  $('#spot-filters').innerHTML =
+    `<button class="chip active" data-base="all">ทั้งหมด (${RESEARCH_SPOTS.length})</button>` +
+    Object.keys(SPOT_BASES).map((k) =>
+      `<button class="chip" data-base="${k}">${esc(SPOT_BASES[k].th)} (${counts[k] || 0})</button>`).join('');
+
+  function draw() {
+    const list = RESEARCH_SPOTS.filter((sp) => activeBase === 'all' || sp.base === activeBase);
+    const baseHead = activeBase === 'all' ? '' :
+      `<div class="spot-base-note card"><strong>เดินทางไปฐานนี้:</strong> ${esc(SPOT_BASES[activeBase].access)}</div>`;
+    grid.innerHTML = baseHead + list.map((sp) => {
+      const fit = fitOf(sp);
+      return `
+      <article class="spot-card ${fit.cls}-card">
+        <div class="spot-head">
+          <div>
+            <h3>${sp.requested ? '<span class="req-tag" title="จากลิสต์ที่ส่งมา">★</span> ' : ''}${esc(sp.name)}</h3>
+            <span class="jp spot-ja">${esc(sp.ja)}</span>
+            <span class="spot-base">${esc(SPOT_BASES[sp.base].th)}</span>
+          </div>
+          <span class="fit-tag ${fit.cls}">${fit.th}</span>
+        </div>
+        <p class="spot-highlight">${sp.highlight}</p>
+        <div class="spot-needs">${(sp.need || []).map((n) =>
+          `<span class="need-tag" title="${esc(SPOT_NEEDS[n].en)}">${SPOT_NEEDS[n].icon} ${esc(SPOT_NEEDS[n].th)}</span>`).join('')}</div>
+        <div class="spot-access">
+          <h4>วิธีไป</h4>
+          <ol>${(sp.access || []).map((a) => `<li>${a}</li>`).join('')}</ol>
+        </div>
+        <p class="spot-season">${sp.season}</p>
+        ${sp.warn ? `<p class="spot-warn">${sp.warn}</p>` : ''}
+        <div class="spot-actions">
+          <a class="btn-mini" href="${photoUrl(sp)}" target="_blank" rel="noopener">📷 รูปช่วง ต.ค. ↗</a>
+          <a class="btn-mini" href="https://www.google.com/maps/search/?api=1&query=${sp.lat},${sp.lng}&hl=th" target="_blank" rel="noopener">🗺 Google Maps ↗</a>
+          <a class="btn-mini" href="${esc(sp.url)}" target="_blank" rel="noopener">ข้อมูลทางการ ↗</a>
+          <button class="btn-mini spot-map-btn" data-lat="${sp.lat}" data-lng="${sp.lng}">📍 ดูบนแผนที่</button>
+        </div>
+      </article>`;
+    }).join('');
+  }
+  draw();
+
+  $('#spot-filters').addEventListener('click', (e) => {
+    const btn = e.target.closest('button.chip[data-base]');
+    if (!btn) return;
+    activeBase = btn.dataset.base;
+    document.querySelectorAll('#spot-filters button.chip[data-base]').forEach((b) =>
+      b.classList.toggle('active', b.dataset.base === activeBase));
+    draw();
+  });
+
+  grid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.spot-map-btn');
+    if (!btn) return;
+    document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+    activeType = 'spot';
+    document.querySelectorAll('#type-filters button.chip[data-type]').forEach((b) =>
+      b.classList.toggle('active', b.dataset.type === 'spot'));
+    refreshMap();
+    setTimeout(() => {
+      map.flyTo([+btn.dataset.lat, +btn.dataset.lng], 11, { duration: .8 });
+    }, 400);
+  });
+
+  $('#spot-photo-note').innerHTML = `<h3>📷 เรื่องรูปภาพ</h3>
+    <p>ปุ่ม <strong>「รูปช่วง ต.ค.」</strong> ของแต่ละจุดเปิดการค้นรูปด้วย<strong>ชื่อภาษาญี่ปุ่นของสถานที่ + 紅葉 (ใบไม้เปลี่ยนสี) + 10月</strong>
+    จึงได้รูปจริงที่คนถ่ายในเดือนตุลาคมและเป็นปัจจุบันเสมอ ไม่ใช่รูปเก่าที่ฝังตายไว้</p>
+    <p class="note">เหตุผลที่ไม่ฝังรูปลงหน้าเว็บโดยตรง: เครื่องที่สร้างเว็บนี้ถูกนโยบายเครือข่ายบล็อกไม่ให้เข้า
+    <span class="mono">commons.wikimedia.org</span>, <span class="mono">upload.wikimedia.org</span>,
+    <span class="mono">flickr.com</span> และ <span class="mono">wikipedia.org</span> — จึง<strong>ยืนยันไม่ได้ว่า URL รูปไหนมีอยู่จริงหรือเป็นภาพของสถานที่นั้นจริง</strong>
+    ถ้าฝังไปแบบเดา จะได้รูปเสียหรือรูปผิดที่ · ถ้าอยากได้รูปฝังในหน้านี้ ส่งลิงก์รูปที่เลือกเองมาได้เลย เดี๋ยวใส่ให้</p>`;
 })();
 
 /* ============ events ============ */

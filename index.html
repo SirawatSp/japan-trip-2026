@@ -19,7 +19,8 @@
       <a href="#itinerary">แผนรายวัน</a>
       <a href="#stay">ที่พัก</a>
       <a href="#map">แผนที่</a>
-      <a href="#transport">การเดินทาง</a>
+      <a href="#spots">คลังสถานที่</a>
+  <a href="#transport">การเดินทาง</a>
       <a href="#hike">เดินเขา</a>
       <a href="#events">Events</a>
       <a href="#shopping">ของที่จะซื้อ</a>
@@ -130,7 +131,8 @@
     <button class="chip" data-type="museum">🏛 เฉพาะพิพิธภัณฑ์</button>
     <button class="chip" data-type="taniguchi">✏️ งาน Yoshio Taniguchi</button>
     <button class="chip" data-type="stay">🛏 ที่พัก</button>
-    <button class="chip" data-type="car">🚗 เช่ารถ</button>
+    <button class="chip" data-type="spot">🔭 ที่เที่ยวตัวเลือก</button>
+      <button class="chip" data-type="car">🚗 เช่ารถ</button>
     <div class="lang-toggle" id="basemap-picker" role="group" aria-label="สไตล์แผนที่ / basemap">
       <button class="chip" data-basemap="en-street" title="ป้ายชื่อภาษาอังกฤษ แบบแผนที่ถนน">EN · Street</button>
       <button class="chip" data-basemap="en-light" title="ป้ายชื่อภาษาอังกฤษ พื้นสีอ่อน อ่านง่าย">EN · Light</button>
@@ -141,6 +143,25 @@
     <div id="leaflet-map" role="application" aria-label="แผนที่สถานที่ท่องเที่ยว"></div>
     <div class="place-list" id="place-list"></div>
   </div>
+</section>
+
+<!-- ============ SPOT RESEARCH ============ -->
+<section class="section" id="spots">
+  <div class="section-head">
+    <span class="section-ja jp">候補地</span>
+    <h2>คลังสถานที่ + เงื่อนไขการเดินทาง</h2>
+    <p class="section-desc">ที่เที่ยวที่ค้นมาสำหรับเลือกฐานช่วง <strong>21–25 ต.ค.</strong> — แต่ละใบบอก<strong>ไฮไลต์ / วิธีไปทีละต่อ / ข้อจำกัดที่ทำให้ไปไม่ได้</strong> ·
+    ป้ายสีบอกว่าเข้ากรอบทริปเราไหม · ทุกจุดมีปุ่มดูรูปจริงช่วงเดือนตุลาคม · หมุดทั้งหมดอยู่บนแผนที่ กรอง「🔭 ที่เที่ยวตัวเลือก」</p>
+  </div>
+  <div class="spot-filters" id="spot-filters"></div>
+  <div class="spot-legend">
+    <span class="fit-tag fit-good">เข้ากรอบ 21–25 ต.ค.</span>
+    <span class="fit-tag fit-stretch">ไปได้แต่ฝืน</span>
+    <span class="fit-tag fit-no">อยู่นอกกรอบทริป</span>
+    <span class="req-tag">★ จากลิสต์ที่ส่งมา</span>
+  </div>
+  <div class="spot-grid" id="spot-grid"></div>
+  <div class="card spot-photo-note" id="spot-photo-note"></div>
 </section>
 
 <!-- ============ TRANSPORT ============ -->

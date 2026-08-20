@@ -772,3 +772,48 @@ body {
   .fare-time::before { content: '⏱ '; }
   .fare-xfer::before { content: '🔀 '; }
 }
+
+/* ---------- คลังสถานที่จากการค้นคว้า ---------- */
+.spot-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.spot-legend { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; font-size: .78rem; }
+.spot-base-note { grid-column: 1 / -1; font-size: .9rem; }
+.spot-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.spot-card {
+  background: var(--card, #fff); border: 1px solid var(--line, #e3ded4);
+  border-left: 4px solid var(--muted, #8d8375);
+  border-radius: 12px; padding: 16px 18px;
+}
+.fit-good-card    { border-left-color: #3e5c46; }
+.fit-stretch-card { border-left-color: #d97b29; }
+.fit-no-card      { border-left-color: #b04a3a; opacity: .92; }
+.spot-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.spot-head h3 { margin: 0 0 2px; font-size: 1.05rem; line-height: 1.4; }
+.spot-ja { font-size: .8rem; color: var(--muted, #8d8375); margin-right: 8px; }
+.spot-base {
+  font-size: .7rem; background: rgba(0,0,0,.05); padding: 1px 7px; border-radius: 20px;
+  color: var(--muted, #8d8375); white-space: nowrap;
+}
+.fit-tag { font-size: .7rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; font-weight: 600; }
+.fit-good    { background: rgba(62,92,70,.14);  color: #3e5c46; }
+.fit-stretch { background: rgba(217,123,41,.16); color: #a85c15; }
+.fit-no      { background: rgba(176,74,58,.14);  color: #b04a3a; }
+.req-tag { color: #b8860b; font-weight: 700; }
+.spot-highlight { font-size: .9rem; line-height: 1.7; margin: 0 0 10px; }
+.spot-needs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.need-tag {
+  font-size: .72rem; background: rgba(0,0,0,.045); border: 1px solid var(--line, #e3ded4);
+  padding: 2px 8px; border-radius: 20px; white-space: nowrap;
+}
+.spot-access h4 {
+  margin: 0 0 4px; font-size: .74rem; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--muted, #8d8375);
+}
+.spot-access ol { margin: 0 0 10px; padding-left: 20px; }
+.spot-access li { font-size: .84rem; line-height: 1.65; margin-bottom: 3px; }
+.spot-season { font-size: .84rem; line-height: 1.65; margin: 0 0 8px; }
+.spot-warn {
+  font-size: .82rem; line-height: 1.65; margin: 0 0 10px;
+  background: rgba(176,74,58,.08); border-radius: 8px; padding: 8px 10px;
+}
+.spot-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.spot-photo-note { margin-top: 18px; }
