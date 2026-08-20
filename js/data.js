@@ -39,7 +39,7 @@ const MAP_UI = {
   th: {
     sectionDesc: 'หมุดทุกจุดที่จะไป แยกสีตามพื้นที่ · คลิกชื่อสถานที่ในลิสต์เพื่อซูมไป',
     all: 'ทั้งหมด', other: 'อื่นๆ ทั่วญี่ปุ่น', route: 'เส้นทางหลัก',
-    allTypes: 'ทุกประเภท', museum: '🏛 เฉพาะพิพิธภัณฑ์', taniguchi: '✏️ งาน Yoshio Taniguchi', stay: '🛏 ที่พัก',
+    allTypes: 'ทุกประเภท', museum: '🏛 เฉพาะพิพิธภัณฑ์', taniguchi: '✏️ งาน Yoshio Taniguchi', stay: '🛏 ที่พัก', car: '🚗 เช่ารถ',
     empty: 'ไม่มีสถานที่ตามตัวกรองนี้',
     outsideTrip: 'นอกแผนทริป',
     official: 'เว็บทางการ', search: 'ค้นหา', directions: 'เปิดใน Google Maps',
@@ -48,7 +48,7 @@ const MAP_UI = {
   en: {
     sectionDesc: 'Every pin on the trip, coloured by area · click a place in the list to zoom to it',
     all: 'All areas', other: 'Elsewhere in Japan', route: 'Main route',
-    allTypes: 'All types', museum: '🏛 Museums only', taniguchi: '✏️ Yoshio Taniguchi works', stay: '🛏 Stays',
+    allTypes: 'All types', museum: '🏛 Museums only', taniguchi: '✏️ Yoshio Taniguchi works', stay: '🛏 Stays', car: '🚗 Car rental',
     empty: 'No places match this filter',
     outsideTrip: 'Not on the trip route',
     official: 'Official site', search: 'Search', directions: 'Open in Google Maps',
@@ -537,6 +537,50 @@ STAYS.forEach((s) => {
     });
   }
 });
+
+
+/* ---------- บริษัทเช่ารถรอบสถานี Fukushima ----------
+   พิกัดเป็นตำแหน่งโดยประมาณจากคำอธิบายทางเดินของแต่ละสาขา (เว็บบริษัทเปิดตรงจาก sandbox ไม่ได้)
+   ราคาเป็นช่วงอ้างอิงจากข้อมูลรวมของเว็บจอง — ต้องกดเข้าไปเช็คราคาจริงตามวันที่ */
+const CAR_RENTALS = [
+  { name: 'Toyota Rent a Car — สาขาฝั่งชินคันเซ็น (西口)', ja: 'トヨタレンタカー 福島駅新幹線口店',
+    lat: 37.7546, lng: 140.4570, walk: 'เดิน 1 นาทีจากทางออกฝั่งตะวันตก (ชินคันเซ็น)',
+    url: 'https://rent.toyota.co.jp/eng/', book: 'จองภาษาอังกฤษได้ที่เว็บ Toyota EN',
+    note: 'ใกล้ชานชาลาชินคันเซ็นที่สุด — สะดวกถ้ารับรถทันทีที่ลงจากรถไฟ · รถใหม่ ระบบภาษาอังกฤษในรถมีเกือบทุกคัน' },
+  { name: 'Toyota Rent a Car — สาขาหน้าสถานี (東口)', ja: 'トヨタレンタカー 福島駅前店',
+    lat: 37.7560, lng: 140.4605, walk: 'เดินขึ้นเหนือ ~3 นาทีจากทางออกฝั่งตะวันออก',
+    url: 'https://rent.toyota.co.jp/eng/', book: 'จองภาษาอังกฤษได้ที่เว็บ Toyota EN',
+    note: 'สาขาสำรองของ Toyota ถ้าสาขาชินคันเซ็นรถเต็ม' },
+  { name: 'Nippon Rent-A-Car — ฝั่งตะวันออก', ja: 'ニッポンレンタカー 福島駅東口',
+    lat: 37.7525, lng: 140.4620, walk: 'เดิน 1 นาทีจากทางออกฝั่งตะวันออก',
+    url: 'https://www.nipponrentacar.co.jp/en/', book: 'เว็บภาษาอังกฤษของ Nippon',
+    note: '⚠️ ย้ายที่ตั้งเมื่อ เม.ย. 2025 ไปที่ 置賜町 1-4 — เช็คแผนที่ในใบจองอีกครั้งก่อนไป' },
+  { name: 'ORIX Rent-A-Car — ฝั่งตะวันตก', ja: 'オリックスレンタカー 福島駅西口店',
+    lat: 37.7535, lng: 140.4570, walk: 'เดิน 3 นาทีจากทางออกฝั่งตะวันตก',
+    url: 'https://car.orix.co.jp/eng/', book: 'เว็บภาษาอังกฤษของ ORIX',
+    note: 'มักเป็นเจ้าที่ราคาถูกสุดในฟุกุชิมะจากข้อมูลเว็บเปรียบเทียบ' },
+  { name: 'Ekiren (JR East) — ฝั่งตะวันตก', ja: '駅レンタカー 福島駅営業所',
+    lat: 37.7538, lng: 140.4577, walk: 'ออกประตูฝั่งตะวันตกแล้วเลี้ยวขวา ~80 ม. · เปิด 08:00–19:00',
+    url: 'https://www.ekiren.co.jp/', book: 'เว็บ Ekiren (ญี่ปุ่น) — จองคู่กับตั๋ว JR ได้',
+    note: 'ของ JR East เอง อยู่ติดสถานีที่สุด · เว็บเป็นภาษาญี่ปุ่นเป็นหลัก' },
+];
+
+/* เว็บเปรียบเทียบราคา/จองรวมหลายเจ้า */
+const CAR_BOOKING_SITES = [
+  { name: 'Klook — รถเช่าฟุกุชิมะ (ไทย/อังกฤษ จ่ายบัตรได้)', url: 'https://www.klook.com/en-US/car-rentals/city/18085-fukushima-car-rentals/' },
+  { name: 'ToCoo! — เจ้าที่นักท่องเที่ยวต่างชาติใช้เยอะ', url: 'https://www2.tocoo.jp/en/' },
+  { name: 'Rakuten Travel — รถเช่ารอบสถานี Fukushima (ญี่ปุ่น)', url: 'https://cars.travel.rakuten.co.jp/cars/station/fukushima/79697.html' },
+  { name: 'Web-Rentacar — รวมสาขาแถวสถานี Fukushima (อังกฤษ)', url: 'https://www.web-rentacar.com/en/area/station/ST0336' },
+  { name: 'KAYAK — เทียบราคารถเช่าจังหวัดฟุกุชิมะ', url: 'https://www.kayak.com/Fukushima-Prefecture-Japan-Car-Rentals.1754.crr.html' },
+];
+
+/* หมุดร้านเช่ารถบนแผนที่ */
+CAR_RENTALS.forEach((r) => PLACES.push({
+  name: r.name, ja: r.ja, area: 'fukushima', lat: r.lat, lng: r.lng, day: 4, type: 'car',
+  url: r.url, ticket: r.walk,
+  desc: `🚗 จุดรับรถสำหรับวันทะเลสาบ/วันเดินเขา — ${r.note} · หมุดโดยประมาณจากคำอธิบายทางเดินของสาขา`,
+  en: { name: r.ja, ticket: r.walk, desc: '🚗 Pick-up point for the lakes and hiking days · pin position approximated from the branch\'s walking directions' },
+}));
 
 /* ---------- budget categories (planned, JPY) ---------- */
 const DEFAULT_BUDGET = [

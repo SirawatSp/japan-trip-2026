@@ -409,7 +409,7 @@ function popupHtml(p) {
     <div class="popup-title">${esc(placeName(p))}</div>
     <div class="popup-ja">${esc(p.ja)}</div>
     <div class="popup-desc">${esc(placeDesc(p))}</div>
-    <span class="popup-day">${dayLabel(p)} · ${areaLabel(p.area)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}${p.type === 'stay' ? ' <span class="popup-tag popup-tag-stay">🛏</span>' : ''}
+    <span class="popup-day">${dayLabel(p)} · ${areaLabel(p.area)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}${p.type === 'stay' ? ' <span class="popup-tag popup-tag-stay">🛏</span>' : ''}${p.type === 'car' ? ' <span class="popup-tag popup-tag-car">🚗</span>' : ''}
     ${placeTicket(p) ? `<div class="popup-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
     ${p.type === 'stay' ? stayPopupBlock(p) : ''}
     <a class="popup-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener">${p.url ? mt('official') : mt('search')} ↗</a>
@@ -439,7 +439,8 @@ function placeMatches(p) {
   const typeOk = activeType === 'all'
     || (activeType === 'museum' && p.type === 'museum')
     || (activeType === 'taniguchi' && p.taniguchi === true)
-    || (activeType === 'stay' && p.type === 'stay');
+    || (activeType === 'stay' && p.type === 'stay')
+    || (activeType === 'car' && p.type === 'car');
   return areaOk && typeOk;
 }
 
@@ -656,6 +657,48 @@ applyMapLang();
     </div>`).join('');
 
   $('#rail-total').textContent = yen(RAIL_MAIN_TOTAL);
+
+  /* ร้านเช่ารถรอบสถานี Fukushima */
+  $('#rental-grid').innerHTML = CAR_RENTALS.map((r, i) => `
+    <article class="rental-card">
+      <div class="rental-head">
+        <a class="rental-name" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.name)} ↗</a>
+        <span class="jp rental-ja">${esc(r.ja)}</span>
+      </div>
+      <div class="rental-walk">🚶 ${esc(r.walk)}</div>
+      <p class="rental-note">${esc(r.note)}</p>
+      <div class="rental-actions">
+        <a class="btn-mini" href="${esc(r.url)}" target="_blank" rel="noopener">ไปหน้าจอง ↗</a>
+        <a class="btn-mini" href="https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}&hl=th" target="_blank" rel="noopener">เปิดใน Google Maps ↗</a>
+        <button class="btn-mini rental-map-btn" data-i="${i}">📍 ดูบนแผนที่</button>
+      </div>
+    </article>`).join('');
+
+  $('#rental-sites').innerHTML = CAR_BOOKING_SITES.map((s) =>
+    `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)} ↗</a>`).join('');
+
+  const c2 = CAR_PLAN;
+  $('#rental-price-note').innerHTML = `<strong>ราคาอ้างอิง:</strong> เว็บเทียบราคารายงานรถเล็กในจังหวัดฟุกุชิมะเริ่มราว
+    <span class="mono">US$37–51/วัน</span> (≈ <span class="mono">¥5,500–7,600</span>) แล้วแต่เจ้าและวันที่ —
+    แผนของเราตั้งงบไว้ที่ <span class="mono">${yen(c2.carPerDay)}/วัน</span> เพราะ 4 คนต้องขยับไปรถขนาดกลาง/แวกอนให้พอกับกระเป๋า
+    และ 23–24 ต.ค. เป็นเสาร์-อาทิตย์ช่วงใบไม้เปลี่ยนสีซึ่งราคาขึ้น ·
+    ตัวเลขนี้แก้ได้ที่ <span class="mono">CAR_PLAN.carPerDay</span> ใน <span class="mono">js/data.js</span> เมื่อได้ราคาจริงแล้ว`;
+
+  $('#rental-grid').addEventListener('click', (e) => {
+    const btn = e.target.closest('.rental-map-btn');
+    if (!btn) return;
+    const r = CAR_RENTALS[+btn.dataset.i];
+    document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+    activeType = 'car';
+    document.querySelectorAll('#type-filters button.chip[data-type]').forEach((b) =>
+      b.classList.toggle('active', b.dataset.type === 'car'));
+    refreshMap();
+    setTimeout(() => {
+      map.flyTo([r.lat, r.lng], 16, { duration: .8 });
+      const marker = markers.find((m) => m._place.lat === r.lat && m._place.lng === r.lng);
+      if (marker && map.hasLayer(marker)) setTimeout(() => marker.openPopup(), 850);
+    }, 400);
+  });
 
   /* คุ้มไหมถ้าเช่ารถช่วง Fukushima */
   const c = CAR_PLAN;

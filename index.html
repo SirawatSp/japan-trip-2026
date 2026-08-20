@@ -130,6 +130,7 @@
     <button class="chip" data-type="museum">🏛 เฉพาะพิพิธภัณฑ์</button>
     <button class="chip" data-type="taniguchi">✏️ งาน Yoshio Taniguchi</button>
     <button class="chip" data-type="stay">🛏 ที่พัก</button>
+    <button class="chip" data-type="car">🚗 เช่ารถ</button>
     <div class="lang-toggle" id="basemap-picker" role="group" aria-label="สไตล์แผนที่ / basemap">
       <button class="chip" data-basemap="en-street" title="ป้ายชื่อภาษาอังกฤษ แบบแผนที่ถนน">EN · Street</button>
       <button class="chip" data-basemap="en-light" title="ป้ายชื่อภาษาอังกฤษ พื้นสีอ่อน อ่านง่าย">EN · Light</button>
@@ -151,6 +152,16 @@
   </div>
   <div class="transport-list" id="transport-list"></div>
   <div class="pass-note card" id="car-note"></div>
+  <div class="rental-block">
+    <h3 class="sub-head">🚗 ร้านเช่ารถรอบสถานี Fukushima</h3>
+    <p class="section-desc rental-desc">ทุกสาขาอยู่ในระยะเดินจากสถานี · กดชื่อร้านเพื่อไปหน้าจอง · ราคาต้องเช็คตามวันที่จริง (23–24 ต.ค. เป็นเสาร์-อาทิตย์ฤดูใบไม้แดง ควรจองล่วงหน้า) · หมุดทุกร้านอยู่บนแผนที่ กรอง「🚗 เช่ารถ」</p>
+    <div class="rental-grid" id="rental-grid"></div>
+    <div class="card rental-sites">
+      <h3>เว็บเทียบราคา / จองรวมหลายเจ้า</h3>
+      <div class="source-links" id="rental-sites"></div>
+      <p class="note" id="rental-price-note"></p>
+    </div>
+  </div>
   <div class="pass-note card">
     <h3>🎫 คุ้มไหมถ้าซื้อ JR EAST PASS (Tohoku Area)?</h3>
     <p>พาส 5 วันติดกัน ราคา <span class="mono">¥30,000</span> — แต่ค่ารถไฟเส้นทางหลักของทริปนี้รวมแล้วประมาณ <span class="mono" id="rail-total">¥—</span> เท่านั้น
