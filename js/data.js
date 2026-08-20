@@ -64,7 +64,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 7;
+const ITINERARY_VERSION = 8;
 /* ป้ายประเภทกิจกรรมในแผนรายวัน — ใช้ดูภาพรวมว่าวันไหนออกนอกเมือง วันไหนอยู่ในเมือง */
 const ITEM_TAGS = {
   nature: { icon: '🌿', th: 'ธรรมชาติ', en: 'Nature',  color: '#3e5c46' },
@@ -77,27 +77,35 @@ const ITEM_TAG_KEYS = Object.keys(ITEM_TAGS);
 
 
 const DEFAULT_ITINERARY = [
-  { day: 1, date: 'อ. 20 ต.ค.', area: 'tochigi', title: 'Narita → Utsunomiya รวดเดียว', items: [
+  { day: 1, date: 'อ. 20 ต.ค.', area: 'tokyo', title: 'Narita → โตเกียว · คืนแรกพักโตเกียว', items: [
     { t: '08:00', act: 'ถึง Narita — ตม. / รับกระเป๋า / เติมเงิน Suica', note: 'เวลาเป็นสมมติฐาน ปรับตามไฟลท์จริง', tag: 'move', cost: 0 },
-    { t: '09:30', act: "N'EX → Tokyo Sta.", note: '~60 นาที · หรือ Skyliner ลง Ueno แล้วต่อชินคันเซ็นที่ Ueno ก็ได้', tag: 'move', cost: 3070 },
-    { t: '11:00', act: 'Tohoku Shinkansen → Utsunomiya', note: '~50 นาที · ขบวน Yamabiko/Nasuno', tag: 'move', cost: 5020 },
-    { t: '12:00', act: 'ถึง Utsunomiya · ฝากกระเป๋า / เช็คอิน Airbnb', note: 'พัก 2 คืน ไม่ต้องย้ายอีก', tag: 'move', cost: 0 },
-    { t: '13:00', act: 'ข้าวเที่ยงเกี๊ยวซ่า — Kirasse', note: 'ลานรวมร้านเกี๊ยวซ่า สั่งได้หลายร้านในที่เดียว', tag: 'food', cost: 1200 },
-    { t: '15:00', act: 'เดินเมือง + ศาลเจ้า Utsunomiya Futaarayama', note: 'พักผ่อนแก้ jet lag ไม่ต้องอัดแน่น', tag: 'city', cost: 0 },
-    { t: '18:30', act: 'เย็น: เกี๊ยวซ่าร้านดัง (Minmin / Masashi)', note: 'ต่อคิวได้ ไปก่อนเวลาจะดีกว่า', tag: 'food', cost: 1500 },
+    { t: '09:30', act: 'Skyliner → Ueno แล้วต่อ Ginza Line ลง Asakusa', note: 'Skyliner ~41 นาที ¥2,570 + Ginza Line ¥180 · พักฝั่ง Asakusa เพราะพรุ่งนี้ขึ้นรถไฟ Tobu ไป Nikko จากที่นี่', tag: 'move', cost: 2750 },
+    { t: '—', act: '🔁 ทางเลือก: N\'EX → Tokyo Sta. แล้วต่อรถไฟในเมือง', note: '~60 นาที ¥3,070 · เลือกอันนี้ถ้าที่พักอยู่ฝั่ง Tokyo/Ueno มากกว่า Asakusa', tag: 'move', cost: 0 },
+    { t: '11:00', act: 'ถึงย่านที่พัก · ฝากกระเป๋า / เช็คอิน Airbnb (1 คืน)', note: 'เช็คอินจริงส่วนใหญ่บ่าย 3 — ฝากกระเป๋าไว้ก่อนแล้วออกไปเดินได้', tag: 'move', cost: 0 },
+    { t: '12:00', act: 'ข้าวเที่ยงแถวที่พัก', note: 'วันแรกอย่าตั้งเป้าร้านดัง เอาที่เดินถึงและไม่ต้องรอคิว', tag: 'food', cost: 1200 },
+    { t: '13:30', act: 'เดินเล่นริมแม่น้ำ Sumida · Sumida Park · วิว Skytree', note: 'วันแรกเอาแบบเบา ๆ แก้ jet lag — เดินอย่างเดียว ไม่ต้องซื้อตั๋วอะไร', tag: 'city', cost: 0 },
+    { t: '15:30', act: 'กลับที่พัก · เช็คอินจริง · อาบน้ำพัก', note: 'พรุ่งนี้ออกเช้า เก็บแรงไว้', tag: 'other', cost: 0 },
+    { t: '18:00', act: 'ข้าวเย็นย่าน Asakusa / Kuramae', note: 'ร้านแถวนี้ปิดค่อนข้างเร็ว ไปก่อน 20:00', tag: 'food', cost: 1800 },
+    { t: '20:00', act: 'จัดกระเป๋าสำหรับพรุ่งนี้ · นอนเร็ว', note: '⚠️ พรุ่งนี้ย้ายเมือง — แยกของใช้ 1 วันไว้ในเป้ใบเล็ก ที่เหลือฝากล็อกเกอร์ที่ Nikko ได้', tag: 'other', cost: 0 },
+    { t: '—', act: '🔁 ถ้ายังไหวคืนนี้: Sensoji ตอนกลางคืน (ไฟส่องวัด คนน้อย)', note: 'ลานวัดเดินได้ตลอดคืน — แต่ Day 7 มี Asakusa เต็ม ๆ อยู่แล้ว ไม่ไปคืนนี้ก็ไม่พลาดอะไร', tag: 'city', cost: 0 },
   ]},
-  { day: 2, date: 'พ. 21 ต.ค.', area: 'nikko', title: 'เดย์ทริป Nikko (ไป-กลับ ไม่ย้ายที่พัก)', items: [
-    { t: '06:50', act: 'ซื้อข้าวเช้าที่เซเว่นหน้าสถานี', note: 'กินบนรถไฟ ประหยัดเวลา', tag: 'food', cost: 500 },
-    { t: '07:15', act: 'JR Nikko Line: Utsunomiya → Nikko', note: '~45 นาที', tag: 'move', cost: 770 },
-    { t: '08:15', act: 'ถึง Nikko · ซื้อบัตรบัส Chuzenji', note: 'Tobu Bus 2-day free pass — คุ้มถ้าแวะหลายจุด', tag: 'move', cost: 2500 },
-    { t: '08:30', act: 'บัสขึ้นโค้ง Irohazaka → Akechidaira Ropeway', note: '⚠️ ขึ้นเช้าเพื่อหนีรถติดใบไม้แดง · กระเช้าไป-กลับ ~¥1,000', tag: 'nature', cost: 1000 },
-    { t: '09:45', act: 'น้ำตก Kegon + ลิฟต์ลงจุดชมวิว', note: 'ลิฟต์ ¥570', tag: 'nature', cost: 570 },
-    { t: '11:00', act: 'ทะเลสาบ Chuzenji + ข้าวเที่ยงริมทะเลสาบ', note: 'ถ้าลงจาก Kegon ก่อน 11:30 ค่อยต่อน้ำตก Ryuzu', tag: 'nature', cost: 1200 },
-    { t: '13:30', act: 'ลงมาศาลเจ้า Toshogu', note: 'ปิด 17:00 ขายตั๋วถึงราว 16:30 · ค่าเข้าประมาณ ¥1,600 เช็คหน้างาน', tag: 'city', cost: 1600 },
-    { t: '14:45', act: 'Toshogu Treasure Hall (โรงหนัง VR)', note: 'ตั๋วแยกจากศาลเจ้า', tag: 'city', cost: 1000 },
-    { t: '16:00', act: 'สะพาน Shinkyo / Kanmangafuchi Abyss', note: 'ข้ามสะพาน ~¥300 · Kanmangafuchi เดินฟรี', tag: 'nature', cost: 300 },
-    { t: '17:15', act: 'JR Nikko Line กลับ Utsunomiya', note: '', tag: 'move', cost: 770 },
-    { t: '18:30', act: 'เย็น: เกี๊ยวซ่ารอบสอง 🥟', note: '', tag: 'food', cost: 1500 },
+  { day: 2, date: 'พ. 21 ต.ค.', area: 'nikko', title: 'โตเกียว → Nikko → ค้างคืน Utsunomiya', items: [
+    { t: '06:45', act: 'เช็คเอาท์ · ซื้อข้าวเช้าเซเว่น · เดินไป Asakusa Sta. (Tobu)', note: 'กินบนรถไฟ', tag: 'food', cost: 500 },
+    { t: '07:30', act: '🚃 Tobu Limited Express (SPACIA) Asakusa → Tobu-Nikko', note: '~1 ชม. 50 นาที ~¥2,920 (ค่ารถ+ค่าด่วนพิเศษ) · ⚠️ จองที่นั่งล่วงหน้า สายนี้เต็มช่วงใบไม้แดง · Tobu ไม่ใช่ JR — JR PASS ใช้ไม่ได้', tag: 'move', cost: 2920 },
+    { t: '09:25', act: 'ถึง Tobu-Nikko · ฝากกระเป๋าล็อกเกอร์ในสถานี', note: 'ล็อกเกอร์ใบใหญ่ ~¥700 · วันใบไม้แดงล็อกเกอร์เต็มเร็ว ถ้าเต็มมีเคาน์เตอร์รับฝากในตัวสถานี', tag: 'move', cost: 700 },
+    { t: '09:40', act: 'ซื้อบัตรบัส Chuzenji Onsen Free Pass', note: '~¥2,500 · คุ้มถ้าขึ้น Irohazaka + แวะหลายจุด', tag: 'move', cost: 2500 },
+    { t: '10:00', act: 'บัสขึ้นโค้ง Irohazaka → Akechidaira Ropeway', note: 'กระเช้าไป-กลับ ~¥1,000 · ⚠️ ช่วงใบไม้แดง Irohazaka รถติดหนัก เผื่อเวลาขาขึ้น', tag: 'nature', cost: 1000 },
+    { t: '11:15', act: 'น้ำตก Kegon + ลิฟต์ลงจุดชมวิว', note: 'ลิฟต์ ¥570', tag: 'nature', cost: 570 },
+    { t: '12:30', act: 'ข้าวเที่ยงริมทะเลสาบ Chuzenji', note: '', tag: 'food', cost: 1200 },
+    { t: '13:45', act: 'เดินริมทะเลสาบ Chuzenji · (ถ้าเวลาเหลือ) น้ำตก Ryuzu', note: 'Ryuzu ต่อบัสอีก ~10 นาที — ไปได้ถ้าลงจาก Kegon ก่อน 13:00', tag: 'nature', cost: 0 },
+    { t: '15:15', act: 'บัสลงเขากลับตัวเมือง Nikko', note: 'ขาลงมักติดน้อยกว่าขาขึ้น แต่ก็ยังเผื่อไว้ 1 ชม.', tag: 'move', cost: 0 },
+    { t: '16:15', act: 'สะพาน Shinkyo / Kanmangafuchi Abyss', note: 'ข้ามสะพาน ~¥300 · Kanmangafuchi เดินฟรี — แถวพระจิโซ่ริมลำธาร', tag: 'nature', cost: 300 },
+    { t: '—', act: '🔁 อยากได้ศาลเจ้า Toshogu ต้องแลกกับฝั่งทะเลสาบ', note: 'Toshogu ปิด 17:00 (ขายตั๋วถึง ~16:30 · ~¥1,600) — วันนี้ออกจากโตเกียวเช้ากว่าเดิมไม่ได้มาก จะเก็บทั้งทะเลสาบและ Toshogu ในวันเดียวแน่นเกินไป · เลือกอย่างใดอย่างหนึ่ง', tag: 'city', cost: 0 },
+    { t: '17:00', act: 'รับกระเป๋า · เดินไปสถานี JR Nikko', note: 'JR Nikko อยู่ถัดจาก Tobu-Nikko เดินประมาณ 3-5 นาที', tag: 'move', cost: 0 },
+    { t: '17:30', act: '🚃 JR Nikko Line → Utsunomiya', note: '~45 นาที ¥770 · ขบวนห่างกันราวชั่วโมงละ 1-2 ขบวน เช็ครอบก่อนลงเขา', tag: 'move', cost: 770 },
+    { t: '18:30', act: 'ถึง Utsunomiya · เช็คอิน Airbnb (1 คืน)', note: 'พักคืนเดียว — พรุ่งนี้เช้าเที่ยว Oya ต่อแล้วขึ้นชินคันเซ็นไป Fukushima บ่าย ขอให้อยู่ใกล้สถานี', tag: 'move', cost: 0 },
+    { t: '19:30', act: '🥟 เย็น: เกี๊ยวซ่า Utsunomiya (Minmin / Masashi)', note: 'ร้านดังต่อคิวยาว · Kirasse ลานรวมร้านเกี๊ยวซ่าปิดค่อนข้างเร็ว เช็คเวลาก่อน', tag: 'food', cost: 1500 },
+    { t: '—', act: '🔁 ขี้เกียจแบกกระเป๋าขึ้นเขา: ส่งของล่วงหน้าแบบ takkyubin', note: 'ส่งจากที่พักโตเกียวไปที่พัก Utsunomiya หรือ Fukushima ~¥1,500-2,000 ต่อใบ ถึงวันรุ่งขึ้น — สะดวกมากถ้ากระเป๋าใหญ่ ต้องคุยกับเจ้าของ Airbnb เรื่องรับของก่อน', tag: 'other', cost: 0 },
   ]},
   { day: 3, date: 'พฤ. 22 ต.ค.', area: 'fukushima', title: 'ครึ่งวัน ① — Utsunomiya ครึ่งเช้า → เข้า Fukushima', items: [
     { t: '08:30', act: 'เช็คเอาท์ · ฝากกระเป๋าล็อกเกอร์สถานี Utsunomiya', note: 'ล็อกเกอร์ใบใหญ่ ~¥700', tag: 'move', cost: 700 },
@@ -218,11 +226,11 @@ const PLACES = [
   { name: 'Kasai Rinkai Park Visitor Center', ja: '葛西臨海公園ビジターセンター', area: 'tokyo', lat: 35.6438, lng: 139.8580, day: 9, type: 'museum', taniguchi: true, ticket: 'ฟรี', url: 'https://www.tokyo-park.or.jp/park/kasairinkai/', desc: '🏛 อีกหนึ่งงานของ Taniguchi ในสวนเดียวกัน (1996) — จุดชมนกและธรรมชาติ เข้าฟรี เดินต่อจากอควาเรียมได้เลย (รวมเป็น 3 อาคารของ Taniguchi ในสวนนี้)',
     en: { name: 'Kasai Rinkai Park Visitor Center', ticket: 'Free', desc: '🏛 Another Taniguchi building in the same park (1996) — birdwatching and nature centre, free entry, a short walk on from the aquarium (three Taniguchi buildings in this park in total)' } },
   // Tochigi
-  { name: 'สถานี Utsunomiya', ja: '宇都宮駅', area: 'tochigi', lat: 36.5591, lng: 139.8986, day: 1, desc: 'ฮับของโทจิกิ — จุดต่อรถไป Nikko',
+  { name: 'สถานี Utsunomiya', ja: '宇都宮駅', area: 'tochigi', lat: 36.5591, lng: 139.8986, day: 2, desc: 'ฮับของโทจิกิ — จุดต่อรถไป Nikko',
     en: { name: 'Utsunomiya Station', desc: 'Tochigi hub — transfer point for trains to Nikko' } },
   { name: 'Oya History Museum', ja: '大谷資料館', area: 'tochigi', lat: 36.6009, lng: 139.8228, day: 3, desc: 'เหมืองหินใต้ดินสุดอลัง เย็น 8°C พกเสื้อคลุม',
     en: { name: 'Oya History Museum', desc: 'Vast underground stone quarry — a steady 8°C, so bring a jacket' } },
-  { name: 'ถนนเกี๊ยวซ่า (Kirasse)', ja: '宇都宮餃子', area: 'tochigi', lat: 36.5583, lng: 139.8830, day: 1, desc: 'เมืองหลวงเกี๊ยวซ่า — ร้าน Minmin, Masashi ห้ามพลาด',
+  { name: 'ถนนเกี๊ยวซ่า (Kirasse)', ja: '宇都宮餃子', area: 'tochigi', lat: 36.5583, lng: 139.8830, day: 2, desc: 'เมืองหลวงเกี๊ยวซ่า — ร้าน Minmin, Masashi ห้ามพลาด',
     en: { name: 'Gyoza Street (Kirasse)', desc: "Japan's gyoza capital — Minmin and Masashi are the must-try shops" } },
   { name: 'ศาลเจ้า Futaarayama', ja: '二荒山神社', area: 'tochigi', lat: 36.5658, lng: 139.8823, day: 3, desc: 'ศาลเจ้าเก่าแก่ใจกลางเมือง Utsunomiya',
     en: { name: 'Utsunomiya Futaarayama Shrine', desc: 'Ancient shrine in the centre of Utsunomiya' } },
@@ -318,27 +326,33 @@ const PLACES = [
 
 /* ---------- main route line (station to station) ---------- */
 const ROUTE = [
-  [35.6812, 139.7671],  // Tokyo Sta.
-  [36.5591, 139.8986],  // Utsunomiya
-  [36.7581, 139.5986],  // Nikko
-  [36.5591, 139.8986],  // back Utsunomiya
-  [37.7543, 140.4590],  // Fukushima
-  [35.6812, 139.7671],  // back Tokyo
+  [35.7118, 139.7967],  // Asakusa (คืนแรก 20 ต.ค.)
+  [36.7581, 139.5986],  // Nikko (21 ต.ค.)
+  [36.5591, 139.8986],  // Utsunomiya (ค้างคืน 21 ต.ค.)
+  [37.7543, 140.4590],  // Fukushima (22–25 ต.ค.)
+  [35.6812, 139.7671],  // back Tokyo (25–28 ต.ค.)
 ];
 
 /* ---------- transport segments ---------- */
 const TRANSPORT = [
-  { title: 'สนามบิน → Utsunomiya (Tochigi) รวดเดียว', day: 'DAY 1 · 20 ต.ค.', options: [
-    { method: "Narita Express (N'EX) + Shinkansen ต่อที่ Tokyo Sta.", note: 'Narita → Tokyo Sta. (¥3,070) → เปลี่ยนขบวน Tohoku Shinkansen ไป Utsunomiya (~¥5,020)', time: 'รวม ~2 ชม.', price: 8090 },
-    { method: 'Keisei Skyliner + Shinkansen', note: 'Narita → Ueno (¥2,580) → ต่อรถไฟ/ชินคันเซ็นไป Utsunomiya', time: 'รวม ~2 ชม.', price: 7600 },
-    { method: 'Tokyo Monorail + Shinkansen', note: 'กรณีลง Haneda → Hamamatsucho → Tokyo Sta. → Utsunomiya', time: 'รวม ~2 ชม. 15 น.', price: 5720 },
+  { title: 'สนามบิน → ที่พักโตเกียว (ฝั่ง Asakusa)', day: 'DAY 1 · 20 ต.ค.', options: [
+    { method: 'Keisei Skyliner → Ueno + Ginza Line → Asakusa', note: 'Narita → Ueno ¥2,570 (~41 นาที เร็วสุด) → Ginza Line อีก ¥180 · เหมาะที่สุดถ้าพักฝั่ง Asakusa', time: 'รวม ~1 ชม.', price: 2750 },
+    { method: "Narita Express (N'EX) → Tokyo Sta.", note: 'ตรงเข้า Tokyo Sta. ¥3,070 · เลือกอันนี้ถ้าที่พักอยู่ฝั่ง Tokyo/Ginza มากกว่า', time: '~60 นาที', price: 3070 },
+    { method: 'Keisei Access Express (รถไฟธรรมดา)', note: 'ถูกที่สุด ~¥1,300 ไม่ต้องจองที่นั่ง แต่ต้องยืนแบกกระเป๋า ~75 นาที', time: '~75 นาที', price: 1300 },
+    { method: 'Tokyo Monorail + Asakusa Line', note: 'กรณีลง Haneda → Hamamatsucho หรือขึ้น Keikyu ต่อ Asakusa Line ตรงถึง Asakusa', time: '~45 นาที', price: 900 },
   ]},
-  { title: 'เดย์ทริป Nikko ไป-กลับจาก Utsunomiya', day: 'DAY 2 · 21 ต.ค.', options: [
-    { method: 'JR Nikko Line ไป-กลับ', note: 'ออกทุก ~30-60 นาที · ขบวนแรกจาก Utsunomiya ราว 06:00 — ที่พักไม่ต้องย้าย เก็บของไว้ที่เดิมได้', time: '~45 นาที/เที่ยว', price: 1540 },
+  { title: 'โตเกียว → Nikko (ขาไป · ไม่ย้อนกลับ)', day: 'DAY 2 · 21 ต.ค. (เช้า)', options: [
+    { method: 'Tobu Limited Express SPACIA — Asakusa → Tobu-Nikko', note: '⚠️ Tobu ไม่ใช่ JR — พาส JR ใช้ไม่ได้ · ค่ารถ+ค่าด่วนพิเศษรวม ~¥2,920 · จองที่นั่งล่วงหน้า ช่วงใบไม้แดงเต็มเร็ว', time: '~1 ชม. 50 นาที', price: 2920 },
+    { method: 'Tobu รถธรรมดา (ต่อขบวนที่ Shimo-Imaichi)', note: 'ถูกกว่ามาก ~¥1,390 แต่ต้องเปลี่ยนขบวนและใช้เวลานานกว่า ~2 ชม. 20 นาที — ประหยัดได้ถ้าไม่รีบ', time: '~2 ชม. 20 นาที', price: 1390 },
+    { method: 'JR Shinkansen → Utsunomiya → JR Nikko Line', note: 'ทางของคนถือ JR PASS: Tokyo → Utsunomiya ~¥5,020 แล้วต่อ JR Nikko Line ¥770 · เร็วกว่าแต่แพงกว่ามากถ้าไม่มีพาส', time: '~1 ชม. 40 นาที', price: 5790 },
   ]},
-  { title: 'ในนิกโก้: บัสขึ้นทะเลสาบ Chuzenji', day: 'DAY 2 · 21 ต.ค.', options: [
-    { method: 'Tobu Bus — Chuzenji Onsen Free Pass 2 วัน', note: 'ขึ้นลงไม่จำกัด Nikko Sta. ⇄ Chuzenji (ผ่าน Irohazaka) — วันเดียวก็ยังคุ้มถ้าแวะ Akechidaira + Kegon + Ryuzu', time: '~50 นาที/เที่ยว', price: 2500 },
-    { method: 'บัสเที่ยวเดียว Nikko → Chuzenji Onsen', note: 'ช่วงใบไม้แดงรถติดมาก เผื่อเวลา 2 เท่า — ขึ้นบัสก่อน 09:00 จะรอดที่สุด', time: '~50-90 นาที', price: 1250 },
+  { title: 'ในนิกโก้: บัสขึ้นทะเลสาบ Chuzenji', day: 'DAY 2 · 21 ต.ค. (กลางวัน)', options: [
+    { method: 'Tobu Bus — Chuzenji Onsen Free Pass', note: 'ขึ้นลงไม่จำกัด Nikko Sta. ⇄ Chuzenji (ผ่าน Irohazaka) — คุ้มถ้าแวะ Akechidaira + Kegon + Ryuzu ในวันเดียว', time: '~50 นาที/เที่ยว', price: 2500 },
+    { method: 'บัสเที่ยวเดียว Nikko → Chuzenji Onsen', note: 'ช่วงใบไม้แดงรถติดมาก เผื่อเวลา 2 เท่า — วันนี้ถึง Nikko ~09:25 ควรขึ้นบัสทันที', time: '~50-90 นาที', price: 1250 },
+  ]},
+  { title: 'Nikko → Utsunomiya (ขาค้างคืน)', day: 'DAY 2 · 21 ต.ค. (เย็น)', options: [
+    { method: 'JR Nikko Line — JR Nikko Sta. → Utsunomiya', note: 'JR Nikko อยู่ถัดจาก Tobu-Nikko เดิน 3-5 นาที · ขบวนราวชั่วโมงละ 1-2 ขบวน ⚠️ เช็ครอบสุดท้ายตั้งแต่ก่อนขึ้นเขา', time: '~45 นาที', price: 770 },
+    { method: 'Tobu กลับ Shimo-Imaichi แล้วต่อรถ', note: 'ทางอ้อม ไม่แนะนำ — JR Nikko Line ตรงกว่าและถูกกว่า', time: '~1 ชม. 20 นาที', price: 1200 },
   ]},
   { title: 'Utsunomiya → Fukushima', day: 'DAY 3 · 22 ต.ค. (บ่าย)', options: [
     { method: 'Tohoku Shinkansen (Yamabiko)', note: 'ขึ้นตรงจาก Utsunomiya ไม่ต้องย้อนกลับโตเกียว — เช็คเอาท์เช้า ฝากกระเป๋าไว้ล็อกเกอร์ แล้วเที่ยว Oya ก่อนได้', time: '~55 นาที', price: 6500 },
@@ -357,7 +371,7 @@ const TRANSPORT = [
     { method: 'Monorail ไป Haneda', note: 'กรณีบินออก Haneda', time: '~25 นาที', price: 700 },
   ]},
   { title: 'ค่าเดินทางในเมือง (เผื่อ)', day: 'ทุกวัน', options: [
-    { method: 'Suica/Pasmo — เมโทร+บัสในโตเกียว', note: 'เฉลี่ยวันละ ~¥800 × 4 วันเมือง (Day 6 เย็น + Day 7-9)', time: '—', price: 3200 },
+    { method: 'Suica/Pasmo — เมโทร+บัสในโตเกียว', note: 'เฉลี่ยวันละ ~¥800 × 5 วันเมือง (Day 1 + Day 6 เย็น + Day 7-9)', time: '—', price: 4000 },
   ]},
 ];
 
@@ -375,7 +389,7 @@ const CAR_PLAN = {
 };
 
 /* เส้นทางรถไฟหลักที่ใช้เทียบกับ JR EAST PASS (¥30,000) */
-const RAIL_MAIN_TOTAL = 3070 + 5020 + 1540 + 6500 + 8810 + 3070; // N'EX + Tokyo→Utsunomiya + เดย์ทริป Nikko + Utsunomiya→Fukushima + Fukushima→Tokyo + N'EX กลับ
+const RAIL_MAIN_TOTAL = 2750 + 2920 + 770 + 6500 + 8810 + 3070; // Skyliner+Ginza เข้าเมือง + Tobu ไป Nikko + JR Nikko→Utsunomiya + Utsunomiya→Fukushima + Fukushima→Tokyo + N'EX กลับ
 
 /* ---------- events (ยืนยันวันที่จริงปี 2026 แล้ว — อัปเดต ก.ค. 2026) ---------- */
 const EVENTS = [
@@ -474,14 +488,23 @@ function airbnbSearch(query, checkIn, checkOut, maxPerNightThb) {
 
 const STAYS = [
   {
+    id: 'tokyo-arrival', city: 'Tokyo (คืนแรก)', ja: '東京', area: 'tokyo',
+    checkIn: '2026-10-20', checkOut: '2026-10-21', nights: 1, days: 'DAY 1',
+    station: 'ฝั่ง Asakusa / Kuramae — พรุ่งนี้ขึ้นรถไฟ Tobu ไป Nikko จาก Asakusa Sta.',
+    searchQuery: 'Asakusa, Taito City, Tokyo, Japan',
+    lat: 35.7118, lng: 139.7967,
+    note: 'คืนเดียวหลังลงเครื่อง — ขอแค่ใกล้สถานี Asakusa (สาย Tobu) เพราะ 21 ต.ค. ต้องออกราว 07:00 ไป Nikko · ไม่ต้องหรู เอาที่เข้าถึงง่ายและเช็คอินได้เอง เพราะอาจถึงช้ากว่ากำหนดถ้าไฟลท์ดีเลย์ · ยังไม่มีลิสต์ที่เลือกไว้ กดลิงก์ค้นหาที่กรองไว้แล้ว',
+    en: { city: 'Tokyo (arrival night)', station: 'Asakusa / Kuramae side — the Tobu train to Nikko leaves from Asakusa Sta. the next morning', note: 'One night after landing — needs to be near Asakusa Sta. because we leave around 07:00 for Nikko. Prioritise self check-in in case the flight is late' },
+  },
+  {
     id: 'utsunomiya', city: 'Utsunomiya', ja: '宇都宮', area: 'tochigi',
-    checkIn: '2026-10-20', checkOut: '2026-10-22', nights: 2, days: 'DAY 1–2',
+    checkIn: '2026-10-21', checkOut: '2026-10-22', nights: 1, days: 'DAY 2',
     station: 'JR Utsunomiya Sta. (ชินคันเซ็น + JR Nikko Line)',
     searchQuery: 'Utsunomiya Station, Tochigi, Japan',
     lat: 36.5591, lng: 139.8986,
-    pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1392269349368841909?adults=4&children=0&infants=0&pets=0&check_in=2026-10-20&check_out=2026-10-22' },
-    note: 'พัก 2 คืนไม่ต้องย้าย — 21 ต.ค. เป็นเดย์ทริป Nikko ไป-กลับ · 22 ต.ค. เช็คเอาท์แล้วขึ้นชินคันเซ็นไป Fukushima ตอนบ่าย ขอให้อยู่ฝั่งเดียวกับสถานี',
-    en: { city: 'Utsunomiya', station: 'JR Utsunomiya Sta. (shinkansen + JR Nikko Line)', note: 'Two nights, no moving — 21 Oct is a Nikko day trip and back · on 22 Oct we check out and take the afternoon shinkansen to Fukushima, so stay on the station side' },
+    pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1392269349368841909?adults=4&children=0&infants=0&pets=0&check_in=2026-10-21&check_out=2026-10-22' },
+    note: 'พักคืนเดียว — 21 ต.ค. ถึงราว 18:30 หลังกลับจาก Nikko จึงต้องเช็คอินเองได้ตอนค่ำ · 22 ต.ค. เช้าเที่ยว Oya แล้วบ่ายขึ้นชินคันเซ็นไป Fukushima ขอให้อยู่ฝั่งเดียวกับสถานีและมีที่ฝากกระเป๋า',
+    en: { city: 'Utsunomiya', station: 'JR Utsunomiya Sta. (shinkansen + JR Nikko Line)', note: 'One night — we arrive about 18:30 on 21 Oct coming back from Nikko, so self check-in matters · on 22 Oct we visit Oya in the morning and take the afternoon shinkansen to Fukushima, so stay on the station side' },
   },
   {
     id: 'fukushima', city: 'Fukushima', ja: '福島', area: 'fukushima',
@@ -531,7 +554,7 @@ STAYS.forEach((s) => {
   } else {
     PLACES.push({
       name: `ที่พัก ${s.city}`, ja: s.ja, area: s.area, lat: s.lat, lng: s.lng,
-      day: s.id === 'utsunomiya' ? 1 : 3, type: 'stay', stayId: s.id, url: s.pick.url,
+      day: { 'tokyo-arrival': 1, utsunomiya: 2 }[s.id] || 3, type: 'stay', stayId: s.id, url: s.pick && s.pick.url,
       desc: `🛏 ${s.nights} คืน · ${s.checkIn} → ${s.checkOut} · 4 คน — ${s.station} · หมุดปักที่สถานี ไม่ใช่ตำแหน่งบ้านจริง`,
       en: { name: `${s.en.city} stay`, desc: `🛏 ${s.nights} nights · ${s.checkIn} → ${s.checkOut} · 4 guests — ${s.en.station} · pin is on the station, not the actual listing address` },
     });
