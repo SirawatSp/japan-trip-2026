@@ -658,6 +658,67 @@ applyMapLang();
 
   $('#rail-total').textContent = yen(RAIL_MAIN_TOTAL);
 
+  /* 'DAY 3 · 22 ต.ค.' -> 'D3 · 22 ต.ค.' ให้ตรงกับตัวเลือกวันในเครื่องคิดงบ */
+  const fareDayOption = (label) => {
+    const m = /^DAY (\d+) · (.+)$/.exec(label);
+    const opt = m && `D${m[1]} · ${m[2]}`;
+    return DAY_OPTIONS.includes(opt) ? opt : 'ก่อนทริป';
+  };
+
+  /* ตารางค่ารถไฟรายเส้นทาง — ทุกแถวลิงก์ไปเช็คราคาสดใน Google Maps */
+  const transitUrl = (from, to) =>
+    `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=transit&hl=th`;
+
+  $('#fare-legs').innerHTML = RAIL_FARES.map((leg, li) => {
+    const cheapest = Math.min(...leg.options.map((o) => o.price));
+    return `
+    <article class="fare-leg">
+      <div class="fare-leg-head">
+        <div>
+          <h4>${esc(leg.leg)}</h4>
+          <span class="fare-day">${esc(leg.day)}</span>
+        </div>
+        <a class="btn-mini" href="${transitUrl(leg.from, leg.to)}" target="_blank" rel="noopener">🔎 เช็คราคาสด ↗</a>
+      </div>
+      <table class="fare-table">
+        <thead><tr><th>วิธี</th><th>เวลา</th><th>เปลี่ยนขบวน</th><th class="fare-num">ราคา/คน</th></tr></thead>
+        <tbody>
+          ${leg.options.map((o, oi) => `
+          <tr class="${o.price === cheapest ? 'fare-cheap' : ''}">
+            <td>
+              <span class="fare-method">${esc(o.method)}</span>
+              <span class="conf-tag conf-${o.conf}">${o.conf === 'src' ? 'อ้างอิงแล้ว' : 'ประมาณการ'}</span>
+              <span class="fare-note">${esc(o.note)}</span>
+            </td>
+            <td class="fare-time">${esc(o.time)}</td>
+            <td class="fare-xfer">${esc(o.xfer)}</td>
+            <td class="fare-num"><span class="mono">${yen(o.price)}</span>
+              <span class="fare-four">×4 = ${yen(o.price * 4)}</span>
+              <button class="btn-mini fare-add" data-leg="${li}" data-opt="${oi}">＋งบ</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </article>`;
+  }).join('');
+
+  $('#fare-local-list').innerHTML = RAIL_LOCAL_NOTES.map((n) =>
+    `<li><strong>${esc(n.what)}</strong> — ${esc(n.detail)}</li>`).join('');
+
+  $('#fare-legs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.fare-add');
+    if (!btn) return;
+    const leg = RAIL_FARES[+btn.dataset.leg];
+    const opt = leg.options[+btn.dataset.opt];
+    if (btn.classList.contains('added')) return;
+    expenses.push({ name: `${leg.leg} — ${opt.method} (4 คน)`, amount: opt.price * 4, cat: 'เดินทาง', day: fareDayOption(leg.day) });
+    persistAll();
+    btn.classList.add('added');
+    btn.textContent = '✓ แล้ว';
+    renderBudget();
+    renderExpenses();
+  });
+
   /* ร้านเช่ารถรอบสถานี Fukushima */
   $('#rental-grid').innerHTML = CAR_RENTALS.map((r, i) => `
     <article class="rental-card">

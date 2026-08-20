@@ -726,3 +726,49 @@ body {
   .seg-opt { grid-template-columns: 1fr auto; }
   .seg-opt .o-time { display: none; }
 }
+
+/* ---------- ตารางค่ารถไฟรายเส้นทาง ---------- */
+.fare-block { margin-top: 28px; }
+.fare-legs { display: grid; gap: 14px; }
+.fare-leg {
+  background: var(--card, #fff); border: 1px solid var(--line, #e3ded4);
+  border-radius: 12px; padding: 14px 16px;
+}
+.fare-leg-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.fare-leg-head h4 { margin: 0; font-size: 1.02rem; }
+.fare-day { font-size: .78rem; color: var(--muted, #8d8375); }
+.fare-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.fare-table th {
+  text-align: left; font-size: .74rem; font-weight: 600; letter-spacing: .04em;
+  color: var(--muted, #8d8375); text-transform: uppercase;
+  border-bottom: 1px solid var(--line, #e3ded4); padding: 0 8px 6px 0;
+}
+.fare-table td { padding: 9px 8px 9px 0; border-bottom: 1px solid var(--line-soft, #f0ece4); vertical-align: top; }
+.fare-table tr:last-child td { border-bottom: 0; }
+.fare-table .fare-num { text-align: right; white-space: nowrap; }
+.fare-method { display: block; font-weight: 600; }
+.fare-note { display: block; font-size: .8rem; color: var(--muted, #8d8375); margin-top: 3px; line-height: 1.5; }
+.fare-time, .fare-xfer { white-space: nowrap; font-size: .84rem; color: var(--muted, #8d8375); }
+.fare-four { display: block; font-size: .74rem; color: var(--muted, #8d8375); margin: 2px 0 4px; }
+.fare-cheap { background: rgba(62, 92, 70, .07); }
+.fare-cheap .fare-method::after { content: ' 💰'; }
+.conf-tag {
+  display: inline-block; font-size: .68rem; padding: 1px 6px; border-radius: 20px;
+  margin-left: 6px; vertical-align: 1px; white-space: nowrap;
+}
+.conf-src  { background: rgba(62, 92, 70, .13); color: #3e5c46; }
+.conf-calc { background: rgba(217, 123, 41, .15); color: #a85c15; }
+.fare-local { margin-top: 14px; }
+.fare-local ul { margin: 8px 0 0; padding-left: 20px; }
+.fare-local li { margin-bottom: 6px; font-size: .88rem; line-height: 1.6; }
+@media (max-width: 640px) {
+  .fare-table thead { display: none; }
+  .fare-table tr { display: block; padding: 8px 0; border-bottom: 1px solid var(--line-soft, #f0ece4); }
+  .fare-table td { display: block; border: 0; padding: 2px 0; }
+  .fare-table .fare-num { text-align: left; }
+  .fare-time::before { content: '⏱ '; }
+  .fare-xfer::before { content: '🔀 '; }
+}

@@ -79,7 +79,7 @@ const ITEM_TAG_KEYS = Object.keys(ITEM_TAGS);
 const DEFAULT_ITINERARY = [
   { day: 1, date: 'อ. 20 ต.ค.', area: 'tokyo', title: 'Narita → โตเกียว · คืนแรกพักโตเกียว', items: [
     { t: '08:00', act: 'ถึง Narita — ตม. / รับกระเป๋า / เติมเงิน Suica', note: 'เวลาเป็นสมมติฐาน ปรับตามไฟลท์จริง', tag: 'move', cost: 0 },
-    { t: '09:30', act: 'Skyliner → Ueno แล้วต่อ Ginza Line ลง Asakusa', note: 'Skyliner ~41 นาที ¥2,570 + Ginza Line ¥180 · พักฝั่ง Asakusa เพราะพรุ่งนี้ขึ้นรถไฟ Tobu ไป Nikko จากที่นี่', tag: 'move', cost: 2750 },
+    { t: '09:30', act: 'Skyliner → Ueno แล้วต่อ Ginza Line ลง Asakusa', note: 'Skyliner ~41 นาที ¥2,580 + Ginza Line ¥180 · พักฝั่ง Asakusa เพราะพรุ่งนี้ขึ้นรถไฟ Tobu ไป Nikko จากที่นี่', tag: 'move', cost: 2760 },
     { t: '—', act: '🔁 ทางเลือก: N\'EX → Tokyo Sta. แล้วต่อรถไฟในเมือง', note: '~60 นาที ¥3,070 · เลือกอันนี้ถ้าที่พักอยู่ฝั่ง Tokyo/Ueno มากกว่า Asakusa', tag: 'move', cost: 0 },
     { t: '11:00', act: 'ถึงย่านที่พัก · ฝากกระเป๋า / เช็คอิน Airbnb (1 คืน)', note: 'เช็คอินจริงส่วนใหญ่บ่าย 3 — ฝากกระเป๋าไว้ก่อนแล้วออกไปเดินได้', tag: 'move', cost: 0 },
     { t: '12:00', act: 'ข้าวเที่ยงแถวที่พัก', note: 'วันแรกอย่าตั้งเป้าร้านดัง เอาที่เดินถึงและไม่ต้องรอคิว', tag: 'food', cost: 1200 },
@@ -113,7 +113,7 @@ const DEFAULT_ITINERARY = [
     { t: '09:45', act: 'Oya History Museum — เหมืองหินใต้ดิน', note: 'ข้างในเย็น ~8°C พกเสื้อคลุม · ค่าเข้าประมาณ ¥800 · ถ้าไม่อยากรีบ ตัดอันนี้ออกแล้วเดินเมือง+ศาลเจ้า Futaarayama แทนได้', tag: 'city', cost: 800 },
     { t: '11:30', act: 'บัสกลับตัวเมือง · รับกระเป๋า', note: '', tag: 'move', cost: 460 },
     { t: '12:15', act: 'ข้าวเที่ยงแถวสถานี Utsunomiya', note: '', tag: 'food', cost: 1200 },
-    { t: '13:30', act: '🚄 ชินคันเซ็น Utsunomiya → Fukushima', note: '~55 นาที · Yamabiko', tag: 'move', cost: 6500 },
+    { t: '13:30', act: '🚄 ชินคันเซ็น Utsunomiya → Fukushima', note: '~55 นาที · Yamabiko', tag: 'move', cost: 6250 },
     { t: '14:40', act: 'ถึง Fukushima · เช็คอิน Airbnb (3 คืน)', note: 'ครึ่งบ่ายที่เหลือเอาไว้ตั้งหลัก อย่าอัดโปรแกรม', tag: 'move', cost: 0 },
     { t: '16:00', act: 'เดินย่านสถานี · ซื้อเสบียงวันเดินเขา · เดินดูทาง West Exit', note: 'ให้รู้ทางก่อนเช้าวันเสาร์ จะได้ไม่หลง · เผื่อซื้อถุงมือ/หมวกที่ยังขาด', tag: 'city', cost: 1500 },
     { t: '18:00', act: '🥟 เย็น: เกี๊ยวซ่าจานกลม (円盤餃子)', note: 'ของขึ้นชื่อประจำเมือง — ร้านดังรอบสถานีมีหลายเจ้า บางร้านหมดเร็ว ไปก่อน 19:00', tag: 'food', cost: 1500 },
@@ -122,7 +122,7 @@ const DEFAULT_ITINERARY = [
   { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'เต็มวัน ① — ธรรมชาติแบบชิว: ทะเลสาบ Urabandai', items: [
     { t: '07:00', act: '⚠️ เช็คพยากรณ์อากาศของวันพรุ่งนี้ก่อนออก', note: 'ถ้าเสาร์ 24 อากาศแย่ ให้สลับ — เดินเขาวันนี้ แล้วยกวันทะเลสาบไปวันเสาร์แทน (ทะเลสาบเที่ยวได้แม้ฟ้าปิด)', tag: 'other', cost: 0 },
     { t: '07:40', act: 'ซื้อข้าวเช้า/น้ำที่สถานี Fukushima', note: '', tag: 'food', cost: 600 },
-    { t: '08:10', act: '🚄 ชินคันเซ็น Fukushima → Koriyama', note: '~13 นาที ~¥2,600 · ประหยัดได้: รถไฟธรรมดาสาย Tohoku ~50 นาที ¥860 (ออกเช้ากว่านี้ ~1 ชม.)', tag: 'move', cost: 2600 },
+    { t: '08:10', act: '🚄 ชินคันเซ็น Fukushima → Koriyama', note: '~13 นาที ~¥1,800 · ประหยัดได้: รถไฟธรรมดาสาย Tohoku ~50 นาที ~¥990 (ออกเช้ากว่านี้ ~1 ชม.)', tag: 'move', cost: 1800 },
     { t: '08:50', act: '🚃 Ban\'etsu West Line → สถานี Inawashiro', note: '~35 นาที · ขบวนห่างกันพอสมควร เช็ครอบก่อนวันเดินทาง', tag: 'move', cost: 770 },
     { t: '09:40', act: '🚌 บัส Bandai Toto → ป้าย Goshikinuma Iriguchi', note: '~30 นาที ¥790 · บัสสายนี้วิ่งต่อไป Urabandai Kogen-eki ปลายอีกฝั่งของเส้นทางเดิน', tag: 'move', cost: 790 },
     { t: '10:15', act: '🥾 เดินเส้น Goshiki-numa — บึงห้าสี 3.6 กม.', note: 'ทางราบ ไม่ต้องปีน ใช้เวลา 80–90 นาที · เดินจาก Goshikinuma Iriguchi ไปออก Urabandai Kogen-eki ผ่าน Bishamon-numa บึงใหญ่สุดที่มองเห็นภูเขาบันได · ใบไม้พีคกลาง ต.ค.–ต้น พ.ย.', tag: 'nature', cost: 0 },
@@ -156,7 +156,7 @@ const DEFAULT_ITINERARY = [
     { t: '—', act: '🔁 สลับเช้าวันนี้เป็นอย่างอื่นได้: เก็บแอปเปิล Fruit Line / Fukushima Prefectural Museum of Art / Mt. Shinobu', note: 'เก็บแอปเปิลต้องโทรจองสวนก่อน · พิพิธภัณฑ์ลง Iizaka Line ป้าย 美術館図書館前 · Mt. Shinobu เดินจากสถานีได้เลยถ้าขี้เกียจเดินทาง', tag: 'other', cost: 0 },
     { t: '11:00', act: 'กลับสถานี · ของฝากฟุกุชิมะ', note: 'พีช/แอปเปิลอบแห้ง เหล้าสาเก ขนมประจำจังหวัด — ในสถานีมีครบ', tag: 'city', cost: 1500 },
     { t: '12:00', act: 'ข้าวเที่ยงในสถานี · รับกระเป๋า', note: 'เผื่อเวลาขึ้นชานชาลา 15 นาที', tag: 'food', cost: 1200 },
-    { t: '13:20', act: '🚄 Tohoku Shinkansen (Yamabiko) → Tokyo', note: '~95 นาที · จองที่นั่งล่วงหน้าเพราะวันอาทิตย์คนกลับเยอะ', tag: 'move', cost: 8810 },
+    { t: '13:20', act: '🚄 Tohoku Shinkansen (Yamabiko) → Tokyo', note: '~95 นาที · จองที่นั่งล่วงหน้าเพราะวันอาทิตย์คนกลับเยอะ', tag: 'move', cost: 9110 },
     { t: '15:00', act: 'ถึง Tokyo Sta. → ไปเช็คอิน Airbnb', note: 'ค่ารถในเมือง ~¥800 · ถึงที่พักราวบ่าย 4 กำลังดี ไม่ค่ำ', tag: 'move', cost: 800 },
     { t: '16:30', act: 'อาบน้ำ พักขา เดินสำรวจย่านที่พัก', note: '', tag: 'other', cost: 0 },
     { t: '18:30', act: '🍽 นัดกินข้าวกับเพื่อน', note: 'นัดร้านล่วงหน้า วันอาทิตย์ร้านดังเต็มเร็ว', tag: 'food', cost: 4000 },
@@ -336,7 +336,7 @@ const ROUTE = [
 /* ---------- transport segments ---------- */
 const TRANSPORT = [
   { title: 'สนามบิน → ที่พักโตเกียว (ฝั่ง Asakusa)', day: 'DAY 1 · 20 ต.ค.', options: [
-    { method: 'Keisei Skyliner → Ueno + Ginza Line → Asakusa', note: 'Narita → Ueno ¥2,570 (~41 นาที เร็วสุด) → Ginza Line อีก ¥180 · เหมาะที่สุดถ้าพักฝั่ง Asakusa', time: 'รวม ~1 ชม.', price: 2750 },
+    { method: 'Keisei Skyliner → Ueno + Ginza Line → Asakusa', note: 'Narita → Ueno ¥2,580 (~41 นาที เร็วสุด) → Ginza Line อีก ¥180 · เหมาะที่สุดถ้าพักฝั่ง Asakusa', time: 'รวม ~1 ชม.', price: 2760 },
     { method: "Narita Express (N'EX) → Tokyo Sta.", note: 'ตรงเข้า Tokyo Sta. ¥3,070 · เลือกอันนี้ถ้าที่พักอยู่ฝั่ง Tokyo/Ginza มากกว่า', time: '~60 นาที', price: 3070 },
     { method: 'Keisei Access Express (รถไฟธรรมดา)', note: 'ถูกที่สุด ~¥1,300 ไม่ต้องจองที่นั่ง แต่ต้องยืนแบกกระเป๋า ~75 นาที', time: '~75 นาที', price: 1300 },
     { method: 'Tokyo Monorail + Asakusa Line', note: 'กรณีลง Haneda → Hamamatsucho หรือขึ้น Keikyu ต่อ Asakusa Line ตรงถึง Asakusa', time: '~45 นาที', price: 900 },
@@ -355,7 +355,7 @@ const TRANSPORT = [
     { method: 'Tobu กลับ Shimo-Imaichi แล้วต่อรถ', note: 'ทางอ้อม ไม่แนะนำ — JR Nikko Line ตรงกว่าและถูกกว่า', time: '~1 ชม. 20 นาที', price: 1200 },
   ]},
   { title: 'Utsunomiya → Fukushima', day: 'DAY 3 · 22 ต.ค. (บ่าย)', options: [
-    { method: 'Tohoku Shinkansen (Yamabiko)', note: 'ขึ้นตรงจาก Utsunomiya ไม่ต้องย้อนกลับโตเกียว — เช็คเอาท์เช้า ฝากกระเป๋าไว้ล็อกเกอร์ แล้วเที่ยว Oya ก่อนได้', time: '~55 นาที', price: 6500 },
+    { method: 'Tohoku Shinkansen (Yamabiko)', note: 'ขึ้นตรงจาก Utsunomiya ไม่ต้องย้อนกลับโตเกียว — เช็คเอาท์เช้า ฝากกระเป๋าไว้ล็อกเกอร์ แล้วเที่ยว Oya ก่อนได้', time: '~55 นาที', price: 6250 },
   ]},
   { title: 'วันเดินเขา: Fukushima ⇄ Jododaira', day: 'DAY 5 · 24 ต.ค.', options: [
     { method: '🚗 เช่ารถขับเอง — ถูกที่สุดเมื่อไป 4 คน', note: 'รถเล็ก ~¥8,000/วัน + น้ำมัน ~¥1,500 + ที่จอด Jododaira ¥500 = ~¥10,000 ต่อคัน → หาร 4 เหลือ ~¥2,500/คน · Skyline ไม่มีค่าผ่านทาง · ⚠️ ต้องมีใบขับขี่สากลแบบอนุสัญญาเจนีวา 1949 · ประตูอาจปิดกลางคืน 17:00–07:00', time: '~75 นาที/เที่ยว', price: 2500 },
@@ -364,7 +364,7 @@ const TRANSPORT = [
     { method: '🚖 แท็กซี่ท่องเที่ยวจากสถานี Fukushima', note: 'เริ่มราว ¥15,900 ต่อคัน/3 ชม. — เวลาไม่พอสำหรับเดินเขา 4-5 ชม. ต้องเหมายาวขึ้นซึ่งแพงกว่าเช่ารถมาก', time: 'เหมาเป็นชั่วโมง', price: 15900 },
   ]},
   { title: 'Fukushima → Tokyo (นัดเพื่อนเย็นนี้)', day: 'DAY 6 · 25 ต.ค.', options: [
-    { method: 'Tohoku Shinkansen (Yamabiko) — ขบวนสาย', note: 'นั่งยาวถึง Tokyo Sta. เลย ออกช่วงสาย ๆ ให้ถึงโตเกียวบ่ายโมง เผื่อเวลาพักก่อนนัดมื้อเย็น', time: '~95 นาที', price: 8810 },
+    { method: 'Tohoku Shinkansen (Yamabiko) — ขบวนสาย', note: 'นั่งยาวถึง Tokyo Sta. เลย ออกช่วงสาย ๆ ให้ถึงโตเกียวบ่ายโมง เผื่อเวลาพักก่อนนัดมื้อเย็น', time: '~95 นาที', price: 9110 },
   ]},
   { title: 'โตเกียว → สนามบิน', day: 'DAY 9 · 28 ต.ค.', options: [
     { method: "N'EX ไป Narita", note: 'ออกจากเมืองก่อน 14:00 เผื่อเช็คอินไฟลท์ 17:00', time: '~60 นาที', price: 3070 },
@@ -388,8 +388,90 @@ const CAR_PLAN = {
   publicLake: 8300,        // ค่ารถวันทะเลสาบ Urabandai ต่อคน
 };
 
+
+/* ---------- ค่ารถไฟรายเส้นทาง ----------
+   ราคาเป็นเยน ต่อคน เที่ยวเดียว (ผู้ใหญ่) · อ้างอิงตารางค่าโดยสารช่วงปี 2026
+   conf: 'src'  = มีแหล่งอ้างอิงตรง ๆ
+         'calc' = คำนวณจากตารางค่าโดยสาร JR ตามระยะทาง (ยังไม่ยืนยันหน้างาน)
+   ทุกแถวมีปุ่มเช็คราคาสดกับ Google Maps เพราะ JR ปรับราคาเป็นระยะ */
+const RAIL_FARES = [
+  { leg: 'Narita Airport → โตเกียว', day: 'DAY 1 · 20 ต.ค.', from: 'Narita Airport Terminal 1 Station', to: 'Asakusa Station Tokyo', options: [
+    { method: 'Keisei Skyliner → Ueno / Nippori', time: '~41 นาที', xfer: '0 ครั้ง (ต่อ Ginza Line ไป Asakusa อีก ¥180)', price: 2580, conf: 'src',
+      note: 'ค่าโดยสาร ¥1,280 + ตั๋วไลเนอร์ ¥1,300 · เร็วที่สุด' },
+    { method: "JR Narita Express (N'EX) → Tokyo Sta.", time: '~60 นาที', xfer: '0 ครั้ง', price: 3070, conf: 'src',
+      note: 'ที่นั่งจองล่วงหน้า วางกระเป๋าใหญ่ได้สบาย · เข้า Tokyo/Shinjuku/Shibuya ตรง' },
+    { method: 'Keisei Access Express (รถธรรมดา)', time: '~60-75 นาที', xfer: '0 ครั้ง ถ้าวิ่งต่อเข้า Asakusa Line', price: 1300, conf: 'calc',
+      note: '💰 ถูกที่สุด · ขบวนที่วิ่งเข้าสาย Asakusa ไปลง Asakusa ได้เลยไม่ต้องเปลี่ยนขบวน แต่ไม่มีที่วางกระเป๋าเฉพาะ' },
+  ]},
+  { leg: 'โตเกียว (Asakusa) → Nikko', day: 'DAY 2 · 21 ต.ค.', from: 'Asakusa Station Tokyo', to: 'Tobu-Nikko Station', options: [
+    { method: 'Tobu ด่วนพิเศษ SPACIA / SPACIA X', time: '~1 ชม. 50 นาที', xfer: '0 ครั้ง', price: 2920, conf: 'src',
+      note: '⚠️ Tobu ไม่ใช่ JR — พาส JR ใช้ไม่ได้ · ต้องจองที่นั่ง ช่วงใบไม้แดงเต็มเร็ว' },
+    { method: 'Tobu รถธรรมดา (เปลี่ยนที่ Shimo-Imaichi)', time: '~2 ชม. 20 นาที', xfer: '1 ครั้ง', price: 1390, conf: 'src',
+      note: '💰 ประหยัดกว่าครึ่ง แต่ไม่มีที่นั่งจอง ต้องลุ้นที่ยืน' },
+    { method: 'JR: ชินคันเซ็น → Utsunomiya → JR Nikko Line', time: '~1 ชม. 40 นาที', xfer: '1 ครั้ง', price: 5790, conf: 'calc',
+      note: 'ทางของคนถือ JR PASS (¥5,020 + ¥770) · เร็วสุดแต่แพงสุดถ้าไม่มีพาส' },
+  ]},
+  { leg: 'Tokyo → Utsunomiya', day: 'ทางเลือก / ถ้าเข้า Tochigi ตรง', from: 'Tokyo Station', to: 'Utsunomiya Station', options: [
+    { method: 'Tohoku Shinkansen (Yamabiko / Nasuno) — ไม่จองที่นั่ง', time: '~50 นาที', xfer: '0 ครั้ง', price: 4490, conf: 'src',
+      note: 'ตู้ไม่จองที่นั่งมีจำกัด วันหยุดอาจต้องยืน' },
+    { method: 'Tohoku Shinkansen — จองที่นั่ง', time: '~50 นาที', xfer: '0 ครั้ง', price: 5020, conf: 'src',
+      note: 'บวกจากตั๋วไม่จองที่นั่ง ¥530' },
+    { method: '🚃 JR Utsunomiya Line / Shonan-Shinjuku Line (รถธรรมดา)', time: '~1 ชม. 30-50 นาที', xfer: '0 ครั้ง', price: 2090, conf: 'src',
+      note: '💰 ถูกกว่าชินคันเซ็นเกินครึ่ง และ**ไม่ต้องเปลี่ยนขบวน** — ตรงกับที่เห็นใน Google Maps (~฿430) · ขึ้นจาก Ueno ถูกลงอีกเหลือ ~¥1,340 / ~1 ชม. 20 นาที · มีตู้ Green Car จ่ายเพิ่มถ้าอยากนั่งชัวร์' },
+  ]},
+  { leg: 'Utsunomiya ⇄ Nikko (ไป-กลับ)', day: 'DAY 2 · 21 ต.ค.', from: 'Utsunomiya Station', to: 'Nikko Station', options: [
+    { method: 'JR Nikko Line — เที่ยวเดียว', time: '~42-45 นาที', xfer: '0 ครั้ง', price: 760, conf: 'src',
+      note: 'รถธรรมดาจอดทุกสถานี ออกราวชั่วโมงละ 1-2 ขบวน · ⚠️ เช็ครอบสุดท้ายก่อนขึ้นเขา' },
+    { method: 'JR Nikko Line — ไป-กลับ', time: '~90 นาที รวมสองเที่ยว', xfer: '0 ครั้ง', price: 1520, conf: 'src',
+      note: 'ไม่มีตั๋วไป-กลับลดราคา จ่ายสองเที่ยวตรง ๆ' },
+    { method: 'ขบวนท่องเที่ยว「Iroha」', time: '~45 นาที', xfer: '0 ครั้ง', price: 760, conf: 'src',
+      note: 'รถแต่งพิเศษ ที่นั่งกว้างกว่า วิ่งวันละราว 5 เที่ยว · ราคาเท่ารถธรรมดา ไม่ต้องจ่ายเพิ่ม' },
+  ]},
+  { leg: 'Utsunomiya → Fukushima', day: 'DAY 3 · 22 ต.ค.', from: 'Utsunomiya Station', to: 'Fukushima Station', options: [
+    { method: 'Tohoku Shinkansen (Yamabiko) — ไม่จองที่นั่ง', time: '~55 นาที', xfer: '0 ครั้ง', price: 5720, conf: 'src',
+      note: 'ขึ้นตรงจาก Utsunomiya ไม่ต้องย้อนกลับโตเกียว' },
+    { method: 'Tohoku Shinkansen — จองที่นั่ง', time: '~55 นาที', xfer: '0 ครั้ง', price: 6250, conf: 'src',
+      note: 'แนะนำให้จอง เพราะขึ้นกลางทางที่นั่งว่างน้อย' },
+    { method: '🚃 รถธรรมดาต่อกัน (Kuroiso → Shin-Shirakawa → Koriyama)', time: '~4 ชม.', xfer: '3 ครั้ง', price: 3410, conf: 'calc',
+      note: '💰 ประหยัด ~¥2,800/คน (4 คน = ~¥11,300) แต่กินเวลาครึ่งวัน — วันนี้ยังมีโปรแกรมเช้าที่ Oya จึงไม่คุ้ม เก็บไว้เป็นแผนสำรองถ้าตัดเช้าออก' },
+  ]},
+  { leg: 'Fukushima → Koriyama (วันไป Urabandai)', day: 'DAY 4 · 23 ต.ค.', from: 'Fukushima Station', to: 'Koriyama Station', options: [
+    { method: 'Tohoku Shinkansen', time: '~12 นาที', xfer: '0 ครั้ง', price: 1800, conf: 'src',
+      note: 'ช่วงราคา ~¥1,520-1,800 แล้วแต่จองที่นั่งหรือไม่ · ระยะสั้นมาก 33-45 กม.' },
+    { method: '🚃 JR Tohoku Line รถธรรมดา', time: '~50 นาที', xfer: '0 ครั้ง', price: 990, conf: 'calc',
+      note: '💰 ประหยัด ~¥800/คน · ต้องออกจากที่พักเช้ากว่าราว 40 นาที' },
+  ]},
+  { leg: 'Koriyama → Inawashiro (ประตูสู่ Urabandai)', day: 'DAY 4 · 23 ต.ค.', from: 'Koriyama Station', to: 'Inawashiro Station', options: [
+    { method: "JR Ban'etsu West Line", time: '~35 นาที', xfer: '0 ครั้ง', price: 770, conf: 'calc',
+      note: '⚠️ ขบวนห่างกันมาก บางช่วงเว้น 1-2 ชม. เช็ครอบทั้งขาไปขากลับตั้งแต่ก่อนออกเดินทาง' },
+  ]},
+  { leg: 'Fukushima → Tokyo', day: 'DAY 6 · 25 ต.ค.', from: 'Fukushima Station', to: 'Tokyo Station', options: [
+    { method: 'Tohoku Shinkansen (Yamabiko) — ไม่จองที่นั่ง', time: '~95 นาที', xfer: '0 ครั้ง', price: 8580, conf: 'src',
+      note: '⚠️ ขบวน Hayabusa บางขบวนไม่จอด Fukushima — ดูขบวน Yamabiko เป็นหลัก' },
+    { method: 'Tohoku Shinkansen — จองที่นั่ง', time: '~95 นาที', xfer: '0 ครั้ง', price: 9110, conf: 'src',
+      note: '25 ต.ค. เป็นวันอาทิตย์ขากลับ คนเยอะ — จองล่วงหน้าเถอะ เย็นนี้มีนัดกินข้าว' },
+  ]},
+  { leg: 'โตเกียว → Narita Airport', day: 'DAY 9 · 28 ต.ค.', from: 'Tokyo Station', to: 'Narita Airport Terminal 1 Station', options: [
+    { method: "JR Narita Express (N'EX)", time: '~60 นาที', xfer: '0 ครั้ง', price: 3070, conf: 'src',
+      note: 'ออกจากเมืองก่อน 14:00 ให้ทันไฟลท์ 17:00' },
+    { method: 'Keisei Skyliner (จาก Ueno / Nippori)', time: '~41 นาที', xfer: '0 ครั้ง', price: 2580, conf: 'src',
+      note: 'เร็วและถูกกว่า ถ้าที่พักอยู่ฝั่ง Ueno/Nippori' },
+    { method: 'Keisei Access Express', time: '~60-75 นาที', xfer: '0 ครั้ง', price: 1300, conf: 'calc',
+      note: '💰 ถูกที่สุด แต่วันกลับมีของฝากเยอะ อาจอึดอัด' },
+  ]},
+];
+
+/* ค่ารถท้องถิ่นย่อย ๆ ที่ไม่ใช่เส้นหลัก */
+const RAIL_LOCAL_NOTES = [
+  { what: 'Fukushima → Iizaka Onsen (แช่ออนเซ็น)', detail: 'Fukushima Kotsu สาย Iizaka ~¥370 เที่ยวเดียว · ~25 นาที · ไม่ใช่ JR' },
+  { what: 'Fukushima → Azuma Sports Park (แปะก๊วย light-up)', detail: 'บัสจากสถานี ~30 นาที ~¥500' },
+  { what: 'Inawashiro → Goshikinuma Iriguchi', detail: "บัส Bandai Toto ~30 นาที ~¥790 · วิ่งตามฤดูกาล เช็ครอบสุดท้ายทุกครั้ง" },
+  { what: 'Nikko → Chuzenji Onsen', detail: 'Tobu Bus เที่ยวเดียว ~¥1,250 · Chuzenji Onsen Free Pass ~¥2,500 คุ้มกว่าถ้าแวะหลายจุด' },
+  { what: 'Tobu-Nikko ↔ JR Nikko', detail: 'สองสถานีอยู่ติดกัน เดิน 3-5 นาที ไม่มีค่าใช้จ่าย' },
+];
+
 /* เส้นทางรถไฟหลักที่ใช้เทียบกับ JR EAST PASS (¥30,000) */
-const RAIL_MAIN_TOTAL = 2750 + 2920 + 770 + 6500 + 8810 + 3070; // Skyliner+Ginza เข้าเมือง + Tobu ไป Nikko + JR Nikko→Utsunomiya + Utsunomiya→Fukushima + Fukushima→Tokyo + N'EX กลับ
+const RAIL_MAIN_TOTAL = 2760 + 2920 + 770 + 6250 + 9110 + 3070; // Skyliner+Ginza เข้าเมือง + Tobu ไป Nikko + JR Nikko→Utsunomiya + Utsunomiya→Fukushima + Fukushima→Tokyo + N'EX กลับ
 
 /* ---------- events (ยืนยันวันที่จริงปี 2026 แล้ว — อัปเดต ก.ค. 2026) ---------- */
 const EVENTS = [
