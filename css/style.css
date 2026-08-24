@@ -817,3 +817,10 @@ body {
 }
 .spot-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .spot-photo-note { margin-top: 18px; }
+
+.stay-alert-warn {
+  background: rgba(217, 123, 41, .09);
+  border-left: 4px solid #d97b29;
+  border-radius: 10px; padding: 14px 16px; margin-top: 14px;
+}
+.stay-alert-warn p { font-size: .87rem; line-height: 1.7; margin: 8px 0 0; }

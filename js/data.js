@@ -64,7 +64,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 8;
+const ITINERARY_VERSION = 9;
 /* ป้ายประเภทกิจกรรมในแผนรายวัน — ใช้ดูภาพรวมว่าวันไหนออกนอกเมือง วันไหนอยู่ในเมือง */
 const ITEM_TAGS = {
   nature: { icon: '🌿', th: 'ธรรมชาติ', en: 'Nature',  color: '#3e5c46' },
@@ -77,35 +77,35 @@ const ITEM_TAG_KEYS = Object.keys(ITEM_TAGS);
 
 
 const DEFAULT_ITINERARY = [
-  { day: 1, date: 'อ. 20 ต.ค.', area: 'tokyo', title: 'Narita → โตเกียว · คืนแรกพักโตเกียว', items: [
+  { day: 1, date: 'อ. 20 ต.ค.', area: 'tokyo', title: 'Narita → Shinjuku · คืนแรกพักโตเกียว', items: [
     { t: '08:00', act: 'ถึง Narita — ตม. / รับกระเป๋า / เติมเงิน Suica', note: 'เวลาเป็นสมมติฐาน ปรับตามไฟลท์จริง', tag: 'move', cost: 0 },
-    { t: '09:30', act: 'Skyliner → Ueno แล้วต่อ Ginza Line ลง Asakusa', note: 'Skyliner ~41 นาที ¥2,580 + Ginza Line ¥180 · พักฝั่ง Asakusa เพราะพรุ่งนี้ขึ้นรถไฟ Tobu ไป Nikko จากที่นี่', tag: 'move', cost: 2760 },
-    { t: '—', act: '🔁 ทางเลือก: N\'EX → Tokyo Sta. แล้วต่อรถไฟในเมือง', note: '~60 นาที ¥3,070 · เลือกอันนี้ถ้าที่พักอยู่ฝั่ง Tokyo/Ueno มากกว่า Asakusa', tag: 'move', cost: 0 },
-    { t: '11:00', act: 'ถึงย่านที่พัก · ฝากกระเป๋า / เช็คอิน Airbnb (1 คืน)', note: 'เช็คอินจริงส่วนใหญ่บ่าย 3 — ฝากกระเป๋าไว้ก่อนแล้วออกไปเดินได้', tag: 'move', cost: 0 },
+    { t: '09:30', act: "N'EX → Shinjuku ตรง ไม่ต้องเปลี่ยนขบวน", note: '~55-90 นาที ¥3,250 · 💰 <strong>ซื้อ N\'EX Tokyo Round Trip ¥5,000</strong> คุ้มกว่าซื้อเที่ยวเดียวสองครั้ง (¥6,500) ประหยัด ¥1,500/คน = ¥6,000 ทั้งกลุ่ม · ที่นั่งจอง วางกระเป๋าใหญ่ได้', tag: 'move', cost: 3250 },
+    { t: '—', act: '🔁 ทางเลือกถูกกว่า: Skyliner → Nippori แล้วต่อ Yamanote', note: 'Skyliner ¥2,580 + JR ~¥210 ≈ ¥2,790 แต่ต้องเปลี่ยนขบวนพร้อมกระเป๋า · หรือ Access Express ~¥1,300 ถูกสุดแต่ต้องเปลี่ยนสองต่อ', tag: 'move', cost: 0 },
+    { t: '11:00', act: 'ถึง Shinjuku · ฝากกระเป๋า / เช็คอิน Airbnb (1 คืน)', note: 'เช็คอินจริงส่วนใหญ่บ่าย 3 — ฝากกระเป๋าไว้ก่อนแล้วออกไปเดินได้ · สถานี Shinjuku ใหญ่มาก จำทางออกที่ใกล้ที่พักไว้ให้ดี', tag: 'move', cost: 0 },
     { t: '12:00', act: 'ข้าวเที่ยงแถวที่พัก', note: 'วันแรกอย่าตั้งเป้าร้านดัง เอาที่เดินถึงและไม่ต้องรอคิว', tag: 'food', cost: 1200 },
-    { t: '13:30', act: 'เดินเล่นริมแม่น้ำ Sumida · Sumida Park · วิว Skytree', note: 'วันแรกเอาแบบเบา ๆ แก้ jet lag — เดินอย่างเดียว ไม่ต้องซื้อตั๋วอะไร', tag: 'city', cost: 0 },
-    { t: '15:30', act: 'กลับที่พัก · เช็คอินจริง · อาบน้ำพัก', note: 'พรุ่งนี้ออกเช้า เก็บแรงไว้', tag: 'other', cost: 0 },
-    { t: '18:00', act: 'ข้าวเย็นย่าน Asakusa / Kuramae', note: 'ร้านแถวนี้ปิดค่อนข้างเร็ว ไปก่อน 20:00', tag: 'food', cost: 1800 },
-    { t: '20:00', act: 'จัดกระเป๋าสำหรับพรุ่งนี้ · นอนเร็ว', note: '⚠️ พรุ่งนี้ย้ายเมือง — แยกของใช้ 1 วันไว้ในเป้ใบเล็ก ที่เหลือฝากล็อกเกอร์ที่ Nikko ได้', tag: 'other', cost: 0 },
-    { t: '—', act: '🔁 ถ้ายังไหวคืนนี้: Sensoji ตอนกลางคืน (ไฟส่องวัด คนน้อย)', note: 'ลานวัดเดินได้ตลอดคืน — แต่ Day 7 มี Asakusa เต็ม ๆ อยู่แล้ว ไม่ไปคืนนี้ก็ไม่พลาดอะไร', tag: 'city', cost: 0 },
+    { t: '13:30', act: '🌿 สวน Shinjuku Gyoen — แก้ jet lag แบบนั่ง ๆ นอน ๆ', note: 'ค่าเข้า ~¥500 · สวนใหญ่มาก มีทั้งสวนญี่ปุ่น อังกฤษ ฝรั่งเศส · ⚠️ ปิดค่อนข้างเร็ว เข้าได้ถึงราวบ่ายสามครึ่ง เช็คเวลาก่อนไป · ปลาย ต.ค. ใบไม้เริ่มเปลี่ยนแต่ยังไม่พีค (โตเกียวพีคปลาย พ.ย.)', tag: 'nature', cost: 500 },
+    { t: '16:00', act: 'ตึกรัฐบาลโตเกียว — ชั้นชมวิวฟรี', note: 'เดินจาก Shinjuku ฝั่งตะวันตก ~10 นาที · ขึ้นฟรี ไม่ต้องจอง · ไปช่วงพระอาทิตย์ตกได้ทั้งวิวกลางวันและไฟกลางคืนในรอบเดียว · ฟ้าใสเห็นฟูจิ', tag: 'city', cost: 0 },
+    { t: '18:00', act: 'ข้าวเย็นย่าน Shinjuku', note: 'ยังไม่ต้องไป Omoide Yokocho คืนนี้ — Day 8 จบที่นั่นอยู่แล้ว', tag: 'food', cost: 1800 },
+    { t: '20:00', act: 'จัดกระเป๋าสำหรับพรุ่งนี้ · นอนเร็ว', note: '⚠️ พรุ่งนี้ย้ายเมือง — แยกของใช้ 1 วันไว้ในเป้ใบเล็ก ที่เหลือฝากล็อกเกอร์ที่ Nikko ได้ · ⚠️ ต้องจองที่นั่งด่วนไป Nikko ล่วงหน้าแล้ว', tag: 'other', cost: 0 },
   ]},
-  { day: 2, date: 'พ. 21 ต.ค.', area: 'nikko', title: 'โตเกียว → Nikko → ค้างคืน Utsunomiya', items: [
-    { t: '06:45', act: 'เช็คเอาท์ · ซื้อข้าวเช้าเซเว่น · เดินไป Asakusa Sta. (Tobu)', note: 'กินบนรถไฟ', tag: 'food', cost: 500 },
-    { t: '07:30', act: '🚃 Tobu Limited Express (SPACIA) Asakusa → Tobu-Nikko', note: '~1 ชม. 50 นาที ~¥2,920 (ค่ารถ+ค่าด่วนพิเศษ) · ⚠️ จองที่นั่งล่วงหน้า สายนี้เต็มช่วงใบไม้แดง · Tobu ไม่ใช่ JR — JR PASS ใช้ไม่ได้', tag: 'move', cost: 2920 },
-    { t: '09:25', act: 'ถึง Tobu-Nikko · ฝากกระเป๋าล็อกเกอร์ในสถานี', note: 'ล็อกเกอร์ใบใหญ่ ~¥700 · วันใบไม้แดงล็อกเกอร์เต็มเร็ว ถ้าเต็มมีเคาน์เตอร์รับฝากในตัวสถานี', tag: 'move', cost: 700 },
-    { t: '09:40', act: 'ซื้อบัตรบัส Chuzenji Onsen Free Pass', note: '~¥2,500 · คุ้มถ้าขึ้น Irohazaka + แวะหลายจุด', tag: 'move', cost: 2500 },
+  { day: 2, date: 'พ. 21 ต.ค.', area: 'nikko', title: 'Shinjuku → Nikko (ด่วนตรง) → ค้างคืน Utsunomiya', items: [
+    { t: '06:45', act: 'เช็คเอาท์ · ซื้อข้าวเช้าเซเว่น · ไปชานชาลาที่ Shinjuku', note: 'กินบนรถไฟ', tag: 'food', cost: 500 },
+    { t: '07:30', act: '🚃 ด่วนพิเศษวิ่งตรง Shinjuku → Tobu-Nikko', note: '~2 ชม. ~¥4,000 · วิ่งบนราง JR แล้วต่อเข้าราง Tobu โดยไม่ต้องเปลี่ยนขบวน ออกจากชานชาลา 5 · ⚠️ <strong>ต้องจองที่ Midori no Madoguchi ล่วงหน้า</strong> · ⚠️ <strong>วันธรรมดาวิ่งวันละเที่ยวเดียว</strong> (ขบวน Nikko #1) — 21 ต.ค. เป็นวันพุธ ต้องเช็ครอบจริงก่อนวางแผนเวลาทั้งวัน · ถ้าผู้ถือ JR PASS ต้องจ่ายช่วง Tobu เพิ่ม ~¥2,000', tag: 'move', cost: 4000 },
+    { t: '—', act: '🔁 ถ้ารอบด่วนตรงไม่ลงตัว: ไป Asakusa แล้วขึ้น Tobu SPACIA', note: 'Shinjuku → Asakusa ~30 นาที ~¥200 แล้วต่อ SPACIA ~¥2,920 · รอบเยอะกว่ามาก เลือกเวลาได้อิสระ · รวมแล้วถูกกว่าด่วนตรงด้วย แต่ต้องตื่นเช้ากว่า', tag: 'move', cost: 0 },
+    { t: '09:30', act: 'ถึง Tobu-Nikko · ฝากกระเป๋าล็อกเกอร์ในสถานี', note: 'ล็อกเกอร์ใบใหญ่ ~¥700 · วันใบไม้แดงล็อกเกอร์เต็มเร็ว ถ้าเต็มมีเคาน์เตอร์รับฝากในตัวสถานี', tag: 'move', cost: 700 },
+    { t: '09:45', act: 'ซื้อบัตรบัส Chuzenji Onsen Free Pass', note: '~¥2,500 · คุ้มถ้าขึ้น Irohazaka + แวะหลายจุด · บัสเที่ยวเดียวอย่างเดียว ~¥1,250', tag: 'move', cost: 2500 },
     { t: '10:00', act: 'บัสขึ้นโค้ง Irohazaka → Akechidaira Ropeway', note: 'กระเช้าไป-กลับ ~¥1,000 · ⚠️ ช่วงใบไม้แดง Irohazaka รถติดหนัก เผื่อเวลาขาขึ้น', tag: 'nature', cost: 1000 },
     { t: '11:15', act: 'น้ำตก Kegon + ลิฟต์ลงจุดชมวิว', note: 'ลิฟต์ ¥570', tag: 'nature', cost: 570 },
     { t: '12:30', act: 'ข้าวเที่ยงริมทะเลสาบ Chuzenji', note: '', tag: 'food', cost: 1200 },
     { t: '13:45', act: 'เดินริมทะเลสาบ Chuzenji · (ถ้าเวลาเหลือ) น้ำตก Ryuzu', note: 'Ryuzu ต่อบัสอีก ~10 นาที — ไปได้ถ้าลงจาก Kegon ก่อน 13:00', tag: 'nature', cost: 0 },
     { t: '15:15', act: 'บัสลงเขากลับตัวเมือง Nikko', note: 'ขาลงมักติดน้อยกว่าขาขึ้น แต่ก็ยังเผื่อไว้ 1 ชม.', tag: 'move', cost: 0 },
     { t: '16:15', act: 'สะพาน Shinkyo / Kanmangafuchi Abyss', note: 'ข้ามสะพาน ~¥300 · Kanmangafuchi เดินฟรี — แถวพระจิโซ่ริมลำธาร', tag: 'nature', cost: 300 },
-    { t: '—', act: '🔁 อยากได้ศาลเจ้า Toshogu ต้องแลกกับฝั่งทะเลสาบ', note: 'Toshogu ปิด 17:00 (ขายตั๋วถึง ~16:30 · ~¥1,600) — วันนี้ออกจากโตเกียวเช้ากว่าเดิมไม่ได้มาก จะเก็บทั้งทะเลสาบและ Toshogu ในวันเดียวแน่นเกินไป · เลือกอย่างใดอย่างหนึ่ง', tag: 'city', cost: 0 },
+    { t: '—', act: '🔁 อยากได้ศาลเจ้า Toshogu ต้องแลกกับฝั่งทะเลสาบ', note: 'Toshogu ปิด 17:00 (ขายตั๋วถึง ~16:30 · ~¥1,600) — จะเก็บทั้งทะเลสาบและ Toshogu ในวันเดียวแน่นเกินไป เลือกอย่างใดอย่างหนึ่ง', tag: 'city', cost: 0 },
     { t: '17:00', act: 'รับกระเป๋า · เดินไปสถานี JR Nikko', note: 'JR Nikko อยู่ถัดจาก Tobu-Nikko เดินประมาณ 3-5 นาที', tag: 'move', cost: 0 },
-    { t: '17:30', act: '🚃 JR Nikko Line → Utsunomiya', note: '~45 นาที ¥770 · ขบวนห่างกันราวชั่วโมงละ 1-2 ขบวน เช็ครอบก่อนลงเขา', tag: 'move', cost: 770 },
+    { t: '17:30', act: '🚃 JR Nikko Line → Utsunomiya', note: '~42-45 นาที ¥760 · ขบวนราวชั่วโมงละ 1-2 ขบวน เช็ครอบก่อนลงเขา', tag: 'move', cost: 760 },
     { t: '18:30', act: 'ถึง Utsunomiya · เช็คอิน Airbnb (1 คืน)', note: 'พักคืนเดียว — พรุ่งนี้เช้าเที่ยว Oya ต่อแล้วขึ้นชินคันเซ็นไป Fukushima บ่าย ขอให้อยู่ใกล้สถานี', tag: 'move', cost: 0 },
     { t: '19:30', act: '🥟 เย็น: เกี๊ยวซ่า Utsunomiya (Minmin / Masashi)', note: 'ร้านดังต่อคิวยาว · Kirasse ลานรวมร้านเกี๊ยวซ่าปิดค่อนข้างเร็ว เช็คเวลาก่อน', tag: 'food', cost: 1500 },
-    { t: '—', act: '🔁 ขี้เกียจแบกกระเป๋าขึ้นเขา: ส่งของล่วงหน้าแบบ takkyubin', note: 'ส่งจากที่พักโตเกียวไปที่พัก Utsunomiya หรือ Fukushima ~¥1,500-2,000 ต่อใบ ถึงวันรุ่งขึ้น — สะดวกมากถ้ากระเป๋าใหญ่ ต้องคุยกับเจ้าของ Airbnb เรื่องรับของก่อน', tag: 'other', cost: 0 },
+    { t: '—', act: '🔁 ขี้เกียจแบกกระเป๋าขึ้นเขา: ส่งของล่วงหน้าแบบ takkyubin', note: 'ส่งจากที่พักโตเกียวไปที่พัก Utsunomiya หรือ Fukushima ~¥1,500-2,000 ต่อใบ ถึงวันรุ่งขึ้น — ต้องคุยกับเจ้าของ Airbnb เรื่องรับของก่อน', tag: 'other', cost: 0 },
   ]},
   { day: 3, date: 'พฤ. 22 ต.ค.', area: 'fukushima', title: 'ครึ่งวัน ① — Utsunomiya ครึ่งเช้า → เข้า Fukushima', items: [
     { t: '08:30', act: 'เช็คเอาท์ · ฝากกระเป๋าล็อกเกอร์สถานี Utsunomiya', note: 'ล็อกเกอร์ใบใหญ่ ~¥700', tag: 'move', cost: 700 },
@@ -157,7 +157,7 @@ const DEFAULT_ITINERARY = [
     { t: '11:00', act: 'กลับสถานี · ของฝากฟุกุชิมะ', note: 'พีช/แอปเปิลอบแห้ง เหล้าสาเก ขนมประจำจังหวัด — ในสถานีมีครบ', tag: 'city', cost: 1500 },
     { t: '12:00', act: 'ข้าวเที่ยงในสถานี · รับกระเป๋า', note: 'เผื่อเวลาขึ้นชานชาลา 15 นาที', tag: 'food', cost: 1200 },
     { t: '13:20', act: '🚄 Tohoku Shinkansen (Yamabiko) → Tokyo', note: '~95 นาที · จองที่นั่งล่วงหน้าเพราะวันอาทิตย์คนกลับเยอะ', tag: 'move', cost: 9110 },
-    { t: '15:00', act: 'ถึง Tokyo Sta. → ไปเช็คอิน Airbnb', note: 'ค่ารถในเมือง ~¥800 · ถึงที่พักราวบ่าย 4 กำลังดี ไม่ค่ำ', tag: 'move', cost: 800 },
+    { t: '15:00', act: 'ถึง Tokyo Sta. → Chuo Line ต่อไป Shinjuku · เช็คอิน Airbnb', note: 'ชินคันเซ็นลงที่ Tokyo Sta. แล้วต่อ Chuo Line ไป Shinjuku อีก ~15 นาที ~¥210 · ถึงที่พักราวบ่าย 4 กำลังดี ไม่ค่ำ', tag: 'move', cost: 400 },
     { t: '16:30', act: 'อาบน้ำ พักขา เดินสำรวจย่านที่พัก', note: '', tag: 'other', cost: 0 },
     { t: '18:30', act: '🍽 นัดกินข้าวกับเพื่อน', note: 'นัดร้านล่วงหน้า วันอาทิตย์ร้านดังเต็มเร็ว', tag: 'food', cost: 4000 },
   ]},
@@ -182,7 +182,7 @@ const DEFAULT_ITINERARY = [
     { t: '08:30', act: 'Ginza + GINZA SIX (Taniguchi) + สวนดาดฟ้า', note: 'ร้านส่วนใหญ่เปิด 10:00-11:00 — ช่วงแรกเดินชมอาคารก่อน', tag: 'city', cost: 0 },
     { t: '10:30', act: 'Don Quijote / drugstore — ของฝากรอบสุดท้าย', note: 'พกพาสปอร์ตไว้ทำ tax-free', tag: 'city', cost: 5000 },
     { t: '12:00', act: 'ข้าวเที่ยง + กลับไปเอากระเป๋า', note: '', tag: 'food', cost: 1200 },
-    { t: '13:30', act: "ออกจากที่พัก → สนามบิน (N'EX)", note: '~60 นาที · เผื่อเวลาให้ถึงก่อน 15:00', tag: 'move', cost: 3070 },
+    { t: '13:30', act: "ออกจากที่พัก → สนามบิน (N'EX จาก Shinjuku)", note: '~55-90 นาที · ถ้าซื้อ N\'EX Tokyo Round Trip ตั้งแต่ขามา ขานี้จ่ายแล้ว · เผื่อเวลาให้ถึงก่อน 15:00', tag: 'move', cost: 3250 },
     { t: '15:00', act: 'ถึงสนามบิน · เช็คอิน + คืนภาษี', note: '', tag: 'move', cost: 0 },
     { t: '17:00', act: 'บินกลับ ✈', note: '', tag: 'move', cost: 0 },
   ]},
@@ -326,32 +326,33 @@ const PLACES = [
 
 /* ---------- main route line (station to station) ---------- */
 const ROUTE = [
-  [35.7118, 139.7967],  // Asakusa (คืนแรก 20 ต.ค.)
+  [35.6896, 139.7006],  // Shinjuku (คืนแรก 20 ต.ค.)
   [36.7581, 139.5986],  // Nikko (21 ต.ค.)
   [36.5591, 139.8986],  // Utsunomiya (ค้างคืน 21 ต.ค.)
   [37.7543, 140.4590],  // Fukushima (22–25 ต.ค.)
-  [35.6812, 139.7671],  // back Tokyo (25–28 ต.ค.)
+  [35.6896, 139.7006],  // back Tokyo — Shinjuku (25–28 ต.ค.)
 ];
 
 /* ---------- transport segments ---------- */
 const TRANSPORT = [
-  { title: 'สนามบิน → ที่พักโตเกียว (ฝั่ง Asakusa)', day: 'DAY 1 · 20 ต.ค.', options: [
-    { method: 'Keisei Skyliner → Ueno + Ginza Line → Asakusa', note: 'Narita → Ueno ¥2,580 (~41 นาที เร็วสุด) → Ginza Line อีก ¥180 · เหมาะที่สุดถ้าพักฝั่ง Asakusa', time: 'รวม ~1 ชม.', price: 2760 },
-    { method: "Narita Express (N'EX) → Tokyo Sta.", note: 'ตรงเข้า Tokyo Sta. ¥3,070 · เลือกอันนี้ถ้าที่พักอยู่ฝั่ง Tokyo/Ginza มากกว่า', time: '~60 นาที', price: 3070 },
-    { method: 'Keisei Access Express (รถไฟธรรมดา)', note: 'ถูกที่สุด ~¥1,300 ไม่ต้องจองที่นั่ง แต่ต้องยืนแบกกระเป๋า ~75 นาที', time: '~75 นาที', price: 1300 },
-    { method: 'Tokyo Monorail + Asakusa Line', note: 'กรณีลง Haneda → Hamamatsucho หรือขึ้น Keikyu ต่อ Asakusa Line ตรงถึง Asakusa', time: '~45 นาที', price: 900 },
+  { title: 'สนามบิน → ที่พักโตเกียว (ย่าน Shinjuku)', day: 'DAY 1 · 20 ต.ค.', options: [
+    { method: "Narita Express (N'EX) → Shinjuku ตรง", note: "ไม่ต้องเปลี่ยนขบวนพร้อมกระเป๋า มีที่เก็บสัมภาระใหญ่ · 💰 ซื้อแบบ N'EX Tokyo Round Trip ¥5,000 ใช้ได้ทั้งขาไปขากลับ ถูกกว่าซื้อแยกสองเที่ยว ¥1,500/คน", time: '~55-90 นาที', price: 3250 },
+    { method: 'Keisei Skyliner → Nippori → JR Yamanote', note: 'Skyliner ¥2,580 + JR ~¥210 · เร็วช่วงแรกแต่ต้องลากกระเป๋าเปลี่ยนขบวนที่ Nippori', time: '~60 นาที', price: 2790 },
+    { method: 'Keisei Access Express (รถธรรมดา)', note: 'ถูกที่สุด แต่ไปย่าน Shinjuku ต้องเปลี่ยนสองต่อ · เหมาะกับคนสัมภาระน้อย', time: '~80-90 นาที', price: 1500 },
+    { method: 'Airport Limousine Bus → Shinjuku', note: 'บัสตรงถึงหน้าสถานี/โรงแรมย่าน Shinjuku ไม่ต้องลากกระเป๋าขึ้นบันได · แลกด้วยความเสี่ยงรถติด', time: '~1 ชม. 45 นาที - 2 ชม. 30 นาที', price: 3600 },
   ]},
-  { title: 'โตเกียว → Nikko (ขาไป · ไม่ย้อนกลับ)', day: 'DAY 2 · 21 ต.ค. (เช้า)', options: [
-    { method: 'Tobu Limited Express SPACIA — Asakusa → Tobu-Nikko', note: '⚠️ Tobu ไม่ใช่ JR — พาส JR ใช้ไม่ได้ · ค่ารถ+ค่าด่วนพิเศษรวม ~¥2,920 · จองที่นั่งล่วงหน้า ช่วงใบไม้แดงเต็มเร็ว', time: '~1 ชม. 50 นาที', price: 2920 },
-    { method: 'Tobu รถธรรมดา (ต่อขบวนที่ Shimo-Imaichi)', note: 'ถูกกว่ามาก ~¥1,390 แต่ต้องเปลี่ยนขบวนและใช้เวลานานกว่า ~2 ชม. 20 นาที — ประหยัดได้ถ้าไม่รีบ', time: '~2 ชม. 20 นาที', price: 1390 },
-    { method: 'JR Shinkansen → Utsunomiya → JR Nikko Line', note: 'ทางของคนถือ JR PASS: Tokyo → Utsunomiya ~¥5,020 แล้วต่อ JR Nikko Line ¥770 · เร็วกว่าแต่แพงกว่ามากถ้าไม่มีพาส', time: '~1 ชม. 40 นาที', price: 5790 },
+  { title: 'Shinjuku → Nikko (ขาไป · ไม่ย้อนกลับ)', day: 'DAY 2 · 21 ต.ค. (เช้า)', options: [
+    { method: '🚃 ด่วนพิเศษวิ่งตรง Shinjuku → Tobu-Nikko', note: '⚠️ <strong>วันธรรมดาวิ่งวันละเที่ยวเดียว</strong> (ขบวน Nikko #1) เสาร์-อาทิตย์ช่วง peak มีเสริม · ต้องจองที่นั่งที่ Midori no Madoguchi ก่อน · วิ่งบนราง JR แล้วต่อเข้าราง Tobu โดยไม่ต้องเปลี่ยนขบวน ออกชานชาลา 5 · ผู้ถือ JR PASS จ่ายช่วง Tobu เพิ่ม ~¥2,000', time: '~2 ชม.', price: 4000 },
+    { method: 'ไป Asakusa ก่อน แล้วขึ้น Tobu SPACIA', note: 'Shinjuku → Asakusa ~30 นาที ~¥200 + SPACIA ~¥2,920 · <strong>รอบเยอะกว่ามาก เลือกเวลาได้อิสระ และรวมแล้วยังถูกกว่า</strong> — แลกด้วยการตื่นเช้ากว่าราวครึ่งชั่วโมง', time: '~2 ชม. 20 นาที รวมการเดินทางในเมือง', price: 3120 },
+    { method: 'Tobu รถธรรมดาจาก Asakusa (เปลี่ยนที่ Shimo-Imaichi)', note: 'ถูกที่สุด ~¥1,390 + ค่าเข้าเมือง · ไม่มีที่นั่งจอง ต้องลุ้นที่ยืน', time: '~2 ชม. 50 นาที', price: 1590 },
+    { method: 'JR ล้วน: ชินคันเซ็น → Utsunomiya → JR Nikko Line', note: 'ทางของคนถือ JR PASS (¥5,020 + ¥760) · เร็วสุดแต่แพงสุดถ้าไม่มีพาส', time: '~1 ชม. 40 นาที', price: 5780 },
   ]},
   { title: 'ในนิกโก้: บัสขึ้นทะเลสาบ Chuzenji', day: 'DAY 2 · 21 ต.ค. (กลางวัน)', options: [
     { method: 'Tobu Bus — Chuzenji Onsen Free Pass', note: 'ขึ้นลงไม่จำกัด Nikko Sta. ⇄ Chuzenji (ผ่าน Irohazaka) — คุ้มถ้าแวะ Akechidaira + Kegon + Ryuzu ในวันเดียว', time: '~50 นาที/เที่ยว', price: 2500 },
     { method: 'บัสเที่ยวเดียว Nikko → Chuzenji Onsen', note: 'ช่วงใบไม้แดงรถติดมาก เผื่อเวลา 2 เท่า — วันนี้ถึง Nikko ~09:25 ควรขึ้นบัสทันที', time: '~50-90 นาที', price: 1250 },
   ]},
   { title: 'Nikko → Utsunomiya (ขาค้างคืน)', day: 'DAY 2 · 21 ต.ค. (เย็น)', options: [
-    { method: 'JR Nikko Line — JR Nikko Sta. → Utsunomiya', note: 'JR Nikko อยู่ถัดจาก Tobu-Nikko เดิน 3-5 นาที · ขบวนราวชั่วโมงละ 1-2 ขบวน ⚠️ เช็ครอบสุดท้ายตั้งแต่ก่อนขึ้นเขา', time: '~45 นาที', price: 770 },
+    { method: 'JR Nikko Line — JR Nikko Sta. → Utsunomiya', note: 'JR Nikko อยู่ถัดจาก Tobu-Nikko เดิน 3-5 นาที · ขบวนราวชั่วโมงละ 1-2 ขบวน ⚠️ เช็ครอบสุดท้ายตั้งแต่ก่อนขึ้นเขา', time: '~42-45 นาที', price: 760 },
     { method: 'Tobu กลับ Shimo-Imaichi แล้วต่อรถ', note: 'ทางอ้อม ไม่แนะนำ — JR Nikko Line ตรงกว่าและถูกกว่า', time: '~1 ชม. 20 นาที', price: 1200 },
   ]},
   { title: 'Utsunomiya → Fukushima', day: 'DAY 3 · 22 ต.ค. (บ่าย)', options: [
@@ -367,7 +368,7 @@ const TRANSPORT = [
     { method: 'Tohoku Shinkansen (Yamabiko) — ขบวนสาย', note: 'นั่งยาวถึง Tokyo Sta. เลย ออกช่วงสาย ๆ ให้ถึงโตเกียวบ่ายโมง เผื่อเวลาพักก่อนนัดมื้อเย็น', time: '~95 นาที', price: 9110 },
   ]},
   { title: 'โตเกียว → สนามบิน', day: 'DAY 9 · 28 ต.ค.', options: [
-    { method: "N'EX ไป Narita", note: 'ออกจากเมืองก่อน 14:00 เผื่อเช็คอินไฟลท์ 17:00', time: '~60 นาที', price: 3070 },
+    { method: "N'EX จาก Shinjuku ไป Narita", note: "ขึ้นที่ Shinjuku ได้เลยไม่ต้องเข้า Tokyo Sta. · ถ้าซื้อ Round Trip ¥5,000 ตั้งแต่ขามา ขานี้ไม่ต้องจ่ายเพิ่ม · ออกจากเมืองก่อน 14:00 เผื่อเช็คอินไฟลท์ 17:00", time: '~55-90 นาที', price: 3250 },
     { method: 'Monorail ไป Haneda', note: 'กรณีบินออก Haneda', time: '~25 นาที', price: 700 },
   ]},
   { title: 'ค่าเดินทางในเมือง (เผื่อ)', day: 'ทุกวัน', options: [
@@ -395,21 +396,25 @@ const CAR_PLAN = {
          'calc' = คำนวณจากตารางค่าโดยสาร JR ตามระยะทาง (ยังไม่ยืนยันหน้างาน)
    ทุกแถวมีปุ่มเช็คราคาสดกับ Google Maps เพราะ JR ปรับราคาเป็นระยะ */
 const RAIL_FARES = [
-  { leg: 'Narita Airport → โตเกียว', day: 'DAY 1 · 20 ต.ค.', from: 'Narita Airport Terminal 1 Station', to: 'Asakusa Station Tokyo', options: [
-    { method: 'Keisei Skyliner → Ueno / Nippori', time: '~41 นาที', xfer: '0 ครั้ง (ต่อ Ginza Line ไป Asakusa อีก ¥180)', price: 2580, conf: 'src',
-      note: 'ค่าโดยสาร ¥1,280 + ตั๋วไลเนอร์ ¥1,300 · เร็วที่สุด' },
-    { method: "JR Narita Express (N'EX) → Tokyo Sta.", time: '~60 นาที', xfer: '0 ครั้ง', price: 3070, conf: 'src',
-      note: 'ที่นั่งจองล่วงหน้า วางกระเป๋าใหญ่ได้สบาย · เข้า Tokyo/Shinjuku/Shibuya ตรง' },
-    { method: 'Keisei Access Express (รถธรรมดา)', time: '~60-75 นาที', xfer: '0 ครั้ง ถ้าวิ่งต่อเข้า Asakusa Line', price: 1300, conf: 'calc',
-      note: '💰 ถูกที่สุด · ขบวนที่วิ่งเข้าสาย Asakusa ไปลง Asakusa ได้เลยไม่ต้องเปลี่ยนขบวน แต่ไม่มีที่วางกระเป๋าเฉพาะ' },
+  { leg: 'Narita Airport → Shinjuku', day: 'DAY 1 · 20 ต.ค.', from: 'Narita Airport Terminal 1 Station', to: 'Shinjuku Station Tokyo', options: [
+    { method: "JR Narita Express (N'EX) → Shinjuku ตรง", time: '~55-90 นาที', xfer: '0 ครั้ง', price: 3250, conf: 'src',
+      note: '💰 <strong>ซื้อแบบ N\'EX Tokyo Round Trip ¥5,000</strong> ใช้ได้ทั้งไปและกลับ — ถูกกว่าซื้อเที่ยวเดียวสองครั้ง (¥6,500) อยู่ ¥1,500/คน = <strong>¥6,000 ทั้งกลุ่ม</strong> · ที่นั่งจอง มีที่เก็บกระเป๋าใหญ่' },
+    { method: 'Keisei Skyliner → Nippori → JR Yamanote → Shinjuku', time: '~60 นาที', xfer: '1 ครั้ง', price: 2790, conf: 'src',
+      note: 'Skyliner ¥2,580 (ค่าโดยสาร ¥1,280 + ตั๋วไลเนอร์ ¥1,300) + JR ~¥210 · ช่วงแรกเร็วกว่า แต่ต้องลากกระเป๋าเปลี่ยนขบวน' },
+    { method: 'Airport Limousine Bus → Shinjuku', time: '~1 ชม. 45 นาที - 2 ชม. 30 นาที', xfer: '0 ครั้ง', price: 3600, conf: 'calc',
+      note: 'ลงหน้าสถานี/โรงแรมย่าน Shinjuku เลย ไม่ต้องขึ้นลงบันไดสถานีพร้อมกระเป๋า 4 ใบ · แลกด้วยความเสี่ยงรถติด' },
+    { method: 'Keisei Access Express (รถธรรมดา)', time: '~80-90 นาที', xfer: '2 ครั้ง', price: 1500, conf: 'calc',
+      note: '💰 ถูกที่สุด แต่ไป Shinjuku ต้องเปลี่ยนสองต่อ — เหมาะกับคนสัมภาระน้อย ไม่เหมาะวันมาถึงพร้อมกระเป๋าใหญ่' },
   ]},
-  { leg: 'โตเกียว (Asakusa) → Nikko', day: 'DAY 2 · 21 ต.ค.', from: 'Asakusa Station Tokyo', to: 'Tobu-Nikko Station', options: [
-    { method: 'Tobu ด่วนพิเศษ SPACIA / SPACIA X', time: '~1 ชม. 50 นาที', xfer: '0 ครั้ง', price: 2920, conf: 'src',
-      note: '⚠️ Tobu ไม่ใช่ JR — พาส JR ใช้ไม่ได้ · ต้องจองที่นั่ง ช่วงใบไม้แดงเต็มเร็ว' },
-    { method: 'Tobu รถธรรมดา (เปลี่ยนที่ Shimo-Imaichi)', time: '~2 ชม. 20 นาที', xfer: '1 ครั้ง', price: 1390, conf: 'src',
-      note: '💰 ประหยัดกว่าครึ่ง แต่ไม่มีที่นั่งจอง ต้องลุ้นที่ยืน' },
-    { method: 'JR: ชินคันเซ็น → Utsunomiya → JR Nikko Line', time: '~1 ชม. 40 นาที', xfer: '1 ครั้ง', price: 5790, conf: 'calc',
-      note: 'ทางของคนถือ JR PASS (¥5,020 + ¥770) · เร็วสุดแต่แพงสุดถ้าไม่มีพาส' },
+  { leg: 'Shinjuku → Nikko', day: 'DAY 2 · 21 ต.ค.', from: 'Shinjuku Station Tokyo', to: 'Tobu-Nikko Station', options: [
+    { method: '🚃 ด่วนพิเศษวิ่งตรง Shinjuku → Tobu-Nikko', time: '~2 ชม.', xfer: '0 ครั้ง', price: 4000, conf: 'src',
+      note: 'วิ่งบนราง JR แล้วต่อเข้าราง Tobu โดยไม่ต้องเปลี่ยนขบวน ออกจากชานชาลา 5 · <strong>ต้องจองที่นั่งที่ Midori no Madoguchi ล่วงหน้า</strong> · ⚠️ <strong>วันธรรมดาวิ่งวันละเที่ยวเดียว</strong> (Nikko #1 / ขากลับ #8) เสาร์-อาทิตย์ช่วง peak มีเสริม #21/#22 · ผู้ถือ JR PASS จ่ายช่วง Tobu เพิ่ม ~¥2,000' },
+    { method: 'ไป Asakusa ก่อน แล้วขึ้น Tobu SPACIA', time: '~2 ชม. 20 นาที รวมค่าเดินทางในเมือง', xfer: '1 ครั้ง', price: 3120, conf: 'src',
+      note: 'Shinjuku → Asakusa ~30 นาที ~¥200 + SPACIA ¥2,920 · <strong>รอบเยอะกว่ามาก เลือกเวลาได้อิสระ และรวมแล้วยังถูกกว่าด่วนตรง</strong> — แลกด้วยการตื่นเช้ากว่าราวครึ่งชั่วโมง · Tobu ไม่ใช่ JR พาส JR ใช้ไม่ได้' },
+    { method: 'Tobu รถธรรมดาจาก Asakusa (เปลี่ยนที่ Shimo-Imaichi)', time: '~2 ชม. 50 นาที', xfer: '2 ครั้ง', price: 1590, conf: 'src',
+      note: '💰 ถูกที่สุด ¥1,390 + ค่าเข้าเมือง ~¥200 · ไม่มีที่นั่งจอง ต้องลุ้นที่ยืนพร้อมกระเป๋า' },
+    { method: 'JR ล้วน: ชินคันเซ็น → Utsunomiya → JR Nikko Line', time: '~1 ชม. 40 นาที', xfer: '1 ครั้ง', price: 5780, conf: 'calc',
+      note: 'ทางของคนถือ JR PASS (¥5,020 + ¥760) · เร็วสุดแต่แพงสุดถ้าไม่มีพาส' },
   ]},
   { leg: 'Tokyo → Utsunomiya', day: 'ทางเลือก / ถ้าเข้า Tochigi ตรง', from: 'Tokyo Station', to: 'Utsunomiya Station', options: [
     { method: 'Tohoku Shinkansen (Yamabiko / Nasuno) — ไม่จองที่นั่ง', time: '~50 นาที', xfer: '0 ครั้ง', price: 4490, conf: 'src',
@@ -449,15 +454,15 @@ const RAIL_FARES = [
     { method: 'Tohoku Shinkansen (Yamabiko) — ไม่จองที่นั่ง', time: '~95 นาที', xfer: '0 ครั้ง', price: 8580, conf: 'src',
       note: '⚠️ ขบวน Hayabusa บางขบวนไม่จอด Fukushima — ดูขบวน Yamabiko เป็นหลัก' },
     { method: 'Tohoku Shinkansen — จองที่นั่ง', time: '~95 นาที', xfer: '0 ครั้ง', price: 9110, conf: 'src',
-      note: '25 ต.ค. เป็นวันอาทิตย์ขากลับ คนเยอะ — จองล่วงหน้าเถอะ เย็นนี้มีนัดกินข้าว' },
+      note: '25 ต.ค. เป็นวันอาทิตย์ขากลับ คนเยอะ — จองล่วงหน้าเถอะ เย็นนี้มีนัดกินข้าว · ⚠️ ลงที่ Tokyo Sta. แล้ว<strong>ต้องต่อ Chuo Line ไป Shinjuku อีก ~15 นาที ~¥210</strong>' },
   ]},
-  { leg: 'โตเกียว → Narita Airport', day: 'DAY 9 · 28 ต.ค.', from: 'Tokyo Station', to: 'Narita Airport Terminal 1 Station', options: [
-    { method: "JR Narita Express (N'EX)", time: '~60 นาที', xfer: '0 ครั้ง', price: 3070, conf: 'src',
-      note: 'ออกจากเมืองก่อน 14:00 ให้ทันไฟลท์ 17:00' },
-    { method: 'Keisei Skyliner (จาก Ueno / Nippori)', time: '~41 นาที', xfer: '0 ครั้ง', price: 2580, conf: 'src',
-      note: 'เร็วและถูกกว่า ถ้าที่พักอยู่ฝั่ง Ueno/Nippori' },
-    { method: 'Keisei Access Express', time: '~60-75 นาที', xfer: '0 ครั้ง', price: 1300, conf: 'calc',
-      note: '💰 ถูกที่สุด แต่วันกลับมีของฝากเยอะ อาจอึดอัด' },
+  { leg: 'Shinjuku → Narita Airport', day: 'DAY 9 · 28 ต.ค.', from: 'Shinjuku Station Tokyo', to: 'Narita Airport Terminal 1 Station', options: [
+    { method: "JR Narita Express (N'EX) จาก Shinjuku", time: '~55-90 นาที', xfer: '0 ครั้ง', price: 3250, conf: 'src',
+      note: 'ขึ้นที่ Shinjuku ได้เลยไม่ต้องเข้า Tokyo Sta. · <strong>ถ้าซื้อ Round Trip ¥5,000 ตั้งแต่ขามา ขานี้จ่ายไปแล้ว</strong> · ออกจากเมืองก่อน 14:00 ให้ทันไฟลท์ 17:00' },
+    { method: 'JR Yamanote → Nippori → Keisei Skyliner', time: '~60 นาที', xfer: '1 ครั้ง', price: 2790, conf: 'src',
+      note: 'ถูกกว่าเล็กน้อย แต่วันกลับมีของฝากเยอะ การเปลี่ยนขบวนที่ Nippori จะลำบากกว่า' },
+    { method: 'Airport Limousine Bus จาก Shinjuku', time: '~2 ชม.', xfer: '0 ครั้ง', price: 3600, conf: 'calc',
+      note: 'ยกกระเป๋าขึ้นใต้ท้องรถครั้งเดียวจบ · ต้องเผื่อรถติดมากกว่าปกติ' },
   ]},
 ];
 
@@ -471,7 +476,7 @@ const RAIL_LOCAL_NOTES = [
 ];
 
 /* เส้นทางรถไฟหลักที่ใช้เทียบกับ JR EAST PASS (¥30,000) */
-const RAIL_MAIN_TOTAL = 2760 + 2920 + 770 + 6250 + 9110 + 3070; // Skyliner+Ginza เข้าเมือง + Tobu ไป Nikko + JR Nikko→Utsunomiya + Utsunomiya→Fukushima + Fukushima→Tokyo + N'EX กลับ
+const RAIL_MAIN_TOTAL = 3250 + 4000 + 760 + 6250 + 9110 + 3250; // N'EX เข้า Shinjuku + ด่วนตรง Shinjuku→Nikko + JR Nikko→Utsunomiya + Utsunomiya→Fukushima + Fukushima→Tokyo + N'EX กลับ
 
 
 /* ---------- คลังสถานที่จากการค้นคว้า + เงื่อนไขการเดินทาง ----------
@@ -862,13 +867,13 @@ function airbnbSearch(query, checkIn, checkOut, maxPerNightThb) {
 
 const STAYS = [
   {
-    id: 'tokyo-arrival', city: 'Tokyo (คืนแรก)', ja: '東京', area: 'tokyo',
+    id: 'tokyo-arrival', city: 'Tokyo (คืนแรก)', ja: '新宿', area: 'tokyo',
     checkIn: '2026-10-20', checkOut: '2026-10-21', nights: 1, days: 'DAY 1',
-    station: 'ฝั่ง Asakusa / Kuramae — พรุ่งนี้ขึ้นรถไฟ Tobu ไป Nikko จาก Asakusa Sta.',
-    searchQuery: 'Asakusa, Taito City, Tokyo, Japan',
-    lat: 35.7118, lng: 139.7967,
-    note: 'คืนเดียวหลังลงเครื่อง — ขอแค่ใกล้สถานี Asakusa (สาย Tobu) เพราะ 21 ต.ค. ต้องออกราว 07:00 ไป Nikko · ไม่ต้องหรู เอาที่เข้าถึงง่ายและเช็คอินได้เอง เพราะอาจถึงช้ากว่ากำหนดถ้าไฟลท์ดีเลย์ · ยังไม่มีลิสต์ที่เลือกไว้ กดลิงก์ค้นหาที่กรองไว้แล้ว',
-    en: { city: 'Tokyo (arrival night)', station: 'Asakusa / Kuramae side — the Tobu train to Nikko leaves from Asakusa Sta. the next morning', note: 'One night after landing — needs to be near Asakusa Sta. because we leave around 07:00 for Nikko. Prioritise self check-in in case the flight is late' },
+    station: 'ย่าน Shinjuku และโดยรอบ — N\'EX จากสนามบินเข้าตรง + พรุ่งนี้มีด่วนตรงไป Nikko',
+    searchQuery: 'Shinjuku City, Tokyo, Japan',
+    lat: 35.6896, lng: 139.7006,
+    note: 'คืนเดียวหลังลงเครื่อง — N\'EX จาก Narita เข้า Shinjuku ตรงไม่ต้องเปลี่ยนขบวน และ 21 ต.ค. มีด่วนพิเศษวิ่งตรง Shinjuku → Tobu-Nikko เลย · ขอที่เช็คอินเองได้เผื่อไฟลท์ดีเลย์ · ⚠️ ดูเรื่องกฎ minpaku ในกล่องเตือนด้านล่างก่อนจอง',
+    en: { city: 'Tokyo (arrival night)', station: 'Shinjuku and around — direct N\'EX from the airport, and a direct limited express to Nikko the next morning', note: 'One night after landing. Self check-in matters in case the flight is late' },
   },
   {
     id: 'utsunomiya', city: 'Utsunomiya', ja: '宇都宮', area: 'tochigi',
@@ -893,25 +898,25 @@ const STAYS = [
   {
     id: 'tokyo', city: 'Tokyo', ja: '東京', area: 'tokyo',
     checkIn: '2026-10-25', checkOut: '2026-10-28', nights: 3, days: 'DAY 6–8',
-    station: 'เลือกได้หลายย่าน — ดูตัวเลือกด้านล่าง',
-    searchQuery: 'Ueno, Taito City, Tokyo, Japan',
-    lat: 35.7141, lng: 139.7774,
-    note: 'ยังไม่มีลิสต์ที่เลือกไว้ — กดลิงก์ค้นหาที่กรองไว้แล้ว (4 คน · 25–28 ต.ค. · ห้องน้ำ 1+ · ทั้งหลัง) แล้วกรอกราคา/ลิงก์กลับมา',
+    station: 'ย่าน Shinjuku และโดยรอบ — ดู 4 ตัวเลือกด้านล่าง',
+    searchQuery: 'Shinjuku City, Tokyo, Japan',
+    lat: 35.6896, lng: 139.7006,
+    note: 'ยังไม่มีลิสต์ที่เลือกไว้ — กดลิงก์ค้นหาที่กรองไว้แล้ว (4 คน · 25–28 ต.ค. · ห้องน้ำ 1+ · ทั้งหลัง) แล้วกรอกราคา/ลิงก์กลับมา · 25–28 ต.ค. เป็น อา.–พ. ซึ่งเป็นวันธรรมดาเกือบหมด ให้ดูกล่องเตือน minpaku ก่อนจอง',
     en: { city: 'Tokyo', station: 'Several districts work — see the options below', note: 'No listing picked yet — use the pre-filtered search links (4 guests · 25–28 Oct · 1+ bathroom · entire place), then paste the price and link back here' },
     /* ย่านที่แนะนำ: ต้องรับชินคันเซ็นจาก Fukushima + ไปสนามบินวันสุดท้าย + ตรงกับแผน Day 7-9 */
     candidates: [
-      { name: 'Ueno / Okachimachi', ja: '上野・御徒町', lat: 35.7141, lng: 139.7774, query: 'Ueno, Taito City, Tokyo, Japan',
-        why: 'ชินคันเซ็นจาก Fukushima ลงที่ Ueno ได้เลย + Skyliner ตรงไป Narita + Day 7 เดินเที่ยว Ueno/Asakusa ได้จากที่พัก',
-        whyEn: 'The shinkansen from Fukushima stops here, the Skyliner runs straight to Narita, and Day 7 (Ueno/Asakusa) starts at the door' },
-      { name: 'Asakusa / Kuramae', ja: '浅草・蔵前', lat: 35.7118, lng: 139.7967, query: 'Asakusa, Taito City, Tokyo, Japan',
-        why: 'ห้องใหญ่ราคาถูกที่สุดในบรรดาย่านนี้ + Asakusa Line ต่อ Haneda ได้ตรง · Day 7 อยู่ในย่านพอดี',
-        whyEn: 'Biggest rooms for the money of the four, direct Asakusa Line to Haneda, and Day 7 is right here' },
-      { name: 'Nippori / Nishi-Nippori', ja: '日暮里・西日暮里', lat: 35.7280, lng: 139.7710, query: 'Nippori, Arakawa City, Tokyo, Japan',
-        why: 'Skyliner จอด ถึง Narita 36 นาที + JR Yamanote ครบ · เงียบและถูกกว่าฝั่ง Ueno',
-        whyEn: 'Skyliner stop (Narita in 36 min) plus the full Yamanote line; quieter and cheaper than Ueno proper' },
-      { name: 'Shinjuku / Shin-Okubo', ja: '新宿・新大久保', lat: 35.6896, lng: 139.7006, query: 'Shinjuku City, Tokyo, Japan',
-        why: 'N\'EX ไป Narita ขึ้นที่ Shinjuku ได้ + Day 8 จบที่ Shinjuku พอดี · แลกมาด้วยราคาที่สูงกว่า',
-        whyEn: "N'EX to Narita departs from Shinjuku and Day 8 ends here — but expect to pay more" },
+      { name: 'Shinjuku (ฝั่งตะวันตก / Nishi-Shinjuku)', ja: '西新宿', lat: 35.6896, lng: 139.6917, query: 'Nishi-Shinjuku, Shinjuku City, Tokyo, Japan',
+        why: 'N\'EX ไป Narita ขึ้นที่ Shinjuku ได้ตรง + Day 8 จบที่ Shinjuku พอดี · โซนตึกสูงเป็นพื้นที่พาณิชย์ ทำให้มีห้องแบบ apart-hotel ที่ไม่ติดข้อจำกัด minpaku มากกว่าโซนบ้านพักอาศัย',
+        whyEn: "N'EX to Narita departs Shinjuku, Day 8 ends here, and the high-rise side is commercially zoned so more listings are licensed hotels rather than day-capped minpaku" },
+      { name: 'Shin-Okubo / Okubo', ja: '新大久保・大久保', lat: 35.7013, lng: 139.7000, query: 'Okubo, Shinjuku City, Tokyo, Japan',
+        why: 'เดินถึง Shinjuku ได้ ราคาถูกกว่าฝั่งสถานีหลักชัดเจน · ย่านเกาหลี ร้านอาหารเปิดดึก ซูเปอร์เยอะ เหมาะกับกลับดึกจากทริป',
+        whyEn: 'Walkable to Shinjuku but clearly cheaper, with Korean-town restaurants open late and plenty of supermarkets' },
+      { name: 'Yoyogi / Sendagaya', ja: '代々木・千駄ヶ谷', lat: 35.6836, lng: 139.7020, query: 'Yoyogi, Shibuya City, Tokyo, Japan',
+        why: 'สถานีถัดจาก Shinjuku สาย Yamanote/Chuo ครบเหมือนกัน แต่เงียบกว่ามาก · เดินไป Shinjuku Gyoen และ Meiji Jingu (Day 8) ได้',
+        whyEn: 'One stop from Shinjuku with the same Yamanote/Chuo access but far quieter; walking distance to Shinjuku Gyoen and Meiji Jingu' },
+      { name: 'Nakano', ja: '中野', lat: 35.7057, lng: 139.6659, query: 'Nakano City, Tokyo, Japan',
+        why: 'Chuo Line 5 นาทีถึง Shinjuku · ห้องใหญ่ราคาถูกที่สุดในกลุ่มนี้ + ถนนคนเดิน Nakano Broadway · คนละเขตปกครองกับ Shinjuku จึงกฎ minpaku ต่างกัน',
+        whyEn: 'Five minutes to Shinjuku on the Chuo Line, biggest rooms for the money here, plus Nakano Broadway — and a different ward, so different minpaku rules' },
     ],
   },
 ];
