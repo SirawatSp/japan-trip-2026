@@ -824,3 +824,26 @@ body {
   border-radius: 10px; padding: 14px 16px; margin-top: 14px;
 }
 .stay-alert-warn p { font-size: .87rem; line-height: 1.7; margin: 8px 0 0; }
+
+/* ---------- ย่อ/ขยายการ์ดรายวัน ---------- */
+.itinerary-toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
+.day-collapse-btn { font-size: 1rem; line-height: 1; }
+.day-summary-line {
+  display: none;
+  flex-wrap: wrap; align-items: center; gap: 6px 10px;
+  padding: 10px 2px 4px; font-size: .92rem;
+}
+.day-summary-date { color: var(--muted, #8d8375); font-size: .82rem; }
+.day-summary-area {
+  font-size: .72rem; background: rgba(0,0,0,.05); padding: 2px 8px; border-radius: 20px;
+  color: var(--muted, #8d8375); white-space: nowrap;
+}
+.day-summary-title { font-weight: 600; flex: 1 1 auto; min-width: 140px; }
+.day-summary-stay {
+  font-size: .82rem; background: rgba(62,92,70,.12); color: #3e5c46;
+  padding: 2px 9px; border-radius: 20px; white-space: nowrap;
+}
+.day-summary-stay-none { background: rgba(0,0,0,.05); color: var(--muted, #8d8375); }
+.day-card-collapsed .day-card-body { display: none; }
+.day-card-collapsed .day-summary-line { display: flex; }
+.day-card-collapsed { padding-bottom: 10px; }

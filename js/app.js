@@ -127,50 +127,81 @@ function tagBar(items) {
 }
 const tripPlanCost = () => itinerary.reduce((sum, d) => sum + dayCost(d), 0);
 
+/* ที่พักคืนนั้นของแต่ละวัน — DAY n ตรงกับคืนวันที่ (19+n) ต.ค. 2026 เทียบกับ STAYS.checkIn */
+function overnightOf(day) {
+  const iso = `2026-10-${String(19 + day).padStart(2, '0')}`;
+  return STAYS.find((s) => s.checkIn <= iso && iso < s.checkOut) || null;
+}
+const overnightLabel = (day) => {
+  const s = overnightOf(day);
+  if (!s) return null;
+  return (s.city || '').replace(/\s*\(คืนแรก\)\s*/, '');
+};
+
+/* ย่อ/ขยายการ์ดรายวัน — จำสถานะไว้ใน localStorage */
+let collapsedDays = new Set(store.load('jt26_collapsed_days', []));
+function saveCollapsedDays() { store.save('jt26_collapsed_days', [...collapsedDays]); }
+
+
 function renderItinerary() {
-  $('#itinerary-grid').innerHTML = itinerary.map((d, di) => `
-    <article class="day-card" data-area="${d.area}">
+  $('#itinerary-grid').innerHTML = itinerary.map((d, di) => {
+    const collapsed = collapsedDays.has(d.day);
+    const stayCity = overnightLabel(d.day);
+    return `
+    <article class="day-card ${collapsed ? 'day-card-collapsed' : ''}" data-area="${d.area}">
       <div class="day-card-head">
         <span class="day-no">DAY ${d.day}</span>
         <div class="day-card-actions">
           <span class="day-cost mono" title="รวมราคาประมาณของวันนี้">${yen(dayCost(d))}</span>
           <button class="icon-btn day-map-btn" data-idx="${di}" title="ดูหมุดวันนี้บนแผนที่" aria-label="ดูบนแผนที่">📍</button>
+          <button class="icon-btn day-collapse-btn" data-idx="${di}" data-day="${d.day}" title="${collapsed ? 'ขยายดูรายละเอียด' : 'ย่อเหลือแค่สรุป'}" aria-label="ย่อ/ขยาย">${collapsed ? '▸' : '▾'}</button>
           <button class="icon-btn day-del-btn" data-idx="${di}" title="ลบวันนี้ทั้งวัน" aria-label="ลบวันนี้">✕</button>
         </div>
       </div>
-      <div class="day-date-row">
-        <input class="day-date-input mono" data-idx="${di}" value="${esc(d.date)}" aria-label="วันที่">
-        <select class="day-area-select" data-idx="${di}" aria-label="พื้นที่ของวันนี้">
-          ${Object.keys(AREA_LABELS).map((a) => `<option value="${a}" ${a === d.area ? 'selected' : ''}>${AREA_LABELS[a]}</option>`).join('')}
-        </select>
-      </div>
-      <input class="day-title-input" data-idx="${di}" value="${esc(d.title)}" aria-label="หัวข้อของวันนี้">
-      ${tagBar(d.items)}
 
-      <div class="day-table" role="table">
-        <div class="day-tr day-th" role="row"><span>เวลา</span><span>กิจกรรม / รายละเอียด</span><span>¥</span><span></span></div>
-        ${d.items.map((item, ii) => `
-        <div class="day-tr" role="row">
-          <div class="day-time-cell">
-            <input class="day-t-input mono" data-idx="${di}" data-item="${ii}" value="${esc(item.t)}" placeholder="09:00" aria-label="เวลา">
-            <select class="day-tag-select" data-idx="${di}" data-item="${ii}" data-tag="${item.tag}" aria-label="ประเภทกิจกรรม" title="${ITEM_TAGS[item.tag].th}">
-              ${ITEM_TAG_KEYS.map((k) => `<option value="${k}" ${k === item.tag ? 'selected' : ''}>${ITEM_TAGS[k].icon}</option>`).join('')}
-            </select>
-          </div>
-          <div class="day-act-cell">
-            <input class="day-act-input" data-idx="${di}" data-item="${ii}" value="${esc(item.act)}" placeholder="กิจกรรม" aria-label="กิจกรรม">
-            <input class="day-note-input" data-idx="${di}" data-item="${ii}" value="${esc(item.note)}" placeholder="+ รายละเอียด / หมายเหตุ" aria-label="รายละเอียด">
-          </div>
-          <input class="day-cost-input mono" type="number" min="0" step="100" data-idx="${di}" data-item="${ii}" value="${item.cost || ''}" placeholder="0" aria-label="ราคาประมาณ">
-          <button class="icon-btn item-del-btn" data-idx="${di}" data-item="${ii}" aria-label="ลบแถวนี้">✕</button>
-        </div>`).join('')}
+      <div class="day-summary-line">
+        <span class="day-summary-date mono">${esc(d.date)}</span>
+        <span class="day-summary-area">${esc(AREA_LABELS[d.area] || d.area)}</span>
+        <span class="day-summary-title">${esc(d.title)}</span>
+        ${stayCity ? `<span class="day-summary-stay">🛏 ค้างคืนที่ ${esc(stayCity)}</span>` : `<span class="day-summary-stay day-summary-stay-none">✈ ไม่ค้างคืน</span>`}
       </div>
 
-      <div class="day-card-foot">
-        <button class="btn-mini add-item-btn" data-idx="${di}">＋ เพิ่มแถว</button>
-        <button class="btn-mini day-budget-btn" data-idx="${di}" title="บันทึกยอดรวมของวันนี้เป็นรายจ่าย">＋งบ ${yen(dayCost(d))}</button>
+      <div class="day-card-body">
+        <div class="day-date-row">
+          <input class="day-date-input mono" data-idx="${di}" value="${esc(d.date)}" aria-label="วันที่">
+          <select class="day-area-select" data-idx="${di}" aria-label="พื้นที่ของวันนี้">
+            ${Object.keys(AREA_LABELS).map((a) => `<option value="${a}" ${a === d.area ? 'selected' : ''}>${AREA_LABELS[a]}</option>`).join('')}
+          </select>
+        </div>
+        <input class="day-title-input" data-idx="${di}" value="${esc(d.title)}" aria-label="หัวข้อของวันนี้">
+        ${tagBar(d.items)}
+
+        <div class="day-table" role="table">
+          <div class="day-tr day-th" role="row"><span>เวลา</span><span>กิจกรรม / รายละเอียด</span><span>¥</span><span></span></div>
+          ${d.items.map((item, ii) => `
+          <div class="day-tr" role="row">
+            <div class="day-time-cell">
+              <input class="day-t-input mono" data-idx="${di}" data-item="${ii}" value="${esc(item.t)}" placeholder="09:00" aria-label="เวลา">
+              <select class="day-tag-select" data-idx="${di}" data-item="${ii}" data-tag="${item.tag}" aria-label="ประเภทกิจกรรม" title="${ITEM_TAGS[item.tag].th}">
+                ${ITEM_TAG_KEYS.map((k) => `<option value="${k}" ${k === item.tag ? 'selected' : ''}>${ITEM_TAGS[k].icon}</option>`).join('')}
+              </select>
+            </div>
+            <div class="day-act-cell">
+              <input class="day-act-input" data-idx="${di}" data-item="${ii}" value="${esc(item.act)}" placeholder="กิจกรรม" aria-label="กิจกรรม">
+              <input class="day-note-input" data-idx="${di}" data-item="${ii}" value="${esc(item.note)}" placeholder="+ รายละเอียด / หมายเหตุ" aria-label="รายละเอียด">
+            </div>
+            <input class="day-cost-input mono" type="number" min="0" step="100" data-idx="${di}" data-item="${ii}" value="${item.cost || ''}" placeholder="0" aria-label="ราคาประมาณ">
+            <button class="icon-btn item-del-btn" data-idx="${di}" data-item="${ii}" aria-label="ลบแถวนี้">✕</button>
+          </div>`).join('')}
+        </div>
+
+        <div class="day-card-foot">
+          <button class="btn-mini add-item-btn" data-idx="${di}">＋ เพิ่มแถว</button>
+          <button class="btn-mini day-budget-btn" data-idx="${di}" title="บันทึกยอดรวมของวันนี้เป็นรายจ่าย">＋งบ ${yen(dayCost(d))}</button>
+        </div>
       </div>
-    </article>`).join('');
+    </article>`;
+  }).join('');
 
   const allItems = itinerary.flatMap((d) => d.items);
   const allCounts = tagCounts(allItems);
@@ -210,6 +241,18 @@ $('#itinerary-update').addEventListener('click', (e) => {
 
 renderItinerary();
 checkItineraryVersion();
+
+$('#collapse-all-btn').addEventListener('click', () => {
+  itinerary.forEach((d) => collapsedDays.add(d.day));
+  saveCollapsedDays();
+  renderItinerary();
+});
+$('#expand-all-btn').addEventListener('click', () => {
+  collapsedDays.clear();
+  saveCollapsedDays();
+  renderItinerary();
+});
+
 
 /* ============ ที่พัก (Airbnb) ============ */
 let mapReady = false;
@@ -561,6 +604,15 @@ function jumpMapToDay(day) {
 $('#itinerary-grid').addEventListener('click', (e) => {
   const mapBtn = e.target.closest('.day-map-btn');
   if (mapBtn) { jumpMapToDay(itinerary[+mapBtn.dataset.idx].day); return; }
+
+  const collapseBtn = e.target.closest('.day-collapse-btn');
+  if (collapseBtn) {
+    const day = +collapseBtn.dataset.day;
+    if (collapsedDays.has(day)) collapsedDays.delete(day); else collapsedDays.add(day);
+    saveCollapsedDays();
+    renderItinerary();
+    return;
+  }
 
   const delDayBtn = e.target.closest('.day-del-btn');
   if (delDayBtn) {
