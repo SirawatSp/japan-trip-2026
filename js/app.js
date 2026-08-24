@@ -242,12 +242,12 @@ $('#itinerary-update').addEventListener('click', (e) => {
 renderItinerary();
 checkItineraryVersion();
 
-$('#collapse-all-btn').addEventListener('click', () => {
+$('#collapse-all-btn')?.addEventListener('click', () => {
   itinerary.forEach((d) => collapsedDays.add(d.day));
   saveCollapsedDays();
   renderItinerary();
 });
-$('#expand-all-btn').addEventListener('click', () => {
+$('#expand-all-btn')?.addEventListener('click', () => {
   collapsedDays.clear();
   saveCollapsedDays();
   renderItinerary();
