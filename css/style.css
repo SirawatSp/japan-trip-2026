@@ -847,3 +847,26 @@ body {
 .day-card-collapsed .day-card-body { display: none; }
 .day-card-collapsed .day-summary-line { display: flex; }
 .day-card-collapsed { padding-bottom: 10px; }
+
+/* ---------- กล้องสด + อากาศ ---------- */
+.cam-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.cam-card {
+  background: var(--card, #fff); border: 1px solid var(--line, #e3ded4);
+  border-left: 4px solid #b04a3a; border-radius: 12px; padding: 14px 16px;
+}
+.cam-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+.cam-head h3 { margin: 0 0 2px; font-size: 1rem; line-height: 1.4; }
+.cam-ja { font-size: .78rem; color: var(--muted, #8d8375); }
+.cam-weather {
+  font-size: .84rem; white-space: nowrap; text-align: right;
+  background: rgba(0,0,0,.04); border-radius: 8px; padding: 4px 9px; line-height: 1.5;
+}
+.cam-weather-cold { background: rgba(70,110,170,.15); color: #2f4870; }
+.cam-weather-off { color: var(--muted, #8d8375); font-size: .75rem; }
+.cam-hilo { display: block; font-size: .72rem; color: var(--muted, #8d8375); }
+.cam-why { font-size: .85rem; line-height: 1.65; margin: 0 0 10px; }
+.cam-embed { position: relative; padding-top: 56.25%; margin-bottom: 10px; border-radius: 8px; overflow: hidden; background: #000; }
+.cam-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.cam-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.cam-sources { margin-top: 16px; }
+.popup-tag-cam { background: rgba(176,74,58,.15); color: #b04a3a; }

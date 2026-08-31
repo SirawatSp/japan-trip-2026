@@ -19,7 +19,8 @@
       <a href="#itinerary">แผนรายวัน</a>
       <a href="#stay">ที่พัก</a>
       <a href="#map">แผนที่</a>
-      <a href="#spots">คลังสถานที่</a>
+      <a href="#cams">กล้องสด</a>
+  <a href="#spots">คลังสถานที่</a>
   <a href="#transport">การเดินทาง</a>
       <a href="#hike">เดินเขา</a>
       <a href="#events">Events</a>
@@ -147,6 +148,7 @@
     <button class="chip" data-type="taniguchi">✏️ งาน Yoshio Taniguchi</button>
     <button class="chip" data-type="stay">🛏 ที่พัก</button>
     <button class="chip" data-type="spot">🔭 ที่เที่ยวตัวเลือก</button>
+      <button class="chip" data-type="cam">🔴 กล้องสด</button>
       <button class="chip" data-type="car">🚗 เช่ารถ</button>
     <div class="lang-toggle" id="basemap-picker" role="group" aria-label="สไตล์แผนที่ / basemap">
       <button class="chip" data-basemap="en-street" title="ป้ายชื่อภาษาอังกฤษ แบบแผนที่ถนน">EN · Street</button>
@@ -157,6 +159,22 @@
   <div class="map-layout">
     <div id="leaflet-map" role="application" aria-label="แผนที่สถานที่ท่องเที่ยว"></div>
     <div class="place-list" id="place-list"></div>
+  </div>
+</section>
+
+<!-- ============ LIVE CAMS + WEATHER ============ -->
+<section class="section" id="cams">
+  <div class="section-head">
+    <span class="section-ja jp">ライブカメラ</span>
+    <h2>กล้องสด + อากาศเรียลไทม์</h2>
+    <p class="section-desc">ดูสภาพจริงของแต่ละจุดก่อนออกเดินทาง — สำคัญมากกับทริปนี้เพราะต้องลุ้นทั้ง<strong>ใบไม้เปลี่ยนสี</strong>และ<strong>หิมะ/น้ำแข็งบนเขา</strong> ·
+    อุณหภูมิดึงสดจาก Open-Meteo · หมุดทุกจุดอยู่บนแผนที่ กรอง「🔴 กล้องสด」</p>
+  </div>
+  <div class="cam-grid" id="cam-grid"></div>
+  <div class="card cam-sources">
+    <h3>เว็บรวมกล้องสด</h3>
+    <div class="source-links" id="cam-dirs"></div>
+    <p class="note" id="cam-note"></p>
   </div>
 </section>
 

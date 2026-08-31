@@ -452,7 +452,7 @@ function popupHtml(p) {
     <div class="popup-title">${esc(placeName(p))}</div>
     <div class="popup-ja">${esc(p.ja)}</div>
     <div class="popup-desc">${esc(placeDesc(p))}</div>
-    <span class="popup-day">${dayLabel(p)} · ${areaLabel(p.area)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}${p.type === 'stay' ? ' <span class="popup-tag popup-tag-stay">🛏</span>' : ''}${p.type === 'car' ? ' <span class="popup-tag popup-tag-car">🚗</span>' : ''}
+    <span class="popup-day">${dayLabel(p)} · ${areaLabel(p.area)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}${p.type === 'stay' ? ' <span class="popup-tag popup-tag-stay">🛏</span>' : ''}${p.type === 'car' ? ' <span class="popup-tag popup-tag-car">🚗</span>' : ''}${p.type === 'cam' ? ' <span class="popup-tag popup-tag-cam">🔴 LIVE</span>' : ''}
     ${placeTicket(p) ? `<div class="popup-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
     ${p.type === 'stay' ? stayPopupBlock(p) : ''}
     <a class="popup-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener">${p.url ? mt('official') : mt('search')} ↗</a>
@@ -477,7 +477,7 @@ let activeType = 'all'; // 'all' | 'museum' | 'taniguchi'
 
 function placeMatches(p) {
   /* ตัวกรองที่รวมสถานที่นอกเส้นทางทริปไว้ด้วย จึงต้องยอมให้ area 'other' ผ่าน */
-  const includesNationwide = activeType === 'taniguchi' || activeType === 'spot';
+  const includesNationwide = activeType === 'taniguchi' || activeType === 'spot' || activeType === 'cam';
   const areaOk = activeArea === 'all'
     ? (includesNationwide ? true : p.area !== 'other')
     : p.area === activeArea;
@@ -486,7 +486,8 @@ function placeMatches(p) {
     || (activeType === 'taniguchi' && p.taniguchi === true)
     || (activeType === 'stay' && p.type === 'stay')
     || (activeType === 'car' && p.type === 'car')
-    || (activeType === 'spot' && p.type === 'spot');
+    || (activeType === 'spot' && p.type === 'spot')
+    || (activeType === 'cam' && p.type === 'cam');
   return areaOk && typeOk;
 }
 
@@ -941,6 +942,109 @@ applyMapLang();
     <span class="mono">commons.wikimedia.org</span>, <span class="mono">upload.wikimedia.org</span>,
     <span class="mono">flickr.com</span> และ <span class="mono">wikipedia.org</span> — จึง<strong>ยืนยันไม่ได้ว่า URL รูปไหนมีอยู่จริงหรือเป็นภาพของสถานที่นั้นจริง</strong>
     ถ้าฝังไปแบบเดา จะได้รูปเสียหรือรูปผิดที่ · ถ้าอยากได้รูปฝังในหน้านี้ ส่งลิงก์รูปที่เลือกเองมาได้เลย เดี๋ยวใส่ให้</p>`;
+})();
+
+
+/* ============ กล้องสด + อากาศเรียลไทม์ ============ */
+(function renderCams() {
+  const grid = $('#cam-grid');
+  if (!grid) return;
+
+  /* ค้นกล้องสดบน YouTube โดยกรองเฉพาะ Live (sp=EgJAAQ%3D%3D คือฟิลเตอร์ Live ของ YouTube) */
+  const camSearchUrl = (c) =>
+    `https://www.youtube.com/results?search_query=${encodeURIComponent(c.q)}&sp=EgJAAQ%253D%253D`;
+
+  /* รหัสสภาพอากาศของ Open-Meteo (WMO) — แปลเป็นไทยเฉพาะที่เจอจริงในญี่ปุ่นฤดูใบไม้ร่วง/หนาว */
+  const WMO = {
+    0: '☀️ แจ่มใส', 1: '🌤 แดดจัดเป็นส่วนใหญ่', 2: '⛅ มีเมฆบางส่วน', 3: '☁️ เมฆมาก',
+    45: '🌫 หมอก', 48: '🌫 หมอกน้ำแข็งเกาะ',
+    51: '🌦 ฝนละอองเบา', 53: '🌦 ฝนละออง', 55: '🌦 ฝนละอองหนัก',
+    61: '🌧 ฝนเบา', 63: '🌧 ฝน', 65: '🌧 ฝนหนัก',
+    66: '🧊 ฝนเยือกแข็ง', 67: '🧊 ฝนเยือกแข็งหนัก',
+    71: '🌨 หิมะเบา', 73: '❄️ หิมะ', 75: '❄️ หิมะหนัก', 77: '❄️ เม็ดหิมะ',
+    80: '🌧 ฝนซู่', 81: '🌧 ฝนซู่แรง', 82: '⛈ ฝนซู่หนักมาก',
+    85: '🌨 หิมะโปรย', 86: '❄️ หิมะโปรยหนัก',
+    95: '⛈ พายุฝนฟ้าคะนอง', 96: '⛈ พายุลูกเห็บ', 99: '⛈ พายุลูกเห็บรุนแรง',
+  };
+
+  grid.innerHTML = LIVE_CAMS.map((c) => `
+    <article class="cam-card" data-cam="${esc(c.id)}">
+      <div class="cam-head">
+        <div>
+          <h3>${esc(c.name)}</h3>
+          <span class="jp cam-ja">${esc(c.ja)}</span>
+        </div>
+        <span class="cam-weather" data-lat="${c.lat}" data-lng="${c.lng}">…</span>
+      </div>
+      <p class="cam-why">${esc(c.why)}</p>
+      ${c.youtubeId ? `<div class="cam-embed"><iframe src="https://www.youtube.com/embed/${esc(c.youtubeId)}" title="${esc(c.name)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>` : ''}
+      <div class="cam-actions">
+        <a class="btn-mini" href="${camSearchUrl(c)}" target="_blank" rel="noopener">🔴 หากล้องสดจุดนี้ ↗</a>
+        <a class="btn-mini" href="https://tomarigi.me/spots" target="_blank" rel="noopener">🗺 Tomarigi ↗</a>
+        <button class="btn-mini cam-map-btn" data-lat="${c.lat}" data-lng="${c.lng}">📍 ดูบนแผนที่</button>
+      </div>
+    </article>`).join('');
+
+  $('#cam-dirs').innerHTML = CAM_DIRECTORIES.map((d) =>
+    `<a href="${esc(d.url)}" target="_blank" rel="noopener" title="${esc(d.note)}">${esc(d.name)} ↗</a>`).join('');
+
+  $('#cam-note').innerHTML = `<strong>เรื่องกล้องสด:</strong> กล้องสดของญี่ปุ่นเกือบทั้งหมดคือ <strong>YouTube Live</strong> —
+    เว็บรวมอย่าง <span class="mono">tomarigi.me</span> ก็ดึงจาก YouTube เหมือนกัน และ<strong>ไม่มี public API ให้ต่อ</strong> (เป็นเว็บที่นักพัฒนาคนเดียวทำขึ้น)
+    ผมจึงไม่ฝังรหัสวิดีโอแบบเดา เพราะเครื่องที่สร้างเว็บนี้เข้า youtube.com ไม่ได้ ยืนยันไม่ได้ว่ารหัสไหนยังไลฟ์อยู่ — ถ้าใส่มั่วจะได้กล่องดำ ·
+    ปุ่ม <strong>「หากล้องสดจุดนี้」</strong> ค้นด้วยชื่อญี่ปุ่น + <span class="mono">ライブカメラ</span> พร้อมกรองเฉพาะ Live จึงได้ผลจริงเสมอและไม่มีวันตาย ·
+    <strong>เจอกล้องที่ถูกใจแล้วส่ง link มา</strong> เดี๋ยวผมใส่ <span class="mono">youtubeId</span> ให้ แล้วมันจะฝังเล่นในการ์ดนี้เลย
+    <br><strong>เรื่องอากาศ:</strong> ตัวเลขดึงสดจาก <span class="mono">Open-Meteo</span> (ฟรี ไม่ต้องใช้ API key) โดยเบราว์เซอร์ของคุณเรียกตรง ไม่ผ่านเซิร์ฟเวอร์ตัวกลาง ·
+    พยากรณ์ล่วงหน้าได้ราว 2 สัปดาห์ ดังนั้นตัวเลขจะมีความหมายจริง ๆ เมื่อใกล้วันเดินทาง ตอนนี้แสดงอากาศ ณ ปัจจุบันของแต่ละจุด`;
+
+  grid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.cam-map-btn');
+    if (!btn) return;
+    document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+    activeType = 'cam';
+    document.querySelectorAll('#type-filters button.chip[data-type]').forEach((b) =>
+      b.classList.toggle('active', b.dataset.type === 'cam'));
+    refreshMap();
+    setTimeout(() => map.flyTo([+btn.dataset.lat, +btn.dataset.lng], 10, { duration: .8 }), 400);
+  });
+
+  /* ดึงอากาศปัจจุบันของทุกจุดพร้อมกันในคำขอเดียว (Open-Meteo รับหลายพิกัดคั่นด้วย comma) */
+  const lats = LIVE_CAMS.map((c) => c.lat).join(',');
+  const lngs = LIVE_CAMS.map((c) => c.lng).join(',');
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}`
+    + '&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min'
+    + '&timezone=Asia%2FTokyo&forecast_days=1';
+
+  const showWeatherOff = () => grid.querySelectorAll('.cam-weather').forEach((el) => {
+    el.textContent = 'ดูอากาศไม่ได้ตอนนี้'; el.classList.add('cam-weather-off');
+  });
+
+  /* ห่อ fetch ไว้ทั้งก้อน — ถ้าสภาพแวดล้อมไม่มี fetch หรือ throw ทันที
+     จะได้ไม่ทำให้สคริปต์ทั้งไฟล์ตายยกแผง (ส่วนที่อยู่ถัดจากนี้จะไม่ถูกผูก event) */
+  if (typeof fetch !== 'function') { showWeatherOff(); return; }
+  try {
+    fetch(url)
+    .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+    .then((data) => {
+      /* หลายพิกัด = array, พิกัดเดียว = object — รองรับทั้งสองแบบ */
+      const list = Array.isArray(data) ? data : [data];
+      list.forEach((d, i) => {
+        const card = grid.children[i];
+        const el = card && card.querySelector('.cam-weather');
+        if (!el || !d || !d.current) return;
+        const t = Math.round(d.current.temperature_2m);
+        const desc = WMO[d.current.weather_code] || '';
+        const hi = d.daily && Math.round(d.daily.temperature_2m_max[0]);
+        const lo = d.daily && Math.round(d.daily.temperature_2m_min[0]);
+        el.innerHTML = `<strong>${t}°C</strong> ${desc}`
+          + (Number.isFinite(hi) ? `<span class="cam-hilo">↑${hi}° ↓${lo}°</span>` : '');
+        /* เตือนถ้าหนาวจัด/มีหิมะ — สำคัญกับวันเดินเขา */
+        if (t <= 3 || (d.current.weather_code >= 71 && d.current.weather_code <= 86)) {
+          el.classList.add('cam-weather-cold');
+        }
+      });
+    })
+    .catch(showWeatherOff);
+  } catch { showWeatherOff(); }
 })();
 
 /* ============ events ============ */

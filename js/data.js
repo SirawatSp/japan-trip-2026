@@ -756,6 +756,73 @@ RESEARCH_SPOTS.forEach((sp) => {
   });
 });
 
+
+/* ---------- กล้องสด + อากาศเรียลไทม์ ----------
+   แหล่งกล้องสดของญี่ปุ่นเกือบทั้งหมดคือ YouTube Live (เว็บรวมอย่าง tomarigi.me ก็ดึงจาก YouTube เหมือนกัน)
+   ⚠️ tomarigi.me ไม่มี public API ที่เปิดให้ต่อ และเครื่องที่สร้างเว็บนี้เข้า youtube.com / tomarigi.me ไม่ได้
+      จึง "ยืนยันรหัสวิดีโอไม่ได้" — ถ้าใส่รหัสมั่วจะได้กล่องดำ
+   วิธีที่ใช้จริง:
+     1) ปุ่มค้นกล้องสด YouTube (กรองเฉพาะ Live) → ได้ผลจริงเสมอ ไม่มีวันตาย
+     2) ถ้าเจอกล้องที่ถูกใจแล้ว เอา video id มาใส่ช่อง youtubeId ด้านล่าง → ฝังเล่นในเว็บเราเลย
+   อากาศ: ใช้ Open-Meteo (ฟรี ไม่ต้องใช้ API key รองรับ CORS สำหรับเรียกจากเบราว์เซอร์) */
+const LIVE_CAMS = [
+  { id: 'fukushima',  name: 'เมือง Fukushima',            ja: '福島市',        area: 'fukushima', lat: 37.7543, lng: 140.4590, day: 3,
+    youtubeId: '', q: '福島市 ライブカメラ',
+    why: 'ฐานที่พัก 22-25 ต.ค. — เช็คว่าเช้านี้ฟ้าเปิดไหมก่อนตัดสินใจสลับวันเดินเขากับวันทะเลสาบ' },
+  { id: 'jododaira',  name: 'Jododaira / Mt. Issaikyo',   ja: '浄土平・一切経山', area: 'fukushima', lat: 37.7264, lng: 140.2489, day: 5,
+    youtubeId: '', q: '浄土平 ライブカメラ 吾妻',
+    why: '⛰ จุดสำคัญที่สุด — วันเดินเขา 24 ต.ค. ที่ 1,600 ม. อากาศเปลี่ยนเร็วมาก และปลาย ต.ค. อาจมีน้ำแข็งเช้ามืด ดูกล้องก่อนออกจากที่พัก' },
+  { id: 'urabandai',  name: 'Urabandai / Goshiki-numa',   ja: '裏磐梯・五色沼',  area: 'fukushima', lat: 37.6479, lng: 140.0722, day: 4,
+    youtubeId: '', q: '裏磐梯 ライブカメラ 磐梯山',
+    why: 'วันขับรถเที่ยว 23 ต.ค. — ดูว่าใบไม้เปลี่ยนสีถึงไหนแล้ว และฟ้าเปิดพอจะเห็นภูเขาบันไดสะท้อนน้ำไหม' },
+  { id: 'inawashiro', name: 'ทะเลสาบ Inawashiro',         ja: '猪苗代湖',      area: 'fukushima', lat: 37.4667, lng: 140.1000, day: 4,
+    youtubeId: '', q: '猪苗代湖 ライブカメラ',
+    why: 'แผนสำรองวันฟ้าปิด · ปลาย ต.ค. หงส์อพยพเริ่มมา' },
+  { id: 'nikko',      name: 'Nikko / ทะเลสาบ Chuzenji',   ja: '日光・中禅寺湖',  area: 'nikko',     lat: 36.7333, lng: 139.4833, day: 2,
+    youtubeId: '', q: '中禅寺湖 ライブカメラ 日光',
+    why: 'เดย์ทริป 21 ต.ค. — Irohazaka รถติดหนักช่วงใบไม้แดง กล้องช่วยดูสภาพจราจร/หมอกบนเขาก่อนขึ้นบัส' },
+  { id: 'utsunomiya', name: 'Utsunomiya',                  ja: '宇都宮',        area: 'tochigi',   lat: 36.5591, lng: 139.8986, day: 1,
+    youtubeId: '', q: '宇都宮 ライブカメラ',
+    why: 'ฐานที่พัก 20-22 ต.ค.' },
+  { id: 'shinjuku',   name: 'Tokyo / Shinjuku',            ja: '新宿',          area: 'tokyo',     lat: 35.6896, lng: 139.7006, day: 6,
+    youtubeId: '', q: '新宿 ライブカメラ',
+    why: 'ฐานที่พัก 25-28 ต.ค. · กล้องย่านชิบูย่า/ชินจูกุเป็นกล้องที่คนดูเยอะที่สุดในญี่ปุ่น หาง่ายสุด' },
+  { id: 'narita',     name: 'สนามบิน Narita',              ja: '成田空港',      area: 'tokyo',     lat: 35.7720, lng: 140.3929, day: 1,
+    youtubeId: '', q: '成田空港 ライブカメラ',
+    why: 'วันบินเข้า-ออก ดูสภาพอากาศสนามบินได้' },
+  /* ฐานทางเลือกที่ยังชั่งใจอยู่ — เอาไว้ดูอากาศประกอบการตัดสินใจ */
+  { id: 'tateyama',   name: 'Tateyama / Murodo',           ja: '立山・室堂',    area: 'other',     lat: 36.5772, lng: 137.5947, day: 0,
+    youtubeId: '', q: '室堂 ライブカメラ 立山',
+    why: '⚠️ ตัวชี้ขาดของแผน Tateyama — ที่ 2,450 ม. หิมะแรกตกตั้งแต่ต้น ต.ค. กล้องสดคือวิธีเดียวที่จะรู้ว่าวันนั้นเดินได้จริงไหม' },
+  { id: 'kamikochi',  name: 'Kamikochi',                   ja: '上高地',        area: 'other',     lat: 36.2506, lng: 137.6383, day: 0,
+    youtubeId: '', q: '上高地 ライブカメラ',
+    why: 'ถ้าเลือกฐาน Matsumoto — ดูว่ายอด Hotaka โรยหิมะแล้วหรือยัง' },
+  { id: 'sendai',     name: 'Sendai',                      ja: '仙台',          area: 'other',     lat: 38.2606, lng: 140.8819, day: 0,
+    youtubeId: '', q: '仙台 ライブカメラ',
+    why: 'ถ้าเลือกฐาน Sendai' },
+];
+
+/* เว็บรวมกล้องสดทั่วญี่ปุ่น — เปิดดูเป็นแผนที่ได้ */
+const CAM_DIRECTORIES = [
+  { name: 'とまり木 (Tomarigi) — แผนที่กล้องสดทั่วญี่ปุ่น', url: 'https://tomarigi.me/spots',
+    note: 'รวมกล้อง YouTube Live ~1,383 จุดทั่วประเทศ เลือกจากแผนที่ได้ — เว็บที่คุณส่งมา' },
+  { name: 'とまり木 — แผนที่กล้องสดทั่วโลก', url: 'https://tomarigi.me/world', note: 'เวอร์ชันทั่วโลกของเว็บเดียวกัน' },
+  { name: 'YouTube — ค้นกล้องสดญี่ปุ่น (กรองเฉพาะ Live)', url: 'https://www.youtube.com/results?search_query=%E3%83%A9%E3%82%A4%E3%83%96%E3%82%AB%E3%83%A1%E3%83%A9+%E7%B4%85%E8%91%89&sp=EgJAAQ%253D%253D',
+    note: 'ค้นด้วยคำว่า ライブカメラ + ชื่อสถานที่ภาษาญี่ปุ่น แล้วกรอง Live' },
+  { name: 'Open-Meteo — API อากาศที่เว็บเราใช้', url: 'https://open-meteo.com/',
+    note: 'ฟรี ไม่ต้องใช้ API key — เว็บเราเรียกตรงจากเบราว์เซอร์ของคุณ ไม่ผ่านเซิร์ฟเวอร์ตัวกลาง' },
+];
+
+/* หมุดกล้องสดลงแผนที่ */
+LIVE_CAMS.forEach((c) => {
+  PLACES.push({
+    name: `🔴 กล้องสด: ${c.name}`, ja: c.ja, area: c.area, lat: c.lat, lng: c.lng,
+    day: c.day, type: 'cam', camId: c.id,
+    desc: `🔴 กล้องถ่ายทอดสด 24 ชม. — ${c.why}`,
+    en: { name: `🔴 Live cam: ${c.name}`, desc: `🔴 24h live camera — ${c.why}` },
+  });
+});
+
 /* ---------- events (ยืนยันวันที่จริงปี 2026 แล้ว — อัปเดต ก.ค. 2026) ---------- */
 const EVENTS = [
   // --- เทศกาล/บรรยากาศ ---
