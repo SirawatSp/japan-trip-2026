@@ -3,16 +3,33 @@
    ============================================================ */
 
 const $ = (sel) => document.querySelector(sel);
+/* เขียน/ผูก event แบบไม่ล้มถ้าหา element ไม่เจอ —
+   ป้องกันกรณี HTML ที่ถูกแคชไว้เป็นเวอร์ชันเก่ากว่า JS แล้วทำให้สคริปต์ตายทั้งไฟล์
+   (บั๊กแบบนี้เคยทำให้ปุ่มย่อ/ขยายทั้งหมดใช้ไม่ได้มาแล้ว) */
+const setHTML = (sel, html) => { const el = $(sel); if (el) el.innerHTML = html; return el; };
+const on = (sel, evt, fn) => { const el = $(sel); if (el) el.addEventListener(evt, fn); return el; };
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const yen = (n) => '¥' + Math.round(n).toLocaleString('en-US');
 const baht = (n) => '฿' + Math.round(n).toLocaleString('en-US');
 
 /* ---------- persistent state ---------- */
 const store = {
+  /* ค่าที่บันทึกไว้ต้องเป็น "ชนิดเดียวกับ" ค่าตั้งต้น ไม่งั้นถือว่าข้อมูลเสียแล้วใช้ค่าตั้งต้นแทน —
+     กัน localStorage ที่เพี้ยน (แก้มือ / เวอร์ชันเก่า / ซิงค์ผิดรูป) ทำให้ทั้งเว็บพัง
+     หมายเหตุ: อาเรย์ว่างถือว่าใช้ได้ เพราะผู้ใช้อาจลบรายการออกจนหมดเองจริง ๆ */
+  sameShape(val, fallback) {
+    if (Array.isArray(fallback)) return Array.isArray(val);
+    if (fallback !== null && typeof fallback === 'object') {
+      return val !== null && typeof val === 'object' && !Array.isArray(val);
+    }
+    return typeof val === typeof fallback;
+  },
   load(key, fallback) {
     try {
       const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : structuredClone(fallback);
+      if (raw === null) return structuredClone(fallback);
+      const val = JSON.parse(raw);
+      return this.sameShape(val, fallback) ? val : structuredClone(fallback);
     } catch { return structuredClone(fallback); }
   },
   save(key, val) { localStorage.setItem(key, JSON.stringify(val)); },
@@ -139,7 +156,8 @@ const overnightLabel = (day) => {
 };
 
 /* ย่อ/ขยายการ์ดรายวัน — จำสถานะไว้ใน localStorage */
-let collapsedDays = new Set(store.load('jt26_collapsed_days', []));
+const savedCollapsed = store.load('jt26_collapsed_days', []);
+let collapsedDays = new Set(Array.isArray(savedCollapsed) ? savedCollapsed : []);
 function saveCollapsedDays() { store.save('jt26_collapsed_days', [...collapsedDays]); }
 
 
@@ -280,11 +298,11 @@ function stayPopupBlock(p) {
 
 function renderStays() {
   const cap = capPerNight();
-  $('#stay-cap-input').value = stayCap;
+  { const el = $('#stay-cap-input'); if (el) el.value = stayCap; }
   $('#stay-cap-calc').innerHTML = `× ${STAY_GUESTS} คน = <strong class="mono">${baht(cap)}</strong> ต่อคืนทั้งหลัง
     <span class="thb">(≈ ${yen(rate > 0 ? cap / rate : 0)}/คืน)</span> · รวมเพดานทั้งทริป ${stayNightsTotal()} คืน = <strong class="mono">${baht(cap * stayNightsTotal())}</strong>`;
 
-  $('#stay-grid').innerHTML = STAYS.map((s) => {
+  setHTML('#stay-grid', STAYS.map((s) => {
     const nightly = stayNightly(s.id);
     const over = nightly > cap;
     const perPerson = nightly / STAY_GUESTS;
@@ -335,7 +353,7 @@ function renderStays() {
           : 'ยังไม่ได้กรอกราคา — เปิดลิงก์ด้านบนไปดูราคาจริงแล้วกรอกกลับมา'}
       </div>
     </article>`;
-  }).join('');
+  }).join(''));
 
   const totalThb = staysTotalThb();
   const totalYen = staysTotalYen();
@@ -357,13 +375,13 @@ function renderStays() {
   }
 }
 
-$('#stay-cap-input').addEventListener('change', (e) => {
+on('#stay-cap-input', 'change', (e) => {
   stayCap = +e.target.value || STAY_CAP_PER_PERSON_THB;
   persistAll();
   renderStays();
 });
 
-$('#stay-grid').addEventListener('change', (e) => {
+on('#stay-grid', 'change', (e) => {
   const priceInput = e.target.closest('.stay-price');
   const urlInput = e.target.closest('.stay-url');
   const id = (priceInput || urlInput || {}).dataset && (priceInput || urlInput).dataset.stay;
@@ -712,7 +730,7 @@ applyMapLang();
       </div>
     </div>`).join('');
 
-  $('#rail-total').textContent = yen(RAIL_MAIN_TOTAL);
+  { const el = $('#rail-total'); if (el) el.textContent = yen(RAIL_MAIN_TOTAL); }
 
   /* 'DAY 3 · 22 ต.ค.' -> 'D3 · 22 ต.ค.' ให้ตรงกับตัวเลือกวันในเครื่องคิดงบ */
   const fareDayOption = (label) => {
@@ -725,7 +743,7 @@ applyMapLang();
   const transitUrl = (from, to) =>
     `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=transit&hl=th`;
 
-  $('#fare-legs').innerHTML = RAIL_FARES.map((leg, li) => {
+  setHTML('#fare-legs', RAIL_FARES.map((leg, li) => {
     const cheapest = Math.min(...leg.options.map((o) => o.price));
     return `
     <article class="fare-leg">
@@ -756,12 +774,12 @@ applyMapLang();
         </tbody>
       </table>
     </article>`;
-  }).join('');
+  }).join(''));
 
-  $('#fare-local-list').innerHTML = RAIL_LOCAL_NOTES.map((n) =>
-    `<li><strong>${esc(n.what)}</strong> — ${esc(n.detail)}</li>`).join('');
+  setHTML('#fare-local-list', RAIL_LOCAL_NOTES.map((n) =>
+    `<li><strong>${esc(n.what)}</strong> — ${esc(n.detail)}</li>`).join(''));
 
-  $('#fare-legs').addEventListener('click', (e) => {
+  on('#fare-legs', 'click', (e) => {
     const btn = e.target.closest('.fare-add');
     if (!btn) return;
     const leg = RAIL_FARES[+btn.dataset.leg];
@@ -776,7 +794,7 @@ applyMapLang();
   });
 
   /* ร้านเช่ารถรอบสถานี Fukushima */
-  $('#rental-grid').innerHTML = CAR_RENTALS.map((r, i) => `
+  setHTML('#rental-grid', CAR_RENTALS.map((r, i) => `
     <article class="rental-card">
       <div class="rental-head">
         <a class="rental-name" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.name)} ↗</a>
@@ -789,19 +807,19 @@ applyMapLang();
         <a class="btn-mini" href="https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}&hl=th" target="_blank" rel="noopener">เปิดใน Google Maps ↗</a>
         <button class="btn-mini rental-map-btn" data-i="${i}">📍 ดูบนแผนที่</button>
       </div>
-    </article>`).join('');
+    </article>`).join(''));
 
-  $('#rental-sites').innerHTML = CAR_BOOKING_SITES.map((s) =>
-    `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)} ↗</a>`).join('');
+  setHTML('#rental-sites', CAR_BOOKING_SITES.map((s) =>
+    `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)} ↗</a>`).join(''));
 
   const c2 = CAR_PLAN;
-  $('#rental-price-note').innerHTML = `<strong>ราคาอ้างอิง:</strong> เว็บเทียบราคารายงานรถเล็กในจังหวัดฟุกุชิมะเริ่มราว
+  setHTML('#rental-price-note', `<strong>ราคาอ้างอิง:</strong> เว็บเทียบราคารายงานรถเล็กในจังหวัดฟุกุชิมะเริ่มราว
     <span class="mono">US$37–51/วัน</span> (≈ <span class="mono">¥5,500–7,600</span>) แล้วแต่เจ้าและวันที่ —
     แผนของเราตั้งงบไว้ที่ <span class="mono">${yen(c2.carPerDay)}/วัน</span> เพราะ 4 คนต้องขยับไปรถขนาดกลาง/แวกอนให้พอกับกระเป๋า
     และ 23–24 ต.ค. เป็นเสาร์-อาทิตย์ช่วงใบไม้เปลี่ยนสีซึ่งราคาขึ้น ·
-    ตัวเลขนี้แก้ได้ที่ <span class="mono">CAR_PLAN.carPerDay</span> ใน <span class="mono">js/data.js</span> เมื่อได้ราคาจริงแล้ว`;
+    ตัวเลขนี้แก้ได้ที่ <span class="mono">CAR_PLAN.carPerDay</span> ใน <span class="mono">js/data.js</span> เมื่อได้ราคาจริงแล้ว`);
 
-  $('#rental-grid').addEventListener('click', (e) => {
+  on('#rental-grid', 'click', (e) => {
     const btn = e.target.closest('.rental-map-btn');
     if (!btn) return;
     const r = CAR_RENTALS[+btn.dataset.i];
@@ -823,7 +841,7 @@ applyMapLang();
   const carEach = carTotal / c.guests;
   const publicEach = c.publicHike + c.publicLake;
   const saveEach = publicEach - carEach;
-  $('#car-note').innerHTML = `
+  setHTML('#car-note', `
     <h3>🚗 คุ้มไหมถ้าเช่ารถ ${c.days} วันตอนอยู่ Fukushima (23–24 ต.ค.)?</h3>
     <table class="mini-table">
       <tr><td>ค่ารถ ${c.days} วัน (รถกลาง/แวกอน พอ 4 คน + กระเป๋า)</td><td class="mono">${yen(c.carPerDay * c.days)}</td></tr>
@@ -837,7 +855,7 @@ applyMapLang();
     และที่พัก Fukushima มีที่จอดรถอยู่แล้ว จึงไม่มีค่าจอดรายคืนเพิ่ม</p>
     <p class="note">⚠️ เงื่อนไขก่อนตัดสินใจ: ต้องมี<strong>ใบขับขี่สากลแบบอนุสัญญาเจนีวา 1949</strong> (ทำที่กรมการขนส่งฯ ใช้ได้ 1 ปี) พร้อมใบขับขี่ไทยตัวจริง · ญี่ปุ่นขับเลนซ้าย พวงมาลัยขวา ·
     Bandai-Azuma Skyline และ Lake Line ไม่มีค่าผ่านทาง แต่ทางโค้งเยอะและ<strong>ประตูอาจปิดกลางคืน 17:00–07:00</strong> ถ้าเสี่ยงถนนลื่น ·
-    ปลาย ต.ค. บนเขา 1,600 ม. อาจมีน้ำแข็งช่วงเช้ามืด · จองรถล่วงหน้าเพราะเป็นเสาร์-อาทิตย์ฤดูใบไม้แดง · ยืนยันกับเจ้าของ Airbnb ว่าที่จอดฟรีและรถขนาดไหนเข้าได้</p>`;
+    ปลาย ต.ค. บนเขา 1,600 ม. อาจมีน้ำแข็งช่วงเช้ามืด · จองรถล่วงหน้าเพราะเป็นเสาร์-อาทิตย์ฤดูใบไม้แดง · ยืนยันกับเจ้าของ Airbnb ว่าที่จอดฟรีและรถขนาดไหนเข้าได้</p>`);
 
   $('#transport-list').addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-mini');
