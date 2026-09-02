@@ -274,7 +274,35 @@ $('#expand-all-btn')?.addEventListener('click', () => {
 
 /* ============ ที่พัก (Airbnb) ============ */
 let mapReady = false;
+/* ดึงพิกัดจากสิ่งที่ผู้ใช้วางมา — รองรับทั้ง "lat,lng" ตรง ๆ และลิงก์ Google Maps หลายรูปแบบ
+   ⚠️ ลิงก์ย่อ (goo.gl / maps.app.goo.gl) อ่านไม่ได้ เพราะพิกัดไม่ได้อยู่ในตัวลิงก์
+      ต้องเปิดลิงก์ก่อนแล้วคัดลอก URL เต็มจากแถบที่อยู่ หรือคัดลอกพิกัดมาวาง */
+function parseLatLng(input) {
+  const str = String(input || '').trim();
+  if (!str) return null;
+  if (/(goo\.gl|maps\.app\.goo\.gl)/i.test(str)) return { short: true };
+  const pats = [
+    /[?&](?:q|query|daddr|ll|center)=(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/i,  // ?q=lat,lng
+    /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,                                    // !3d..!4d..
+    /@(-?\d+\.\d+),(-?\d+\.\d+)/,                                        // @lat,lng,zoom
+    /^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/,                          // lat,lng
+  ];
+  for (const re of pats) {
+    const m = str.match(re);
+    if (m) {
+      const lat = +m[1], lng = +m[2];
+      if (Math.abs(lat) <= 90 && Math.abs(lng) <= 180) return { lat, lng };
+    }
+  }
+  return null;
+}
+
 const stayOf = (id) => stays[id] || {};
+/* พิกัดที่ผู้ใช้ปักเอง (ถ้ามี) ถือว่าสำคัญกว่าพิกัดสถานีที่ตั้งไว้ในข้อมูล */
+const stayCoords = (s) => {
+  const c = stayOf(s.id).coords;
+  return c && Number.isFinite(c.lat) && Number.isFinite(c.lng) ? c : null;
+};
 const capPerNight = () => stayCap * STAY_GUESTS;              // ฿ ต่อคืน ทั้งหลัง
 const stayNightly = (id) => +stayOf(id).thb || 0;             // ฿ ต่อคืน ทั้งหลัง
 const stayTotalThb = (s) => stayNightly(s.id) * s.nights;
@@ -342,6 +370,14 @@ function renderStays() {
         <label>ลิงก์ห้องที่เลือก (ถ้ามี)
           <input type="url" class="stay-url" data-stay="${s.id}" value="${esc(picked || '')}" placeholder="วางลิงก์ Airbnb ที่นี่">
         </label>
+        <label class="stay-pin-label">📍 พิกัดที่พักจริง (ปักหมุดเอง)
+          <input type="text" class="stay-pin" data-stay="${s.id}"
+                 value="${stayCoords(s) ? `${stayCoords(s).lat},${stayCoords(s).lng}` : ''}"
+                 placeholder="วางลิงก์ Google Maps แบบเต็ม หรือ 35.6896,139.7006">
+          <span class="stay-pin-state">${stayCoords(s)
+            ? `✓ ปักหมุดจริงแล้ว — <button type="button" class="linkish stay-pin-clear" data-stay="${s.id}">กลับไปใช้หมุดสถานี</button>`
+            : 'ยังไม่ได้ปัก — ตอนนี้หมุดอยู่ที่สถานี/ย่านโดยประมาณ'}</span>
+        </label>
       </div>
 
       <div class="stay-verdict ${nightly ? (over ? 'over' : 'ok') : 'empty'}">
@@ -384,15 +420,86 @@ on('#stay-cap-input', 'change', (e) => {
 on('#stay-grid', 'change', (e) => {
   const priceInput = e.target.closest('.stay-price');
   const urlInput = e.target.closest('.stay-url');
-  const id = (priceInput || urlInput || {}).dataset && (priceInput || urlInput).dataset.stay;
+  const pinInput = e.target.closest('.stay-pin');
+  const field = priceInput || urlInput || pinInput;
+  const id = field && field.dataset.stay;
   if (!id) return;
   stays[id] = stays[id] || {};
   if (priceInput) stays[id].thb = +priceInput.value || 0;
   if (urlInput) stays[id].url = urlInput.value.trim();
+  if (pinInput) {
+    const raw = pinInput.value.trim();
+    if (!raw) {
+      delete stays[id].coords;
+    } else {
+      const parsed = parseLatLng(raw);
+      if (parsed && parsed.short) {
+        alert('ลิงก์ย่อ (goo.gl / maps.app.goo.gl) อ่านพิกัดไม่ได้ เพราะตัวเลขพิกัดไม่ได้อยู่ในลิงก์\n\n'
+          + 'วิธีทำ: เปิดลิงก์นั้นในเบราว์เซอร์ก่อน แล้วคัดลอก URL เต็มจากแถบที่อยู่มาวางแทน\n'
+          + 'หรือคลิกขวาบนหมุดใน Google Maps แล้วเลือกคัดลอกพิกัด (จะได้เลขแบบ 35.6896, 139.7006)');
+        renderStays();
+        return;
+      }
+      if (!parsed) {
+        alert('อ่านพิกัดจากข้อความนี้ไม่ได้\n\nใส่ได้สองแบบ:\n'
+          + '1) ลิงก์ Google Maps แบบเต็ม (ที่มี @35.68…,139.70… อยู่ใน URL)\n'
+          + '2) พิกัดตรง ๆ เช่น 35.6896,139.7006');
+        renderStays();
+        return;
+      }
+      stays[id].coords = parsed;
+    }
+  }
   persistAll();
   renderStays();
   renderBudget();
+  syncStayPins();
 });
+
+/* ปุ่มยกเลิกหมุดที่ปักเอง */
+on('#stay-grid', 'click', (e) => {
+  const btn = e.target.closest('.stay-pin-clear');
+  if (!btn) return;
+  const id = btn.dataset.stay;
+  if (stays[id]) delete stays[id].coords;
+  persistAll();
+  renderStays();
+  syncStayPins();
+});
+
+/* ย้ายหมุดที่พักบนแผนที่ให้ตรงกับพิกัดที่ปักเอง */
+function syncStayPins() {
+  if (!mapReady) return;
+  STAYS.forEach((s) => {
+    const c = stayCoords(s);
+    let marker = markers.find((m) => m._place.type === 'stay' && m._place.stayId === s.id && !m._place.query);
+
+    /* ที่พักที่มีแต่ "ย่านตัวเลือก" (เช่นโตเกียว) ยังไม่มีหมุดของตัวเอง —
+       สร้างให้ตอนที่ผู้ใช้ปักพิกัดจริงเข้ามาเท่านั้น */
+    if (!marker) {
+      if (!c) return;
+      const place = {
+        name: `ที่พัก ${s.city}`, ja: s.ja, area: s.area, lat: c.lat, lng: c.lng,
+        day: { utsunomiya: 1 }[s.id] || 3, type: 'stay', stayId: s.id, url: stayLink(s),
+        desc: `🛏 ${s.nights} คืน · ${s.checkIn} → ${s.checkOut} · ${STAY_GUESTS} คน — ${s.station}`,
+        en: { name: `${s.en.city} stay`, desc: `🛏 ${s.nights} nights · ${s.checkIn} → ${s.checkOut} · ${STAY_GUESTS} guests` },
+      };
+      PLACES.push(place);
+      marker = L.marker([c.lat, c.lng], { icon: pinIcon(AREA_COLORS[s.area]) });
+      marker._place = place;
+      marker.bindPopup(popupHtml(place));
+      markers.push(marker);
+    }
+
+    const target = c || { lat: s.lat, lng: s.lng };
+    marker._place.lat = target.lat;
+    marker._place.lng = target.lng;
+    marker._place.pinnedByUser = !!c;
+    marker.setLatLng([target.lat, target.lng]);
+    marker.setPopupContent(popupHtml(marker._place));
+  });
+  refreshMap();
+}
 
 /* ============ map ============ */
 const map = L.map('leaflet-map', { scrollWheelZoom: false });
@@ -472,6 +579,7 @@ function popupHtml(p) {
     <div class="popup-desc">${esc(placeDesc(p))}</div>
     <span class="popup-day">${dayLabel(p)} · ${areaLabel(p.area)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}${p.type === 'stay' ? ' <span class="popup-tag popup-tag-stay">🛏</span>' : ''}${p.type === 'car' ? ' <span class="popup-tag popup-tag-car">🚗</span>' : ''}${p.type === 'cam' ? ' <span class="popup-tag popup-tag-cam">🔴 LIVE</span>' : ''}
     ${placeTicket(p) ? `<div class="popup-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
+    ${p.pinnedByUser ? '<div class="popup-pinned">📍 หมุดนี้คือตำแหน่งที่พักจริงที่ปักไว้เอง</div>' : ''}
     ${p.type === 'stay' ? stayPopupBlock(p) : ''}
     <a class="popup-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener">${p.url ? mt('official') : mt('search')} ↗</a>
     <a class="popup-link" href="${esc(gmapsUrl(p))}" target="_blank" rel="noopener">${mt('directions')} ↗</a>`;

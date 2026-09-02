@@ -870,3 +870,15 @@ body {
 .cam-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .cam-sources { margin-top: 16px; }
 .popup-tag-cam { background: rgba(176,74,58,.15); color: #b04a3a; }
+
+/* ---------- ปักหมุดที่พักเอง ---------- */
+.stay-pin-label { grid-column: 1 / -1; }
+.stay-pin-state { display: block; font-size: .74rem; color: var(--muted, #8d8375); margin-top: 3px; line-height: 1.5; }
+.linkish {
+  background: none; border: 0; padding: 0; font: inherit; color: var(--accent, #b04a3a);
+  text-decoration: underline; cursor: pointer;
+}
+.popup-pinned {
+  font-size: .78rem; background: rgba(62,92,70,.12); color: #3e5c46;
+  border-radius: 6px; padding: 3px 7px; margin: 4px 0;
+}
