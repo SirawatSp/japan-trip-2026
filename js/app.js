@@ -11,6 +11,9 @@ const on = (sel, evt, fn) => { const el = $(sel); if (el) el.addEventListener(ev
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const yen = (n) => '¥' + Math.round(n).toLocaleString('en-US');
 const baht = (n) => '฿' + Math.round(n).toLocaleString('en-US');
+/* แปลงเยน → บาท ด้วยเรตปัจจุบันในหมวดงบ · ใช้คู่กับ yen() เพื่อให้ทุกตัวเลขมีบาทกำกับ */
+const toThb = (y) => (rate > 0 ? baht(y * rate) : '฿—');
+const yenThb = (y) => `${yen(y)} <span class="thb">≈${toThb(y)}</span>`;
 
 /* ---------- persistent state ---------- */
 const store = {
@@ -72,11 +75,8 @@ TripSync.init((remote) => {
   store.save('jt26_staycap', stayCap);
   $('#rate-input').value = rate;
   $('#exp-cat').innerHTML = planned.map((b) => `<option>${esc(b.cat)}</option>`).join('');
-  renderShopping();
-  renderBudget();
-  renderExpenses();
-  renderItinerary();
-  renderStays();
+  /* เรตอาจถูกแก้จากอีกเครื่องผ่าน sync — วาดใหม่ทุกส่วนที่มีตัวเลขบาทเหมือนตอนแก้เรตเอง */
+  renderMoneyViews();
 });
 
 /* ============ countdown ============ */
@@ -170,7 +170,7 @@ function renderItinerary() {
       <div class="day-card-head">
         <span class="day-no">DAY ${d.day}</span>
         <div class="day-card-actions">
-          <span class="day-cost mono" title="รวมราคาประมาณของวันนี้">${yen(dayCost(d))}</span>
+          <span class="day-cost mono" title="รวมราคาประมาณของวันนี้">${yenThb(dayCost(d))}</span>
           <button class="icon-btn day-map-btn" data-idx="${di}" title="ดูหมุดวันนี้บนแผนที่" aria-label="ดูบนแผนที่">📍</button>
           <button class="icon-btn day-collapse-btn" data-idx="${di}" data-day="${d.day}" title="${collapsed ? 'ขยายดูรายละเอียด' : 'ย่อเหลือแค่สรุป'}" aria-label="ย่อ/ขยาย">${collapsed ? '▸' : '▾'}</button>
           <button class="icon-btn day-del-btn" data-idx="${di}" title="ลบวันนี้ทั้งวัน" aria-label="ลบวันนี้">✕</button>
@@ -823,7 +823,8 @@ refreshMap();
 applyMapLang();
 
 /* ============ transport ============ */
-(function renderTransport() {
+let transportBound = false;
+function renderTransport() {
   $('#transport-list').innerHTML = TRANSPORT.map((seg, si) => `
     <div class="seg-card">
       <div class="seg-head"><span class="seg-day">${esc(seg.day)}</span><h3>${esc(seg.title)}</h3></div>
@@ -832,13 +833,13 @@ applyMapLang();
         <div class="seg-opt">
           <div class="o-method">${esc(o.method)}<span class="o-note">${esc(o.note)}</span></div>
           <span class="o-time">${esc(o.time)}</span>
-          <span class="o-price">${yen(o.price)}</span>
+          <span class="o-price">${yenThb(o.price)}</span>
           <button class="btn-mini" data-seg="${si}" data-opt="${oi}">＋งบ</button>
         </div>`).join('')}
       </div>
     </div>`).join('');
 
-  { const el = $('#rail-total'); if (el) el.textContent = yen(RAIL_MAIN_TOTAL); }
+  { const el = $('#rail-total'); if (el) el.innerHTML = yenThb(RAIL_MAIN_TOTAL); }
 
   /* 'DAY 3 · 22 ต.ค.' -> 'D3 · 22 ต.ค.' ให้ตรงกับตัวเลือกวันในเครื่องคิดงบ */
   const fareDayOption = (label) => {
@@ -874,8 +875,8 @@ applyMapLang();
             </td>
             <td class="fare-time">${esc(o.time)}</td>
             <td class="fare-xfer">${esc(o.xfer)}</td>
-            <td class="fare-num"><span class="mono">${yen(o.price)}</span>
-              <span class="fare-four">×4 = ${yen(o.price * 4)}</span>
+            <td class="fare-num"><span class="mono">${yenThb(o.price)}</span>
+              <span class="fare-four">×4 = ${yenThb(o.price * 4)}</span>
               <button class="btn-mini fare-add" data-leg="${li}" data-opt="${oi}">＋งบ</button>
             </td>
           </tr>`).join('')}
@@ -927,6 +928,29 @@ applyMapLang();
     และ 23–24 ต.ค. เป็นเสาร์-อาทิตย์ช่วงใบไม้เปลี่ยนสีซึ่งราคาขึ้น ·
     ตัวเลขนี้แก้ได้ที่ <span class="mono">CAR_PLAN.carPerDay</span> ใน <span class="mono">js/data.js</span> เมื่อได้ราคาจริงแล้ว`);
 
+  /* คุ้มไหมถ้าเช่ารถช่วง Fukushima */
+  const c = CAR_PLAN;
+  const carTotal = c.carPerDay * c.days + c.fuel + c.parking;
+  const carEach = carTotal / c.guests;
+  const publicEach = c.publicHike + c.publicLake;
+  const saveEach = publicEach - carEach;
+  setHTML('#car-note', `
+    <h3>🚗 คุ้มไหมถ้าเช่ารถ ${c.days} วันตอนอยู่ Fukushima (23–24 ต.ค.)?</h3>
+    <table class="mini-table">
+      <tr><td>ค่ารถ ${c.days} วัน (รถกลาง/แวกอน พอ 4 คน + กระเป๋า)</td><td class="mono">${yenThb(c.carPerDay * c.days)}</td></tr>
+      <tr><td>น้ำมัน (Urabandai ไป-กลับ + ขึ้น Skyline)</td><td class="mono">${yenThb(c.fuel)}</td></tr>
+      <tr><td>ที่จอดนอกที่พัก (Jododaira ฯลฯ)</td><td class="mono">${yenThb(c.parking)}</td></tr>
+      <tr><td><strong>รวมต่อคัน</strong></td><td class="mono"><strong>${yenThb(carTotal)}</strong></td></tr>
+      <tr><td><strong>หาร ${c.guests} คน</strong></td><td class="mono"><strong>${yenThb(carEach)}/คน</strong></td></tr>
+      <tr><td>ถ้าไม่เช่ารถ: Sky Access ${yen(c.publicHike)} + ค่ารถวันทะเลสาบ ~${yen(c.publicLake)}</td><td class="mono">${yenThb(publicEach)}/คน</td></tr>
+    </table>
+    <p><strong>เช่ารถถูกกว่าประมาณ ${yen(saveEach)} ต่อคน (≈ ${baht(saveEach * rate)})</strong>
+    และที่พัก Fukushima มีที่จอดรถอยู่แล้ว จึงไม่มีค่าจอดรายคืนเพิ่ม</p>
+    <p class="note">⚠️ เงื่อนไขก่อนตัดสินใจ: ต้องมี<strong>ใบขับขี่สากลแบบอนุสัญญาเจนีวา 1949</strong> (ทำที่กรมการขนส่งฯ ใช้ได้ 1 ปี) พร้อมใบขับขี่ไทยตัวจริง · ญี่ปุ่นขับเลนซ้าย พวงมาลัยขวา ·
+    Bandai-Azuma Skyline และ Lake Line ไม่มีค่าผ่านทาง แต่ทางโค้งเยอะและ<strong>ประตูอาจปิดกลางคืน 17:00–07:00</strong> ถ้าเสี่ยงถนนลื่น ·
+    ปลาย ต.ค. บนเขา 1,600 ม. อาจมีน้ำแข็งช่วงเช้ามืด · จองรถล่วงหน้าเพราะเป็นเสาร์-อาทิตย์ฤดูใบไม้แดง · ยืนยันกับเจ้าของ Airbnb ว่าที่จอดฟรีและรถขนาดไหนเข้าได้</p>`);
+
+  if (!transportBound) {
   on('#rental-grid', 'click', (e) => {
     const btn = e.target.closest('.rental-map-btn');
     if (!btn) return;
@@ -943,27 +967,7 @@ applyMapLang();
     }, 400);
   });
 
-  /* คุ้มไหมถ้าเช่ารถช่วง Fukushima */
-  const c = CAR_PLAN;
-  const carTotal = c.carPerDay * c.days + c.fuel + c.parking;
-  const carEach = carTotal / c.guests;
-  const publicEach = c.publicHike + c.publicLake;
-  const saveEach = publicEach - carEach;
-  setHTML('#car-note', `
-    <h3>🚗 คุ้มไหมถ้าเช่ารถ ${c.days} วันตอนอยู่ Fukushima (23–24 ต.ค.)?</h3>
-    <table class="mini-table">
-      <tr><td>ค่ารถ ${c.days} วัน (รถกลาง/แวกอน พอ 4 คน + กระเป๋า)</td><td class="mono">${yen(c.carPerDay * c.days)}</td></tr>
-      <tr><td>น้ำมัน (Urabandai ไป-กลับ + ขึ้น Skyline)</td><td class="mono">${yen(c.fuel)}</td></tr>
-      <tr><td>ที่จอดนอกที่พัก (Jododaira ฯลฯ)</td><td class="mono">${yen(c.parking)}</td></tr>
-      <tr><td><strong>รวมต่อคัน</strong></td><td class="mono"><strong>${yen(carTotal)}</strong></td></tr>
-      <tr><td><strong>หาร ${c.guests} คน</strong></td><td class="mono"><strong>${yen(carEach)}/คน</strong></td></tr>
-      <tr><td>ถ้าไม่เช่ารถ: Sky Access ${yen(c.publicHike)} + ค่ารถวันทะเลสาบ ~${yen(c.publicLake)}</td><td class="mono">${yen(publicEach)}/คน</td></tr>
-    </table>
-    <p><strong>เช่ารถถูกกว่าประมาณ ${yen(saveEach)} ต่อคน (≈ ${baht(saveEach * rate)})</strong>
-    และที่พัก Fukushima มีที่จอดรถอยู่แล้ว จึงไม่มีค่าจอดรายคืนเพิ่ม</p>
-    <p class="note">⚠️ เงื่อนไขก่อนตัดสินใจ: ต้องมี<strong>ใบขับขี่สากลแบบอนุสัญญาเจนีวา 1949</strong> (ทำที่กรมการขนส่งฯ ใช้ได้ 1 ปี) พร้อมใบขับขี่ไทยตัวจริง · ญี่ปุ่นขับเลนซ้าย พวงมาลัยขวา ·
-    Bandai-Azuma Skyline และ Lake Line ไม่มีค่าผ่านทาง แต่ทางโค้งเยอะและ<strong>ประตูอาจปิดกลางคืน 17:00–07:00</strong> ถ้าเสี่ยงถนนลื่น ·
-    ปลาย ต.ค. บนเขา 1,600 ม. อาจมีน้ำแข็งช่วงเช้ามืด · จองรถล่วงหน้าเพราะเป็นเสาร์-อาทิตย์ฤดูใบไม้แดง · ยืนยันกับเจ้าของ Airbnb ว่าที่จอดฟรีและรถขนาดไหนเข้าได้</p>`);
+
 
   $('#transport-list').addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-mini');
@@ -977,7 +981,10 @@ applyMapLang();
     renderBudget();
     renderExpenses();
   });
-})();
+  transportBound = true;
+  }
+}
+renderTransport();
 
 
 /* ============ คลังสถานที่จากการค้นคว้า ============ */
@@ -1219,15 +1226,15 @@ function renderShopping() {
       <input type="checkbox" data-i="${i}" ${item.bought ? 'checked' : ''} aria-label="ซื้อแล้ว">
       <span class="s-name">${esc(item.name)} ${item.qty > 1 ? `<span class="mono">×${item.qty}</span>` : ''}</span>
       <span class="s-cat">${esc(item.cat)}</span>
-      <span class="s-price">${yen(item.price * item.qty)}</span>
+      <span class="s-price">${yenThb(item.price * item.qty)}</span>
       <button class="del-btn" data-del="${i}" aria-label="ลบ">✕</button>
     </div>`).join('') || '<p class="empty-note">ยังไม่มีของในลิสต์ — เพิ่มด้านบนเลย</p>';
 
   const t = shoppingTotals();
   $('#shop-summary').innerHTML = `
     <div class="sum-block"><span class="sum-label">ทั้งหมด</span><strong>${shopping.length} รายการ</strong></div>
-    <div class="sum-block"><span class="sum-label">งบประมาณการ</span><strong>${yen(t.est)}</strong></div>
-    <div class="sum-block"><span class="sum-label">ซื้อแล้ว</span><strong>${yen(t.bought)}</strong></div>
+    <div class="sum-block"><span class="sum-label">งบประมาณการ</span><strong>${yen(t.est)}</strong><span class="sum-label thb">≈ ${toThb(t.est)}</span></div>
+    <div class="sum-block"><span class="sum-label">ซื้อแล้ว</span><strong>${yen(t.bought)}</strong><span class="sum-label thb">≈ ${toThb(t.bought)}</span></div>
     <div class="sum-block"><span class="sum-label">คิดเป็นเงินบาท (ประมาณการ)</span><strong class="thb">${baht(t.est * rate)}</strong></div>`;
   renderBudget(); // bought total feeds ช้อปปิ้ง
 }
@@ -1279,11 +1286,12 @@ function renderBudget() {
       <div class="b-head">
         <span class="b-name">${esc(b.cat)}</span>
         <input class="b-plan-input" type="number" min="0" value="${b.planned}" data-plan="${i}" aria-label="งบที่ตั้งไว้">
+        <span class="b-plan-thb thb">≈${toThb(b.planned)}</span>
       </div>
       <div class="b-bar"><div class="b-bar-fill ${over ? 'over' : ''}" style="width:${pct}%"></div></div>
       <div class="b-nums">
-        <span>ใช้ไป <span class="mono ${over ? 'b-over' : ''}">${yen(spent)}</span></span>
-        <span>${over ? `เกิน <span class="mono b-over">${yen(spent - b.planned)}</span>` : `เหลือ <span class="mono">${yen(b.planned - spent)}</span>`}</span>
+        <span>ใช้ไป <span class="mono ${over ? 'b-over' : ''}">${yenThb(spent)}</span></span>
+        <span>${over ? `เกิน <span class="mono b-over">${yenThb(spent - b.planned)}</span>` : `เหลือ <span class="mono">${yenThb(b.planned - spent)}</span>`}</span>
       </div>
     </div>`;
   }).join('');
@@ -1306,11 +1314,20 @@ $('#budget-grid').addEventListener('change', (e) => {
 
 /* rate */
 $('#rate-input').value = rate;
-$('#rate-input').addEventListener('change', (e) => {
-  rate = +e.target.value || TRIP.defaultRate;
-  persistAll();
+/* ทุกส่วนที่แสดงตัวเลขบาท ต้องวาดใหม่เมื่อเรตเปลี่ยน ไม่งั้นตัวเลขค้างเป็นเรตเก่า */
+function renderMoneyViews() {
   renderShopping();
   renderExpenses();
+  renderBudget();
+  renderItinerary();
+  renderStays();
+  renderTransport();
+}
+
+on('#rate-input', 'change', (e) => {
+  rate = +e.target.value || TRIP.defaultRate;
+  persistAll();
+  renderMoneyViews();
 });
 
 /* expense form selects */

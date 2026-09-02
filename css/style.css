@@ -882,3 +882,8 @@ body {
   font-size: .78rem; background: rgba(62,92,70,.12); color: #3e5c46;
   border-radius: 6px; padding: 3px 7px; margin: 4px 0;
 }
+
+/* ---------- บาทกำกับคู่กับเยน ---------- */
+.day-cost .thb, .o-price .thb, .fare-num .thb, .b-nums .thb, .s-price .thb { font-size: .74rem; }
+.b-plan-thb { display: block; font-size: .72rem; text-align: right; margin-top: 2px; }
+.mini-table .thb { font-size: .76rem; }
