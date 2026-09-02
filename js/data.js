@@ -64,7 +64,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 11;
+const ITINERARY_VERSION = 12;
 /* ป้ายประเภทกิจกรรมในแผนรายวัน — ใช้ดูภาพรวมว่าวันไหนออกนอกเมือง วันไหนอยู่ในเมือง */
 const ITEM_TAGS = {
   nature: { icon: '🌿', th: 'ธรรมชาติ', en: 'Nature',  color: '#3e5c46' },
@@ -152,12 +152,12 @@ const DEFAULT_ITINERARY = [
     { t: '11:00', act: 'กลับสถานี · ของฝากฟุกุชิมะ', note: 'พีช/แอปเปิลอบแห้ง เหล้าสาเก ขนมประจำจังหวัด — ในสถานีมีครบ', tag: 'city', cost: 1500 },
     { t: '12:00', act: 'ข้าวเที่ยงในสถานี · รับกระเป๋า', note: 'เผื่อเวลาขึ้นชานชาลา 15 นาที', tag: 'food', cost: 1200 },
     { t: '13:20', act: '🚄 Tohoku Shinkansen (Yamabiko) → Tokyo', note: '~95 นาที · จองที่นั่งล่วงหน้าเพราะวันอาทิตย์คนกลับเยอะ', tag: 'move', cost: 9110 },
-    { t: '15:00', act: 'ถึง Tokyo Sta. → Chuo Line ต่อไป Shinjuku · เช็คอิน Airbnb', note: 'ชินคันเซ็นลงที่ Tokyo Sta. แล้วต่อ Chuo Line ไป Shinjuku อีก ~15 นาที ~¥210 · ถึงที่พักราวบ่าย 4 กำลังดี ไม่ค่ำ', tag: 'move', cost: 400 },
+    { t: '15:00', act: 'ลงที่ Ueno → Ginza Line → Asakusa → Tobu ไป Hikifune · เช็คอิน', note: '💡 <strong>ลงชินคันเซ็นที่ Ueno ไม่ต้องเลยไป Tokyo Sta.</strong> ใกล้ที่พักกว่า · Ueno → Asakusa (Ginza Line ~5 นาที) → Hikifune (Tobu Skytree Line 2 สถานี ~3 นาที) รวม ~20 นาที ~¥400 · แล้วเดินอีก ~480 ม. ถึง Jハウス', tag: 'move', cost: 400 },
     { t: '16:30', act: 'อาบน้ำ พักขา เดินสำรวจย่านที่พัก', note: '', tag: 'other', cost: 0 },
     { t: '18:30', act: '🍽 นัดกินข้าวกับเพื่อน', note: 'นัดร้านล่วงหน้า วันอาทิตย์ร้านดังเต็มเร็ว', tag: 'food', cost: 4000 },
   ]},
   { day: 7, date: 'จ. 26 ต.ค.', area: 'tokyo', title: 'Asakusa + Ueno + Ryogoku', items: [
-    { t: '08:30', act: 'Asakusa — วัด Sensoji + ถนน Nakamise', note: 'ไปเช้าคนน้อย ถ่ายรูปสวย', tag: 'city', cost: 0 },
+    { t: '08:30', act: 'Asakusa — วัด Sensoji + ถนน Nakamise', note: 'ไปเช้าคนน้อย ถ่ายรูปสวย · 💡 <strong>วันนี้อยู่ติดที่พักพอดี</strong> — จาก Hikifune ไป Asakusa แค่ 2 สถานี ~3 นาที และ Tokyo Skytree เดินจากที่พักได้เลย ~700 ม.', tag: 'city', cost: 0 },
     { t: '10:30', act: 'ข้ามแม่น้ำไป Sumida Hokusai Museum (Ryogoku)', note: 'อาคาร SANAA + งานโฮคุไซ', tag: 'city', cost: 1000 },
     { t: '12:00', act: 'ข้าวเที่ยงแถว Ryogoku', note: 'ย่านซูโม่ — มีจังโกะนาเบะ', tag: 'food', cost: 1200 },
     { t: '13:30', act: 'Ueno — Tokyo National Museum + Gallery of Hōryū-ji Treasures', note: 'ตั๋วเดียวเข้าได้ทั้งสอง (Taniguchi 1999) · นิทรรศการ Genji + Daitokuji ก็อยู่ที่นี่', tag: 'city', cost: 1000 },
@@ -177,7 +177,7 @@ const DEFAULT_ITINERARY = [
     { t: '08:30', act: 'Ginza + GINZA SIX (Taniguchi) + สวนดาดฟ้า', note: 'ร้านส่วนใหญ่เปิด 10:00-11:00 — ช่วงแรกเดินชมอาคารก่อน', tag: 'city', cost: 0 },
     { t: '10:30', act: 'Don Quijote / drugstore — ของฝากรอบสุดท้าย', note: 'พกพาสปอร์ตไว้ทำ tax-free', tag: 'city', cost: 5000 },
     { t: '12:00', act: 'ข้าวเที่ยง + กลับไปเอากระเป๋า', note: '', tag: 'food', cost: 1200 },
-    { t: '13:30', act: "ออกจากที่พัก → สนามบิน (N'EX จาก Shinjuku)", note: '~55-90 นาที · ถ้าซื้อ N\'EX Tokyo Round Trip ตั้งแต่ขามา ขานี้จ่ายแล้ว · เผื่อเวลาให้ถึงก่อน 15:00', tag: 'move', cost: 3250 },
+    { t: '13:30', act: 'เดินไป Oshiage → 🚃 Keisei Access Express ตรงเข้า Narita', note: '💰 <strong>ข้อได้เปรียบใหญ่ของที่พักย่านนี้</strong> — จาก Oshiage วิ่งตรงถึง Narita <strong>~46 นาที ¥1,170 ไม่ต้องเปลี่ยนขบวนเลย</strong> · ถูกกว่า N\'EX จาก Shinjuku (¥3,250) ถึง ~¥2,080/คน = <strong>ประหยัด ~¥8,320 ทั้งกลุ่ม</strong> และเร็วกว่าด้วย · เดินจากที่พักไป Oshiage ~610 ม.', tag: 'move', cost: 1170 },
     { t: '15:00', act: 'ถึงสนามบิน · เช็คอิน + คืนภาษี', note: '', tag: 'move', cost: 0 },
     { t: '17:00', act: 'บินกลับ ✈', note: '', tag: 'move', cost: 0 },
   ]},
@@ -364,9 +364,10 @@ const TRANSPORT = [
   { title: 'Fukushima → Tokyo (นัดเพื่อนเย็นนี้)', day: 'DAY 6 · 25 ต.ค.', options: [
     { method: 'Tohoku Shinkansen (Yamabiko) — ขบวนสาย', note: 'นั่งยาวถึง Tokyo Sta. เลย ออกช่วงสาย ๆ ให้ถึงโตเกียวบ่ายโมง เผื่อเวลาพักก่อนนัดมื้อเย็น', time: '~95 นาที', price: 9110 },
   ]},
-  { title: 'โตเกียว → สนามบิน', day: 'DAY 9 · 28 ต.ค.', options: [
-    { method: "N'EX จาก Shinjuku ไป Narita", note: "ขึ้นที่ Shinjuku ได้เลยไม่ต้องเข้า Tokyo Sta. · ถ้าซื้อ Round Trip ¥5,000 ตั้งแต่ขามา ขานี้ไม่ต้องจ่ายเพิ่ม · ออกจากเมืองก่อน 14:00 เผื่อเช็คอินไฟลท์ 17:00", time: '~55-90 นาที', price: 3250 },
-    { method: 'Monorail ไป Haneda', note: 'กรณีบินออก Haneda', time: '~25 นาที', price: 700 },
+  { title: 'ที่พัก Mukojima → สนามบิน', day: 'DAY 9 · 28 ต.ค.', options: [
+    { method: '🚃 Keisei Access Express จาก Oshiage — วิ่งตรง', note: '💰 <strong>ถูกและง่ายที่สุดจากที่พักนี้</strong> ~46 นาที ¥1,170 ไม่ต้องเปลี่ยนขบวน · เดินจากที่พักไป Oshiage ~610 ม. · ถูกกว่า N\'EX จาก Shinjuku ~¥2,080/คน', time: '~46 นาที', price: 1170 },
+    { method: 'Keisei Skyliner (ต่อไปขึ้นที่ Nippori/Ueno)', note: 'เร็วกว่าเล็กน้อยแต่ต้องเดินทางไปขึ้นที่ Nippori หรือ Ueno ก่อน — ไม่คุ้มเมื่อที่พักอยู่ติด Oshiage อยู่แล้ว', time: '~41 นาที + เวลาเดินทางไปสถานี', price: 2580 },
+    { method: 'Airport Limousine Bus (จากโรงแรมย่าน Asakusa/Skytree)', note: 'ยกกระเป๋าขึ้นใต้ท้องรถครั้งเดียวจบ · ต้องเช็คว่ามีรอบจากจุดใกล้ที่พักไหม และเผื่อรถติด', time: '~1 ชม. 30 นาที+', price: 3200 },
   ]},
   { title: 'ค่าเดินทางในเมือง (เผื่อ)', day: 'ทุกวัน', options: [
     { method: 'Suica/Pasmo — เมโทร+บัสในโตเกียว', note: 'เฉลี่ยวันละ ~¥800 × 5 วันเมือง (Day 1 + Day 6 เย็น + Day 7-9)', time: '—', price: 4000 },
@@ -441,13 +442,11 @@ const RAIL_FARES = [
     { method: 'Tohoku Shinkansen — จองที่นั่ง', time: '~95 นาที', xfer: '0 ครั้ง', price: 9110, conf: 'src',
       note: '25 ต.ค. เป็นวันอาทิตย์ขากลับ คนเยอะ — จองล่วงหน้าเถอะ เย็นนี้มีนัดกินข้าว · ⚠️ ลงที่ Tokyo Sta. แล้ว<strong>ต้องต่อ Chuo Line ไป Shinjuku อีก ~15 นาที ~¥210</strong>' },
   ]},
-  { leg: 'Shinjuku → Narita Airport', day: 'DAY 9 · 28 ต.ค.', from: 'Shinjuku Station Tokyo', to: 'Narita Airport Terminal 1 Station', options: [
-    { method: "JR Narita Express (N'EX) จาก Shinjuku", time: '~55-90 นาที', xfer: '0 ครั้ง', price: 3250, conf: 'src',
-      note: 'ขึ้นที่ Shinjuku ได้เลยไม่ต้องเข้า Tokyo Sta. · <strong>ถ้าซื้อ Round Trip ¥5,000 ตั้งแต่ขามา ขานี้จ่ายไปแล้ว</strong> · ออกจากเมืองก่อน 14:00 ให้ทันไฟลท์ 17:00' },
-    { method: 'JR Yamanote → Nippori → Keisei Skyliner', time: '~60 นาที', xfer: '1 ครั้ง', price: 2790, conf: 'src',
-      note: 'ถูกกว่าเล็กน้อย แต่วันกลับมีของฝากเยอะ การเปลี่ยนขบวนที่ Nippori จะลำบากกว่า' },
-    { method: 'Airport Limousine Bus จาก Shinjuku', time: '~2 ชม.', xfer: '0 ครั้ง', price: 3600, conf: 'calc',
-      note: 'ยกกระเป๋าขึ้นใต้ท้องรถครั้งเดียวจบ · ต้องเผื่อรถติดมากกว่าปกติ' },
+  { leg: 'Oshiage (ที่พัก Mukojima) → Narita Airport', day: 'DAY 9 · 28 ต.ค.', from: 'Oshiage Station Tokyo', to: 'Narita Airport Terminal 1 Station', options: [
+    { method: '🚃 Keisei Access Express — วิ่งตรงจาก Oshiage', time: '~46 นาที', xfer: '0 ครั้ง', price: 1170, conf: 'src',
+      note: '💰 <strong>ถูกที่สุดและไม่ต้องเปลี่ยนขบวน</strong> — ที่พักย่าน Mukojima อยู่บนสาย Narita Sky Access พอดี · เดินจากที่พักไป Oshiage ~610 ม. · เทียบกับ N\'EX จาก Shinjuku (¥3,250) ประหยัด ~¥2,080/คน = <strong>~¥8,320 ทั้งกลุ่ม</strong>' },
+    { method: 'Keisei Skyliner (ขึ้นที่ Nippori / Keisei-Ueno)', time: '~41 นาที + เวลาไปสถานี', xfer: '1 ครั้ง', price: 2580, conf: 'src',
+      note: 'เร็วกว่านิดเดียวแต่ต้องเดินทางไปขึ้นต้นทางก่อน — ไม่คุ้มเมื่อ Oshiage อยู่ใกล้ที่พักกว่ามาก' },
   ]},
 ];
 
@@ -462,7 +461,7 @@ const RAIL_LOCAL_NOTES = [
 ];
 
 /* เส้นทางรถไฟหลักที่ใช้เทียบกับ JR EAST PASS (¥30,000) */
-const RAIL_MAIN_TOTAL = 5020 + 1520 + 6250 + 9110 + 3250; // เย็นวันแรก Tokyo→Utsunomiya (ชินคันเซ็นจองที่นั่ง) + เดย์ทริป Nikko ไป-กลับ + Utsunomiya→Fukushima + Fukushima→Tokyo + N'EX กลับ (ไม่รวม N'EX ขาเข้า เพราะวันแรกเข้าเมืองแบบเบาไม่ผ่าน route หลัก)
+const RAIL_MAIN_TOTAL = 5020 + 1520 + 6250 + 9110 + 1170; // เย็นวันแรก Tokyo→Utsunomiya (ชินคันเซ็นจองที่นั่ง) + เดย์ทริป Nikko ไป-กลับ + Utsunomiya→Fukushima + Fukushima→Tokyo + Keisei Access Express กลับสนามบินจาก Oshiage (ไม่รวมขาเข้า เพราะวันแรกเข้าเมืองแบบเบาไม่ผ่าน route หลัก)
 
 
 /* ---------- คลังสถานที่จากการค้นคว้า + เงื่อนไขการเดินทาง ----------
@@ -940,28 +939,15 @@ const STAYS = [
     en: { city: 'Fukushima', station: 'JR Fukushima Sta. — mountain bus leaves the West Exit at 08:30', note: 'The most important location of the trip: on hiking day we must leave by 08:15 to catch Sky Access at the West Exit' },
   },
   {
-    id: 'tokyo', city: 'Tokyo', ja: '東京', area: 'tokyo',
+    id: 'tokyo', city: 'Tokyo — Mukojima (จองแล้ว)', ja: '向島・Jハウス', area: 'tokyo',
     checkIn: '2026-10-25', checkOut: '2026-10-28', nights: 3, days: 'DAY 6–8',
-    station: 'ย่าน Shinjuku และโดยรอบ — ดู 4 ตัวเลือกด้านล่าง',
-    searchQuery: 'Shinjuku City, Tokyo, Japan',
-    lat: 35.6896, lng: 139.7006,
-    note: 'ยังไม่มีลิสต์ที่เลือกไว้ — กดลิงก์ค้นหาที่กรองไว้แล้ว (4 คน · 25–28 ต.ค. · ห้องน้ำ 1+ · ทั้งหลัง) แล้วกรอกราคา/ลิงก์กลับมา · 25–28 ต.ค. เป็น อา.–พ. ซึ่งเป็นวันธรรมดาเกือบหมด ให้ดูกล่องเตือน minpaku ก่อนจอง',
-    en: { city: 'Tokyo', station: 'Several districts work — see the options below', note: 'No listing picked yet — use the pre-filtered search links (4 guests · 25–28 Oct · 1+ bathroom · entire place), then paste the price and link back here' },
-    /* ย่านที่แนะนำ: ต้องรับชินคันเซ็นจาก Fukushima + ไปสนามบินวันสุดท้าย + ตรงกับแผน Day 7-9 */
-    candidates: [
-      { name: 'Shinjuku (ฝั่งตะวันตก / Nishi-Shinjuku)', ja: '西新宿', lat: 35.6896, lng: 139.6917, query: 'Nishi-Shinjuku, Shinjuku City, Tokyo, Japan',
-        why: 'N\'EX ไป Narita ขึ้นที่ Shinjuku ได้ตรง + Day 8 จบที่ Shinjuku พอดี · โซนตึกสูงเป็นพื้นที่พาณิชย์ ทำให้มีห้องแบบ apart-hotel ที่ไม่ติดข้อจำกัด minpaku มากกว่าโซนบ้านพักอาศัย',
-        whyEn: "N'EX to Narita departs Shinjuku, Day 8 ends here, and the high-rise side is commercially zoned so more listings are licensed hotels rather than day-capped minpaku" },
-      { name: 'Shin-Okubo / Okubo', ja: '新大久保・大久保', lat: 35.7013, lng: 139.7000, query: 'Okubo, Shinjuku City, Tokyo, Japan',
-        why: 'เดินถึง Shinjuku ได้ ราคาถูกกว่าฝั่งสถานีหลักชัดเจน · ย่านเกาหลี ร้านอาหารเปิดดึก ซูเปอร์เยอะ เหมาะกับกลับดึกจากทริป',
-        whyEn: 'Walkable to Shinjuku but clearly cheaper, with Korean-town restaurants open late and plenty of supermarkets' },
-      { name: 'Yoyogi / Sendagaya', ja: '代々木・千駄ヶ谷', lat: 35.6836, lng: 139.7020, query: 'Yoyogi, Shibuya City, Tokyo, Japan',
-        why: 'สถานีถัดจาก Shinjuku สาย Yamanote/Chuo ครบเหมือนกัน แต่เงียบกว่ามาก · เดินไป Shinjuku Gyoen และ Meiji Jingu (Day 8) ได้',
-        whyEn: 'One stop from Shinjuku with the same Yamanote/Chuo access but far quieter; walking distance to Shinjuku Gyoen and Meiji Jingu' },
-      { name: 'Nakano', ja: '中野', lat: 35.7057, lng: 139.6659, query: 'Nakano City, Tokyo, Japan',
-        why: 'Chuo Line 5 นาทีถึง Shinjuku · ห้องใหญ่ราคาถูกที่สุดในกลุ่มนี้ + ถนนคนเดิน Nakano Broadway · คนละเขตปกครองกับ Shinjuku จึงกฎ minpaku ต่างกัน',
-        whyEn: 'Five minutes to Shinjuku on the Chuo Line, biggest rooms for the money here, plus Nakano Broadway — and a different ward, so different minpaku rules' },
-    ],
+    station: 'Hikifune ~480 ม. · Oshiage (Skytree) ~610 ม. · Tokyo Skytree Sta. ~630 ม.',
+    address: '〒131-0033 東京都墨田区向島4-13-19 Jハウス',
+    searchQuery: '東京都墨田区向島4-13-19',
+    lat: 35.7135, lng: 139.8135,
+    pick: { label: 'เปิดที่อยู่ใน Google Maps', url: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('〒131-0033 東京都墨田区向島4-13-19') },
+    note: '✅ <strong>จองแล้ว: Jハウス — 〒131-0033 東京都墨田区向島4-13-19</strong> · เดินถึงสถานี Hikifune (สาย Tobu Skytree + Keisei Oshiage) ~480 ม. และ Oshiage ~610 ม. · Tokyo Skytree อยู่ห่างเดินราว 700 ม. · ⚠️ <strong>หมุดบนแผนที่เป็นตำแหน่งย่านโดยประมาณ ไม่ใช่พิกัดตัวอาคาร</strong> — ใช้ช่อง 📍 ด้านล่างวางพิกัดจริงเพื่อปักให้ตรงเป๊ะได้',
+    en: { city: 'Tokyo — Mukojima (booked)', station: 'Hikifune ~480m · Oshiage (Skytree) ~610m', note: 'Booked: J House, 4-13-19 Mukojima, Sumida City. Pin is an approximate neighbourhood position, not the building itself' },
   },
 ];
 
@@ -978,7 +964,7 @@ STAYS.forEach((s) => {
     PLACES.push({
       name: `ที่พัก ${s.city}`, ja: s.ja, area: s.area, lat: s.lat, lng: s.lng,
       day: { utsunomiya: 1 }[s.id] || 3, type: 'stay', stayId: s.id, url: s.pick && s.pick.url,
-      desc: `🛏 ${s.nights} คืน · ${s.checkIn} → ${s.checkOut} · 4 คน — ${s.station} · หมุดปักที่สถานี ไม่ใช่ตำแหน่งบ้านจริง`,
+      desc: `🛏 ${s.nights} คืน · ${s.checkIn} → ${s.checkOut} · 4 คน — ${s.station}${s.address ? ` · ${s.address}` : ''} · หมุดโดยประมาณ ไม่ใช่พิกัดตัวอาคาร`,
       en: { name: `${s.en.city} stay`, desc: `🛏 ${s.nights} nights · ${s.checkIn} → ${s.checkOut} · 4 guests — ${s.en.station} · pin is on the station, not the actual listing address` },
     });
   }
