@@ -85,6 +85,36 @@ TripSync.init((remote) => {
   }
 })();
 
+/* ============ collapsible utility panels ============ */
+const PANEL_STATE_KEY = 'jt26_collapsed_panels';
+let collapsedPanels = store.load(PANEL_STATE_KEY, {});
+
+function setPanelCollapsed(button, collapsed) {
+  const targetId = button.dataset.collapseTarget;
+  const target = document.getElementById(targetId);
+  if (!target) return;
+
+  target.hidden = collapsed;
+  target.closest('.map-layout')?.classList.toggle('is-catalog-hidden', collapsed);
+  button.setAttribute('aria-expanded', String(!collapsed));
+  const label = button.querySelector('[data-collapse-label]');
+  if (label) label.textContent = (collapsed ? 'แสดง' : 'ซ่อน') + button.dataset.collapseName;
+  collapsedPanels[targetId] = collapsed;
+  store.save(PANEL_STATE_KEY, collapsedPanels);
+
+  if (targetId === 'place-catalog') {
+    window.dispatchEvent(new CustomEvent('trip:map-layout-change'));
+  }
+}
+
+document.querySelectorAll('[data-collapse-target]').forEach((button) => {
+  const targetId = button.dataset.collapseTarget;
+  setPanelCollapsed(button, collapsedPanels[targetId] === true);
+  button.addEventListener('click', () => {
+    setPanelCollapsed(button, button.getAttribute('aria-expanded') === 'true');
+  });
+});
+
 /* ============ itinerary (fully editable) ============ */
 function renderItinerary() {
   $('#itinerary-grid').innerHTML = itinerary.map((d, di) => `
@@ -117,6 +147,9 @@ renderItinerary();
 
 /* ============ map ============ */
 const map = L.map('leaflet-map', { scrollWheelZoom: false });
+window.addEventListener('trip:map-layout-change', () => {
+  setTimeout(() => map.invalidateSize(), 180);
+});
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   maxZoom: 18,

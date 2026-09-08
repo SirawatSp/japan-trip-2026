@@ -80,10 +80,11 @@
 
 <!-- ============ MAP ============ -->
 <section class="section section-wide" id="map">
-  <div class="section-head">
+  <div class="section-head section-head-with-action">
     <span class="section-ja jp">地図</span>
     <h2>แผนที่ปักหมุด</h2>
     <p class="section-desc">หมุดทุกจุดที่จะไป แยกสีตามพื้นที่ · คลิกชื่อสถานที่ในลิสต์เพื่อซูมไป</p>
+    <button class="section-collapse-button" type="button" data-collapse-target="place-catalog" data-collapse-name="คลังสถานที่" aria-controls="place-catalog" aria-expanded="true"><span class="collapse-chevron" aria-hidden="true"></span><span data-collapse-label>ซ่อนคลังสถานที่</span></button>
   </div>
   <div class="map-filters" id="map-filters">
     <button class="chip active" data-filter="all">ทั้งหมด</button>
@@ -100,24 +101,30 @@
     <button class="chip" data-type="museum">🏛 เฉพาะพิพิธภัณฑ์</button>
     <button class="chip" data-type="taniguchi">✏️ งาน Yoshio Taniguchi</button>
   </div>
-  <div class="map-layout">
+  <div class="map-layout" id="map-layout">
     <div id="leaflet-map" role="application" aria-label="แผนที่สถานที่ท่องเที่ยว"></div>
-    <div class="place-list" id="place-list"></div>
+    <aside class="place-catalog collapsible-panel" id="place-catalog" aria-label="คลังสถานที่">
+      <div class="place-catalog-head"><span>PLACE VAULT</span><strong>คลังสถานที่</strong></div>
+      <div class="place-list" id="place-list"></div>
+    </aside>
   </div>
 </section>
 
 <!-- ============ TRANSPORT ============ -->
 <section class="section" id="transport">
-  <div class="section-head">
+  <div class="section-head section-head-with-action">
     <span class="section-ja jp">交通</span>
     <h2>วิธีเดินทาง & ค่าเดินทาง</h2>
     <p class="section-desc">ราคาโดยประมาณต่อคน (เช็คราคาจริงก่อนเดินทาง) · กด「＋งบ」เพื่อบันทึกเข้าเครื่องคิดงบด้านล่าง</p>
+    <button class="section-collapse-button" type="button" data-collapse-target="transport-conditions" data-collapse-name="เงื่อนไขการเดินทาง" aria-controls="transport-conditions" aria-expanded="true"><span class="collapse-chevron" aria-hidden="true"></span><span data-collapse-label>ซ่อนเงื่อนไขการเดินทาง</span></button>
   </div>
-  <div class="transport-list" id="transport-list"></div>
-  <div class="pass-note card">
-    <h3>🎫 คุ้มไหมถ้าซื้อ JR EAST PASS (Tohoku Area)?</h3>
-    <p>พาส 5 วันติดกัน ราคา <span class="mono">¥30,000</span> — แต่ค่ารถไฟเส้นทางหลักของทริปนี้รวมแล้วประมาณ <span class="mono" id="rail-total">¥—</span> เท่านั้น
-    <strong>ซื้อตั๋วแยกถูกกว่า</strong> ยกเว้นจะนั่งชินคันเซ็นเที่ยวเพิ่มหลายรอบ (เช่น แวะเซนได/ยามากาตะ)</p>
+  <div class="collapsible-panel" id="transport-conditions" aria-label="เงื่อนไขการเดินทาง">
+    <div class="transport-list" id="transport-list"></div>
+    <div class="pass-note card">
+      <h3>🎫 คุ้มไหมถ้าซื้อ JR EAST PASS (Tohoku Area)?</h3>
+      <p>พาส 5 วันติดกัน ราคา <span class="mono">¥30,000</span> — แต่ค่ารถไฟเส้นทางหลักของทริปนี้รวมแล้วประมาณ <span class="mono" id="rail-total">¥—</span> เท่านั้น
+      <strong>ซื้อตั๋วแยกถูกกว่า</strong> ยกเว้นจะนั่งชินคันเซ็นเที่ยวเพิ่มหลายรอบ (เช่น แวะเซนได/ยามากาตะ)</p>
+    </div>
   </div>
 </section>
 
