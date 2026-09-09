@@ -3,12 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
 <title>秋の旅 — Japan Trip 20–28 Oct 2026 | Tokyo · Tochigi · Nikko · Fukushima</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Anuphan:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+  }
+}
+</script>
 </head>
 <body>
 
@@ -136,6 +145,7 @@
     <button class="chip" data-filter="fukushima"><span class="dot" data-area="fukushima"></span>Fukushima</button>
     <button class="chip" data-filter="other"><span class="dot" data-area="other"></span>อื่นๆ ทั่วญี่ปุ่น</button>
     <label class="chip chip-toggle"><input type="checkbox" id="route-toggle" checked> เส้นทางหลัก</label>
+    <label class="chip chip-toggle hike-route-chip"><input type="checkbox" id="hike-route-toggle"> เส้นเดิน Mt. Issaikyo</label>
     <div class="lang-toggle" id="map-lang" role="group" aria-label="ภาษาของแผนที่ / map language">
       <button class="chip" data-lang="en">EN</button>
       <button class="chip" data-lang="th">ไทย</button>
@@ -179,12 +189,14 @@
 
 <!-- ============ SPOT RESEARCH ============ -->
 <section class="section" id="spots">
-  <div class="section-head">
+  <div class="section-head section-head-with-action">
     <span class="section-ja jp">候補地</span>
     <h2>คลังสถานที่ + เงื่อนไขการเดินทาง</h2>
     <p class="section-desc">ที่เที่ยวที่ค้นมาสำหรับเลือกฐานช่วง <strong>21–25 ต.ค.</strong> — แต่ละใบบอก<strong>ไฮไลต์ / วิธีไปทีละต่อ / ข้อจำกัดที่ทำให้ไปไม่ได้</strong> ·
     ป้ายสีบอกว่าเข้ากรอบทริปเราไหม · ทุกจุดมีปุ่มดูรูปจริงช่วงเดือนตุลาคม · หมุดทั้งหมดอยู่บนแผนที่ กรอง「🔭 ที่เที่ยวตัวเลือก」</p>
+    <button class="section-collapse-button" type="button" data-collapse-target="spots-content" data-collapse-name="หมวดนี้" aria-controls="spots-content" aria-expanded="true"><span class="collapse-chevron" aria-hidden="true"></span><span data-collapse-label>ซ่อนหมวดนี้</span></button>
   </div>
+  <div class="collapsible-panel spots-content" id="spots-content">
   <div class="spot-filters" id="spot-filters"></div>
   <div class="spot-legend">
     <span class="fit-tag fit-good">เข้ากรอบ 21–25 ต.ค.</span>
@@ -194,6 +206,7 @@
   </div>
   <div class="spot-grid" id="spot-grid"></div>
   <div class="card spot-photo-note" id="spot-photo-note"></div>
+  </div>
 </section>
 
 <!-- ============ TRANSPORT ============ -->
@@ -245,6 +258,63 @@
       <div><span>ระยะทาง</span><strong>7.0 km</strong></div><div><span>เวลาบนทาง</span><strong>3–4 hr</strong></div>
       <div><span>ช่วงเดินจริง</span><strong>09:40–14:15</strong></div><div><span>ระดับความยาก</span><strong>ปานกลาง</strong></div>
     </div>
+    <div class="hike-actions">
+      <button class="hike-map-button" id="show-hike-3d-btn" type="button"><span class="cube-icon" aria-hidden="true"></span> เปิดแผนที่ 3D</button>
+      <button class="hike-map-button hike-map-button-secondary" id="show-hike-route-btn" type="button"><span aria-hidden="true">⌖</span> ดูบนแผนที่รวม</button>
+      <a class="hike-source-link" href="https://www.alltrails.com/trail/japan/fukushima--2/mount-issaikyo-okenuma-marsh" target="_blank" rel="noopener">AllTrails · เส้นไปกลับ 3.4 mi ↗</a>
+      <a class="hike-source-link" href="https://www.env.go.jp/park/bandai/guide/joudodaira/english/course/course03.html" target="_blank" rel="noopener">แผนลูป 7 km ทางการ ↗</a>
+    </div>
+    <article class="hike-terrain" id="hike-terrain" aria-labelledby="hike-terrain-title">
+      <div class="terrain-viewer" id="terrain-viewer" data-view="3d">
+        <canvas id="hike-terrain-canvas" aria-label="แผนที่ภูมิประเทศสามมิติของ Mt. Issaikyo ลากเพื่อหมุนและเอียง ใช้ล้อเมาส์หรือสองนิ้วเพื่อซูม"></canvas>
+        <div id="hike-terrain-map-2d" aria-label="แผนที่ดาวเทียมสองมิติของเส้นทาง Mt. Issaikyo"></div>
+        <div class="terrain-label-layer" id="terrain-label-layer" aria-hidden="true"></div>
+        <div class="terrain-topbar">
+          <div>
+            <span class="terrain-kicker">SATELLITE TERRAIN · FUKUSHIMA</span>
+            <h3 id="hike-terrain-title">Mt. Issaikyo <span class="jp">一切経山</span></h3>
+          </div>
+          <div class="terrain-view-switch" role="group" aria-label="เลือกรูปแบบแผนที่">
+            <button type="button" data-terrain-view="2d" aria-pressed="false">2D</button>
+            <button type="button" class="active" data-terrain-view="3d" aria-pressed="true">3D</button>
+          </div>
+        </div>
+        <div class="terrain-loading" id="terrain-loading" role="status">
+          <span class="terrain-loading-mark" aria-hidden="true"></span>
+          <span>กำลังสร้างภูมิประเทศจากข้อมูลระดับความสูงจริง</span>
+        </div>
+        <div class="terrain-guide" id="terrain-guide">
+          <strong>3D</strong><span>ลากเพื่อหมุน · เลื่อนเพื่อซูม · สองนิ้วบนมือถือ</span>
+        </div>
+        <button class="terrain-reset" id="terrain-reset" type="button" title="รีเซ็ตมุมมอง" aria-label="รีเซ็ตมุมมอง 3D">↺</button>
+        <div class="terrain-readout" aria-label="ข้อมูลเส้นทาง">
+          <div><span>LOOP</span><strong>7.0 km</strong></div>
+          <div><span>SUMMIT</span><strong>1,949 m</strong></div>
+          <div><span>GAIN</span><strong>~350 m</strong></div>
+        </div>
+        <p class="terrain-attribution">Elevation: Copernicus DEM GLO-90 / Open-Meteo · Imagery: Esri, Maxar, Earthstar Geographics & GIS User Community</p>
+      </div>
+      <div class="terrain-caption">
+        <p><strong>เส้นสีเขียวคือแนวลูปที่วางแผนไว้</strong> ภูมิประเทศสร้างจากค่าระดับความสูงจริง แต่เส้นบนหน้าจอใช้เพื่อวางแผนเท่านั้น ควรใช้ GPX และป้ายทางการเมื่อลงพื้นที่</p>
+        <span id="terrain-source-status">กำลังโหลดภาพดาวเทียม</span>
+      </div>
+    </article>
+    <article class="hike-weather" aria-labelledby="hike-weather-title">
+      <div class="weather-head">
+        <div>
+          <span class="eyebrow">LIVE FORECAST · JODODAIRA 1,600 M</span>
+          <h3 id="hike-weather-title">อากาศวันเดินเขา · 24 ต.ค. 2026</h3>
+        </div>
+        <div class="weather-update">
+          <span id="weather-updated">กำลังโหลดข้อมูล</span>
+          <button id="refresh-weather-btn" class="weather-refresh" type="button" title="อัปเดตพยากรณ์" aria-label="อัปเดตพยากรณ์">↻</button>
+        </div>
+      </div>
+      <div id="hike-weather-content" class="weather-content" aria-live="polite">
+        <div class="weather-loading"><span></span><span></span><span></span></div>
+      </div>
+      <p class="weather-context">ข้อมูลจาก Open-Meteo จะอัปเดตอัตโนมัติอย่างน้อยทุก 6 ชั่วโมง และแสดงพยากรณ์วันเดินเขาเมื่อเข้าสู่ช่วงล่วงหน้า 16 วัน ค่านี้อ้างอิงบริเวณ Jododaira; บนยอดอาจหนาวและลมแรงกว่า</p>
+    </article>
     <div class="hike-grid hike-grid-main">
       <article class="card hike-plan">
         <div class="hike-card-head"><div><span class="eyebrow">PLAN A · อากาศดี</span><h3>Issaikyo → Kamanuma loop</h3></div><span class="route-pill">ต้องถึงรถก่อน 15:00</span></div>
@@ -275,11 +345,16 @@
       </aside>
     </div>
     <div class="hike-grid hike-grid-detail">
-      <article class="card"><span class="eyebrow">PACKING</span><h3>อุปกรณ์ปลายเดือนตุลาคม</h3><ul class="gear-list">
-        <li>รองเท้าเดินเขาดอกลึก + ถุงเท้าสำรอง</li><li>เสื้อ base layer, fleece และ shell กันลม/กันฝน</li>
-        <li>หมวกอุ่น ถุงมือ และแว่นกันแดด</li><li>น้ำอย่างน้อย 1.5 ลิตร + มื้อกลางวัน + snack ฉุกเฉิน</li>
-        <li>trekking poles, headlamp, power bank และชุดปฐมพยาบาล</li><li>แผนที่ออฟไลน์ YAMAP/GPX + เงินสด + ถุงใส่ขยะกลับ</li>
-      </ul></article>
+      <article class="card hike-checklist-card">
+        <div class="checklist-head">
+          <div><span class="eyebrow">PACKING CHECKLIST</span><h3>ของที่ต้องเตรียม</h3></div>
+          <button id="reset-hike-checklist" class="checklist-reset" type="button">ล้างที่ติ๊ก</button>
+        </div>
+        <div class="checklist-progress" aria-hidden="true"><span id="hike-checklist-bar"></span></div>
+        <p class="checklist-count" id="hike-checklist-count">0 / 0 พร้อมแล้ว</p>
+        <div id="hike-checklist" class="hike-checklist"></div>
+        <p class="checklist-source">อ้างอิงรายการอุปกรณ์จาก <a href="https://www.japan.travel/national-parks/plan-your-visit/what-to-bring/" target="_blank" rel="noopener">National Parks of Japan ↗</a></p>
+      </article>
       <article class="card"><span class="eyebrow">BOOKING & COST</span><h3>รถและค่าใช้จ่ายที่อัปเดตปี 2026</h3><table class="mini-table">
         <tr><td>Sky Access คอร์สนักเดินเขา ไป-กลับ <strong>(ต่อคน)</strong></td><td class="mono">¥13,000</td></tr>
         <tr><td><strong>หรือ</strong> เช่ารถหารกัน 4 คน (รถ+น้ำมัน+ที่จอด)</td><td class="mono">~¥2,500</td></tr><tr><td>อาหาร น้ำ และ snack</td><td class="mono">~¥1,500</td></tr>
@@ -290,44 +365,6 @@
       <a href="https://www.f-kankou.jp/pickup/36185" target="_blank" rel="noopener">จอง Sky Access ↗</a>
       <a href="https://www.jododaira-vc.jp/" target="_blank" rel="noopener">สภาพทาง Jododaira ↗</a>
       <a href="https://www.jma.go.jp/bosai/volcano/" target="_blank" rel="noopener">ประกาศภูเขาไฟ JMA ↗</a>
-    </div>
-  </div>
-  <div class="section-head">
-    <span class="section-ja jp">登山</span>
-    <h2>เดินเขา 1 วัน — Mt. Issaikyo <span class="jp">一切経山</span></h2>
-    <p class="section-desc">1,949 ม. · Bandai-Azuma Skyline, Fukushima · ไฮไลต์: ทะเลสาบ Goshikinuma「ดวงตาแม่มด 魔女の瞳」</p>
-  </div>
-  <div class="hike-grid">
-    <div class="card hike-plan">
-      <h3>ตารางวันเดินเขา (แผน: 26 ต.ค.)</h3>
-      <ul class="timeline">
-        <li><span class="mono">08:30</span> ขึ้นบัส <strong>Jododaira Sky Access</strong> จาก Fukushima Sta. (ฝั่ง West Exit) — ต้องจองล่วงหน้า</li>
-        <li><span class="mono">10:00</span> ถึง Jododaira Visitor Center (1,600 ม.) — เข้าห้องน้ำ เตรียมตัว</li>
-        <li><span class="mono">10:15</span> เริ่มเดิน: Jododaira → สันเขา → ยอด Issaikyo (~90 นาที)</li>
-        <li><span class="mono">12:00</span> ถึงยอด — วิว Goshikinuma สีฟ้าเทอร์ควอยซ์ · พักกินข้าวกล่อง</li>
-        <li><span class="mono">13:00</span> ลงทางฝั่ง Kamanuma → Okenuma wetland วนกลับ Jododaira</li>
-        <li><span class="mono">15:00</span> เดินเสริม Azuma-Kofuji (ปากปล่องภูเขาไฟ ~15 นาทีถึงขอบ)</li>
-        <li><span class="mono">15:30</span> ขึ้นบัสกลับ → ถึง Fukushima Sta. <span class="mono">17:00</span> → แช่ออนเซ็น 🍜</li>
-      </ul>
-      <p class="note">⚠️ บัสวิ่งตามฤดูกาล (พ.ค.–กลาง พ.ย.) เช็คตาราง/จองที่ Japan Bus Online ก่อนไป · ถ้าอากาศแย่ให้สลับวันกับวันช้อปปิ้ง · Skyline อาจปิดถ้าหิมะมาเร็ว</p>
-    </div>
-    <div class="card">
-      <h3>ของที่ต้องเตรียม</h3>
-      <ul class="gear-list">
-        <li>🧥 เสื้อกันลม/กันหนาว — ปลาย ต.ค. บนเขา ~0–8°C ลมแรง</li>
-        <li>👟 รองเท้าเดินเขา (ทางกรวดภูเขาไฟ ลื่น)</li>
-        <li>🧤 ถุงมือ + หมวก + buff</li>
-        <li>🍙 ข้าวกล่อง + น้ำ 1–1.5 ลิตร (ซื้อจากเซเว่นหน้าสถานี — บนเขามีแค่ resthouse)</li>
-        <li>🧴 กันแดด + แว่นกันแดด (ไม่มีร่มเงาตลอดเส้น)</li>
-        <li>💴 เงินสด (ค่าบัส/resthouse)</li>
-        <li>📱 โหลดแผนที่ออฟไลน์ (YAMAP / Google Maps offline)</li>
-      </ul>
-      <h3 style="margin-top:1.4rem">ค่าใช้จ่ายวันเดินเขา</h3>
-      <table class="mini-table">
-        <tr><td>บัส Sky Access ไป–กลับ</td><td class="mono">~¥4,000</td></tr>
-        <tr><td>ข้าวกล่อง + น้ำ + ขนม</td><td class="mono">~¥1,500</td></tr>
-        <tr><td>ออนเซ็นตอนเย็น</td><td class="mono">~¥800</td></tr>
-      </table>
     </div>
   </div>
 </section>
@@ -412,5 +449,6 @@
 <script src="js/sync.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
+<script type="module" src="js/hike-terrain.js"></script>
 </body>
 </html>

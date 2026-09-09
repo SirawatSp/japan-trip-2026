@@ -334,6 +334,48 @@ const ROUTE = [
   [35.6896, 139.7006],  // back Tokyo — Shinjuku (25–28 ต.ค.)
 ];
 
+/* ---------- Mt. Issaikyo loop (schematic line between official waypoints) ---------- */
+const HIKING_ROUTE = [
+  { name: 'Jododaira Visitor Center', ja: '浄土平ビジターセンター', lat: 37.7232, lng: 140.2542, time: '09:40', note: 'จุดเริ่มเดิน ห้องน้ำ และข้อมูลสภาพทางล่าสุด' },
+  { name: 'Sugadaira trail junction', ja: '酸ヶ平分岐', lat: 37.7249, lng: 140.2439, time: '10:20', note: 'ทางแยกไป Kamanuma และ Mt. Issaikyo' },
+  { name: 'Sugadaira Shelter', ja: '酸ヶ平避難小屋', lat: 37.72678, lng: 140.24131, time: '10:35', note: 'จุดหลบอากาศฉุกเฉินระหว่างทาง' },
+  { name: 'Mt. Issaikyo summit', ja: '一切経山山頂', lat: 37.7358, lng: 140.2442, time: '11:20', note: 'ยอด 1,949 ม. จุดชม Goshikinuma หรือดวงตาแม่มด' },
+  { name: 'Sugadaira Shelter', ja: '酸ヶ平避難小屋', lat: 37.72678, lng: 140.24131, time: '12:30', note: 'ย้อนทางเดิมจากยอดแล้วแยกไป Kamanuma' },
+  { name: 'Kamanuma', ja: '鎌沼', lat: 37.7189, lng: 140.2352, time: '13:10', note: 'บึงและทางไม้กระดานในพื้นที่ชุ่มน้ำ' },
+  { name: 'Ubagahara', ja: '姥ヶ原', lat: 37.7147, lng: 140.2412, time: '13:35', note: 'ทุ่งพืชอัลไพน์ เดินตามป้ายกลับ Jododaira' },
+  { name: 'Jododaira Visitor Center', ja: '浄土平ビジターセンター', lat: 37.7232, lng: 140.2542, time: '14:10', note: 'จบเส้นทาง เผื่อรถ Sky Access รอบ 15:00' },
+];
+
+const HIKING_CHECKLIST = [
+  { group: 'เสื้อผ้าและรองเท้า', items: [
+    { id: 'boots', label: 'รองเท้าเดินเขาดอกลึก', detail: 'รองรับทางกรวดภูเขาไฟและไม้กระดานเปียก' },
+    { id: 'layers', label: 'base layer แห้งเร็ว + fleece', detail: 'เลี่ยงเสื้อฝ้ายที่อมเหงื่อและทำให้ตัวเย็น' },
+    { id: 'shell', label: 'เสื้อกันน้ำมีฮูด + กางเกงกันฝน', detail: 'บนสันเขาไม่มีที่กำบังลม' },
+    { id: 'warm', label: 'หมวกอุ่น ถุงมือ และ buff', detail: 'สำหรับอาการหนาวจากลม' },
+    { id: 'socks', label: 'ถุงเท้าสำรอง', detail: 'ใส่ถุงกันน้ำแยกไว้' },
+  ]},
+  { group: 'ความปลอดภัยและนำทาง', items: [
+    { id: 'offline-map', label: 'แผนที่ออฟไลน์ / GPX + แผนที่กระดาษ', detail: 'ไม่พึ่งสัญญาณมือถือเพียงอย่างเดียว' },
+    { id: 'phone', label: 'มือถือชาร์จเต็ม + power bank', detail: 'เก็บหัวต่อในถุงกันน้ำ' },
+    { id: 'headlamp', label: 'ไฟคาดหัว + แบตสำรอง', detail: 'ควรมีแม้เป็นทริปเช้าไปเย็นกลับ' },
+    { id: 'first-aid', label: 'ชุดปฐมพยาบาล + เทปป้องกันรองเท้ากัด', detail: 'ยาประจำตัวควรมีสำรอง' },
+    { id: 'poles', label: 'trekking poles + นกหวีด', detail: 'ช่วยทางลงหินกรวดและใช้ส่งสัญญาณฉุกเฉิน' },
+  ]},
+  { group: 'น้ำ อาหาร และของจำเป็น', items: [
+    { id: 'water', label: 'น้ำ 1.5–2.0 ลิตร', detail: 'ปรับตามอากาศและความต้องการส่วนตัว' },
+    { id: 'food', label: 'มื้อกลางวัน + ขนมให้พลังงาน + อาหารสำรอง', detail: 'ซื้อก่อนขึ้นรถที่ Fukushima' },
+    { id: 'sun', label: 'กันแดด + แว่นกันแดด', detail: 'พกไปด้วยแม้ฟ้าครึ้ม' },
+    { id: 'cash', label: 'เงินสด/เหรียญ + ถุงขยะ', detail: 'นำขยะทุกชิ้นกลับลงมา' },
+  ]},
+  { group: 'ตรวจก่อนไป', items: [
+    { id: 'bus', label: 'การจอง Sky Access และรถกลับ 15:00', detail: 'บันทึกหลักฐานการจองแบบออฟไลน์' },
+    { id: 'weather', label: 'พยากรณ์อากาศ ลม และลมกระโชก', detail: 'กดอัปเดตในแผงอากาศด้านบน' },
+    { id: 'trail', label: 'สภาพทางจาก Visitor Center + การเปิด Skyline', detail: 'ถ้าปิดทางให้ยกเลิกแผนขึ้นยอด' },
+    { id: 'volcano', label: 'ประกาศภูเขาไฟ Azumayama จาก JMA', detail: 'ไม่เข้าเขตเตือนก๊าซหรือเขตห้ามเข้า' },
+    { id: 'share-plan', label: 'บอกเส้นทางและเวลากลับให้เพื่อน/ครอบครัว', detail: 'สำคัญมากเมื่อเดินคนเดียว' },
+  ]},
+];
+
 /* ---------- transport segments ---------- */
 const TRANSPORT = [
   { title: 'สนามบิน → เข้าเมือง (ไปนัดข้าวกับญาติ)', day: 'DAY 1 · 20 ต.ค. (เช้า)', options: [

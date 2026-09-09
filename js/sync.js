@@ -28,6 +28,10 @@ const TripSync = (() => {
   function init(onRemoteUpdate) {
     applyRemote = onRemoteUpdate;
 
+    if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
+      setStatus('โหมดทดสอบ · บันทึกเฉพาะเครื่องนี้', 'offline');
+      return;
+    }
     if (!isConfigured()) {
       setStatus('🔒 ยังไม่เชื่อมซิงค์ (บันทึกในเครื่องนี้เท่านั้น)', 'offline');
       return;

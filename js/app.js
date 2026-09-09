@@ -46,6 +46,7 @@ let itinerary = store.load('jt26_itinerary', DEFAULT_ITINERARY);
 /* ที่พัก: { [stayId]: { thb: ราคาต่อคืนทั้งหลัง, url: ลิงก์ที่จองจริง } } + เพดานต่อคน/คืน */
 let stays = store.load('jt26_stays', {});
 let stayCap = store.load('jt26_staycap', STAY_CAP_PER_PERSON_THB);
+let hikeChecklist = store.load('jt26_hike_checklist', {});
 
 function persistAll() {
   store.save('jt26_shopping', shopping);
@@ -55,7 +56,8 @@ function persistAll() {
   store.save('jt26_itinerary', itinerary);
   store.save('jt26_stays', stays);
   store.save('jt26_staycap', stayCap);
-  TripSync.push({ shopping, planned, expenses, rate, itinerary, stays, stayCap });
+  store.save('jt26_hike_checklist', hikeChecklist);
+  TripSync.push({ shopping, planned, expenses, rate, itinerary, stays, stayCap, hikeChecklist });
 }
 
 TripSync.init((remote) => {
@@ -66,6 +68,7 @@ TripSync.init((remote) => {
   if (remote.itinerary) itinerary = normalizeItinerary(remote.itinerary);
   if (remote.stays) stays = remote.stays;
   if (typeof remote.stayCap === 'number') stayCap = remote.stayCap;
+  if (remote.hikeChecklist) hikeChecklist = remote.hikeChecklist;
   store.save('jt26_shopping', shopping);
   store.save('jt26_planned', planned);
   store.save('jt26_expenses', expenses);
@@ -73,10 +76,12 @@ TripSync.init((remote) => {
   store.save('jt26_itinerary', itinerary);
   store.save('jt26_stays', stays);
   store.save('jt26_staycap', stayCap);
+  store.save('jt26_hike_checklist', hikeChecklist);
   $('#rate-input').value = rate;
   $('#exp-cat').innerHTML = planned.map((b) => `<option>${esc(b.cat)}</option>`).join('');
   /* เรตอาจถูกแก้จากอีกเครื่องผ่าน sync — วาดใหม่ทุกส่วนที่มีตัวเลขบาทเหมือนตอนแก้เรตเอง */
   renderMoneyViews();
+  renderHikeChecklist();
 });
 
 /* ============ countdown ============ */
@@ -97,6 +102,32 @@ TripSync.init((remote) => {
     el.textContent = days;
   }
 })();
+
+/* ============ collapsible utility panels ============ */
+const PANEL_STATE_KEY = 'jt26_collapsed_panels';
+let collapsedPanels = store.load(PANEL_STATE_KEY, {});
+
+function setPanelCollapsed(button, collapsed) {
+  const targetId = button.dataset.collapseTarget;
+  const target = document.getElementById(targetId);
+  if (!target) return;
+
+  target.hidden = collapsed;
+  button.setAttribute('aria-expanded', String(!collapsed));
+  const label = button.querySelector('[data-collapse-label]');
+  if (label) label.textContent = (collapsed ? 'แสดง' : 'ซ่อน') + button.dataset.collapseName;
+  collapsedPanels[targetId] = collapsed;
+  store.save(PANEL_STATE_KEY, collapsedPanels);
+
+}
+
+document.querySelectorAll('[data-collapse-target]').forEach((button) => {
+  const targetId = button.dataset.collapseTarget;
+  setPanelCollapsed(button, collapsedPanels[targetId] === true);
+  button.addEventListener('click', () => {
+    setPanelCollapsed(button, button.getAttribute('aria-expanded') === 'true');
+  });
+});
 
 /* ============ itinerary (fully editable timetable) ============ */
 /* รูปแบบเก่าเก็บรายการเป็นสตริง — แปลงเป็น { t, act, note, cost } ให้อัตโนมัติ */
@@ -598,6 +629,26 @@ const routeLine = L.polyline(ROUTE, {
   color: '#2b2118', weight: 2.5, dashArray: '7 7', opacity: .55,
 });
 
+const hikeRouteLine = L.polyline(HIKING_ROUTE.map((p) => [p.lat, p.lng]), {
+  color: '#d97b29', weight: 5, opacity: .9, lineJoin: 'round',
+});
+const uniqueHikeWaypoints = HIKING_ROUTE.filter((point, index, points) =>
+  index === points.findIndex((candidate) => candidate.lat === point.lat && candidate.lng === point.lng));
+const hikeWaypointMarkers = uniqueHikeWaypoints.map((p, i) => {
+  const marker = L.circleMarker([p.lat, p.lng], {
+    radius: i === 0 ? 7 : 5,
+    color: '#fffdf7', weight: 2, fillColor: '#d97b29', fillOpacity: 1,
+  });
+  marker.bindTooltip(p.name, { direction: 'top', className: 'hike-waypoint-label' });
+  marker.bindPopup(
+    '<div class="popup-title">' + esc(p.name) + '</div>' +
+    '<div class="popup-ja">' + esc(p.ja) + '</div>' +
+    '<div class="popup-desc"><strong>' + esc(p.time) + '</strong> · ' + esc(p.note) + '</div>' +
+    '<div class="popup-ticket">แนวเส้นทางโดยประมาณ · ใช้ GPX/แผนที่ทางการนำทางจริง</div>'
+  );
+  return marker;
+});
+
 let activeArea = 'all';
 let activeType = 'all'; // 'all' | 'museum' | 'taniguchi'
 
@@ -628,6 +679,22 @@ function refreshMap() {
   } else if (map.hasLayer(routeLine)) {
     map.removeLayer(routeLine);
   }
+
+  const showHikeRoute = $('#hike-route-toggle').checked
+    && activeType === 'all'
+    && (activeArea === 'all' || activeArea === 'fukushima');
+  if (showHikeRoute) {
+    if (!map.hasLayer(hikeRouteLine)) hikeRouteLine.addTo(map);
+    hikeWaypointMarkers.forEach((marker) => {
+      if (!map.hasLayer(marker)) marker.addTo(map);
+    });
+  } else {
+    if (map.hasLayer(hikeRouteLine)) map.removeLayer(hikeRouteLine);
+    hikeWaypointMarkers.forEach((marker) => {
+      if (map.hasLayer(marker)) map.removeLayer(marker);
+    });
+  }
+
   const visible = markers.filter((m) => map.hasLayer(m));
   if (visible.length) {
     map.fitBounds(L.featureGroup(visible).getBounds().pad(0.15));
@@ -658,6 +725,7 @@ $('#map-filters').addEventListener('click', (e) => {
   refreshMap();
 });
 $('#route-toggle').addEventListener('change', refreshMap);
+$('#hike-route-toggle').addEventListener('change', refreshMap);
 
 /* ---------- map language switch (EN ⇄ ไทย) ---------- */
 function applyMapLang() {
@@ -727,6 +795,23 @@ function jumpMapToDay(day) {
     if (first) first.openPopup();
   }, 450);
 }
+
+$('#show-hike-route-btn').addEventListener('click', () => {
+  activeArea = 'fukushima';
+  activeType = 'all';
+  $('#hike-route-toggle').checked = true;
+  document.querySelectorAll('#map-filters button.chip').forEach((button) =>
+    button.classList.toggle('active', button.dataset.filter === 'fukushima'));
+  document.querySelectorAll('#type-filters button.chip').forEach((button) =>
+    button.classList.toggle('active', button.dataset.type === 'all'));
+  refreshMap();
+  document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+  setTimeout(() => {
+    map.invalidateSize();
+    map.fitBounds(hikeRouteLine.getBounds().pad(0.25));
+    hikeWaypointMarkers[0].openPopup();
+  }, 650);
+});
 
 $('#itinerary-grid').addEventListener('click', (e) => {
   const mapBtn = e.target.closest('.day-map-btn');
@@ -821,6 +906,169 @@ $('#reset-itinerary-btn').addEventListener('click', () => {
 
 refreshMap();
 applyMapLang();
+
+/* ============ Mt. Issaikyo checklist ============ */
+function renderHikeChecklist() {
+  const allItems = HIKING_CHECKLIST.flatMap((group) => group.items);
+  $('#hike-checklist').innerHTML = HIKING_CHECKLIST.map((group) =>
+    '<section class="checklist-group">' +
+      '<h4>' + esc(group.group) + '</h4>' +
+      group.items.map((item) =>
+        '<label class="checklist-item">' +
+          '<input type="checkbox" data-check-id="' + esc(item.id) + '"' + (hikeChecklist[item.id] ? ' checked' : '') + '>' +
+          '<span><strong>' + esc(item.label) + '</strong><small>' + esc(item.detail) + '</small></span>' +
+        '</label>'
+      ).join('') +
+    '</section>'
+  ).join('');
+
+  const complete = allItems.filter((item) => hikeChecklist[item.id]).length;
+  const percent = allItems.length ? (complete / allItems.length) * 100 : 0;
+  $('#hike-checklist-bar').style.width = percent + '%';
+  $('#hike-checklist-count').textContent = complete + ' / ' + allItems.length + ' พร้อมแล้ว';
+}
+
+$('#hike-checklist').addEventListener('change', (event) => {
+  const input = event.target.closest('input[data-check-id]');
+  if (!input) return;
+  hikeChecklist[input.dataset.checkId] = input.checked;
+  persistAll();
+  renderHikeChecklist();
+});
+
+$('#reset-hike-checklist').addEventListener('click', () => {
+  hikeChecklist = {};
+  persistAll();
+  renderHikeChecklist();
+});
+
+renderHikeChecklist();
+
+/* ============ Mt. Issaikyo live weather ============ */
+const HIKE_DATE = '2026-10-24';
+const WEATHER_CACHE_KEY = 'jt26_hike_weather';
+const WEATHER_CACHE_MS = 6 * 60 * 60 * 1000;
+const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?latitude=37.7232&longitude=140.2542&elevation=1600&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max,sunrise,sunset&temperature_unit=celsius&wind_speed_unit=kmh&timezone=Asia%2FTokyo&forecast_days=16';
+
+function describeWeather(code) {
+  if (code === 0) return { symbol: '☀', label: 'ท้องฟ้าโปร่ง' };
+  if (code <= 2) return { symbol: '◐', label: 'มีเมฆบางส่วน' };
+  if (code === 3) return { symbol: '☁', label: 'เมฆมาก' };
+  if (code === 45 || code === 48) return { symbol: '≋', label: 'หมอก' };
+  if (code >= 51 && code <= 67) return { symbol: '☂', label: 'ฝน' };
+  if (code >= 71 && code <= 77) return { symbol: '✳', label: 'หิมะ' };
+  if (code >= 80 && code <= 82) return { symbol: '☂', label: 'ฝนเป็นช่วง' };
+  if (code >= 85 && code <= 86) return { symbol: '✳', label: 'หิมะเป็นช่วง' };
+  if (code >= 95) return { symbol: 'ϟ', label: 'พายุฝนฟ้าคะนอง' };
+  return { symbol: '○', label: 'สภาพอากาศเปลี่ยนแปลง' };
+}
+
+function weatherAdvice(code, rainChance, gust) {
+  if (code >= 71 || code >= 95 || gust >= 50 || rainChance >= 70) {
+    return 'เงื่อนไขมีความเสี่ยงสูง: เตรียมใช้ Plan B หรือยกเลิก และถาม Visitor Center ก่อนออกเดิน';
+  }
+  if (gust >= 35 || rainChance >= 40 || code >= 51) {
+    return 'ควรประเมินอีกครั้งที่ Jododaira: ทางเปียกและลมบนยอดอาจรุนแรงกว่าค่าพยากรณ์';
+  }
+  return 'แนวโน้มยังพอใช้ได้ แต่ต้องเช็คสภาพทาง ลม และประกาศภูเขาไฟอีกครั้งในเช้าวันเดิน';
+}
+
+function formatWeatherUpdate(timestamp) {
+  return new Date(timestamp).toLocaleString('th-TH', {
+    timeZone: 'Asia/Tokyo', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+  }) + ' JST';
+}
+
+function renderHikeWeather(data, fetchedAt) {
+  const content = $('#hike-weather-content');
+  $('#weather-updated').textContent = 'อัปเดต ' + formatWeatherUpdate(fetchedAt);
+  const current = data.current || {};
+  const currentCondition = describeWeather(current.weather_code);
+  const targetIndex = data.daily && data.daily.time ? data.daily.time.indexOf(HIKE_DATE) : -1;
+
+  if (targetIndex < 0) {
+    const tripTime = Date.parse(HIKE_DATE + 'T00:00:00+09:00');
+    const tripPassed = Date.now() > tripTime + 86400000;
+    const daysToTrip = Math.max(0, Math.ceil((tripTime - Date.now()) / 86400000));
+    const daysToWindow = Math.max(0, daysToTrip - 16);
+    const liveNow = Number.isFinite(current.temperature_2m)
+      ? '<div class="weather-now"><span>ตอนนี้ ' + Math.round(current.temperature_2m) + '°C</span><span>' +
+        currentCondition.label + '</span><span>ลม ' + Math.round(current.wind_speed_10m || 0) + ' km/h</span><span>กระโชก ' +
+        Math.round(current.wind_gusts_10m || 0) + ' km/h</span></div>'
+      : '';
+    content.innerHTML =
+      '<div class="weather-waiting">' +
+        '<div class="weather-countdown"><strong>' + (tripPassed ? '—' : daysToWindow) + '</strong><span>' +
+          (tripPassed ? 'ทริปนี้ผ่านไปแล้ว' : 'วันจนเริ่มเห็นพยากรณ์') + '</span></div>' +
+        '<div class="weather-wait-copy"><h4>' +
+          (tripPassed ? 'ข้อมูลพยากรณ์ย้อนหลังไม่แสดงในแผงนี้' : 'ยังไม่ถึงช่วงพยากรณ์ 16 วัน') +
+        '</h4><p>' +
+          (tripPassed ? 'แผงนี้จะแสดงเฉพาะ forecast ก่อนวันเดินเขา' : 'ข้อมูลวันที่ 24 ต.ค. ควรเริ่มแสดงอัตโนมัติประมาณ 8 ต.ค. 2026') +
+        '</p>' + liveNow + '</div>' +
+      '</div>';
+    return;
+  }
+
+  const daily = data.daily;
+  const at = (key) => daily[key] && daily[key][targetIndex];
+  const code = at('weather_code');
+  const condition = describeWeather(code);
+  const maxTemp = Math.round(at('temperature_2m_max'));
+  const minTemp = Math.round(at('temperature_2m_min'));
+  const feelsMin = Math.round(at('apparent_temperature_min'));
+  const rainChance = Math.round(at('precipitation_probability_max') || 0);
+  const rainSum = Number(at('precipitation_sum') || 0).toFixed(1);
+  const wind = Math.round(at('wind_speed_10m_max') || 0);
+  const gust = Math.round(at('wind_gusts_10m_max') || 0);
+  const sunrise = String(at('sunrise') || '').slice(11,16);
+  const sunset = String(at('sunset') || '').slice(11,16);
+
+  content.innerHTML =
+    '<div class="weather-forecast">' +
+      '<div class="weather-primary"><div class="weather-symbol" aria-hidden="true">' + condition.symbol + '</div>' +
+        '<div><div class="weather-temp">' + minTemp + '–' + maxTemp + '°C</div><div class="weather-condition">' + condition.label + ' · รู้สึกต่ำสุด ' + feelsMin + '°C</div></div></div>' +
+      '<div class="weather-stats">' +
+        '<div class="weather-stat"><span>โอกาสฝนสูงสุด</span><strong>' + rainChance + '%</strong></div>' +
+        '<div class="weather-stat"><span>ปริมาณฝน</span><strong>' + rainSum + ' mm</strong></div>' +
+        '<div class="weather-stat"><span>ลมสูงสุด</span><strong>' + wind + ' km/h</strong></div>' +
+        '<div class="weather-stat"><span>ลมกระโชก</span><strong>' + gust + ' km/h</strong></div>' +
+        '<div class="weather-stat"><span>พระอาทิตย์ขึ้น</span><strong>' + sunrise + '</strong></div>' +
+        '<div class="weather-stat"><span>พระอาทิตย์ตก</span><strong>' + sunset + '</strong></div>' +
+      '</div>' +
+      '<div class="weather-advice"><strong>ประเมินเบื้องต้น:</strong> ' + esc(weatherAdvice(code, rainChance, gust)) + '</div>' +
+    '</div>';
+}
+
+async function loadHikeWeather(force) {
+  const refreshButton = $('#refresh-weather-btn');
+  const cached = store.load(WEATHER_CACHE_KEY, null);
+  if (cached && cached.data) renderHikeWeather(cached.data, cached.fetchedAt);
+
+  if (!force && cached && Date.now() - cached.fetchedAt < WEATHER_CACHE_MS) return;
+  refreshButton.classList.add('loading');
+  refreshButton.disabled = true;
+
+  try {
+    const response = await fetch(WEATHER_URL);
+    if (!response.ok) throw new Error('Weather API returned ' + response.status);
+    const data = await response.json();
+    const weatherCache = { data, fetchedAt: Date.now() };
+    store.save(WEATHER_CACHE_KEY, weatherCache);
+    renderHikeWeather(data, weatherCache.fetchedAt);
+  } catch (error) {
+    if (!cached || !cached.data) {
+      $('#weather-updated').textContent = 'อัปเดตไม่สำเร็จ';
+      $('#hike-weather-content').innerHTML =
+        '<p class="weather-error">โหลดพยากรณ์ไม่ได้ในขณะนี้ กรุณาตรวจอินเทอร์เน็ตแล้วกดปุ่มอัปเดตอีกครั้ง</p>';
+    }
+  } finally {
+    refreshButton.classList.remove('loading');
+    refreshButton.disabled = false;
+  }
+}
+
+$('#refresh-weather-btn').addEventListener('click', () => loadHikeWeather(true));
+loadHikeWeather(false);
 
 /* ============ transport ============ */
 let transportBound = false;

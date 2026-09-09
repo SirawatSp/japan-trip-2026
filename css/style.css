@@ -170,6 +170,24 @@ body {
   border-left: 6px solid var(--accent); padding-left: .8rem; line-height: 1.25;
 }
 .section-desc { color: var(--ink-soft); margin-top: .45rem; padding-left: 1.1rem; font-size: .95rem; }
+.section-head-with-action { padding-right: 15rem; min-height: 52px; }
+.section-collapse-button {
+  position: absolute; top: .05rem; right: 0; z-index: 1;
+  min-height: 38px; display: inline-flex; align-items: center; gap: .55rem;
+  max-width: 14rem; padding: .42rem .72rem; border: 1px solid var(--line); border-radius: 6px;
+  background: rgba(255, 253, 247, .72); color: var(--ink-soft);
+  font-family: var(--font-body); font-size: .76rem; font-weight: 700; cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.section-collapse-button:hover { border-color: var(--ink); background: var(--card); color: var(--ink); }
+.section-collapse-button:focus-visible { outline: 3px solid rgba(217, 123, 41, .32); outline-offset: 2px; }
+.collapse-chevron {
+  width: 8px; height: 8px; flex: 0 0 auto; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px); transition: transform .18s;
+}
+.section-collapse-button[aria-expanded="false"] .collapse-chevron { transform: rotate(-45deg) translate(-1px, -1px); }
+.collapsible-panel[hidden] { display: none !important; }
+
 .sub-head { margin: 2.2rem 0 .9rem; font-size: 1.15rem; }
 
 .card {
@@ -411,6 +429,7 @@ body {
 .map-layout {
   display: grid; grid-template-columns: 1fr 320px; gap: 1rem; align-items: stretch;
 }
+
 #leaflet-map {
   height: 560px; border-radius: 14px; border: 1.5px solid var(--ink);
   box-shadow: var(--shadow); z-index: 1;
@@ -532,8 +551,6 @@ body {
 .pass-note p { font-size: .92rem; color: var(--ink-soft); }
 
 /* ---------- hike ---------- */
-.section-hike > .section-head,
-.section-hike > .hike-grid { display: none; }
 .hike-v2 { display: block; }
 .section-hike .section-head h2 { border-left-color: var(--fukushima); }
 .hike-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 1rem; }
@@ -545,7 +562,7 @@ body {
 .hike-facts span { display: block; font-size: .72rem; color: var(--ink-soft); }
 .hike-facts strong { display: block; margin-top: .12rem; font-family: var(--font-mono); font-size: 1rem; }
 .hike-grid-main { align-items: start; }
-.hike-grid-detail { grid-template-columns: 1fr 1fr; margin-top: 1rem; }
+.hike-grid-detail { grid-template-columns: 1fr 1fr; align-items: start; margin-top: 1rem; }
 .hike-side { display: grid; gap: 1rem; }
 .hike-card-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
 .eyebrow { display: block; margin-bottom: .25rem; font-family: var(--font-mono); font-size: .68rem; font-weight: 700; color: var(--fukushima); }
@@ -580,6 +597,239 @@ body {
 .mini-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
 .mini-table td { padding: .35rem 0; border-bottom: 1px dashed var(--line); }
 .mini-table td:last-child { text-align: right; font-weight: 600; }
+
+
+.hike-actions {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .55rem;
+  margin: 0 0 1rem;
+}
+.hike-map-button, .hike-source-link {
+  min-height: 38px; display: inline-flex; align-items: center; gap: .45rem;
+  border-radius: 6px; padding: .42rem .8rem;
+  font-family: var(--font-body); font-size: .78rem; font-weight: 700;
+  cursor: pointer; text-decoration: none; transition: border-color .15s, background .15s, color .15s;
+}
+.hike-map-button {
+  border: 1px solid var(--fukushima); background: var(--fukushima); color: #fff;
+}
+.hike-map-button:hover { background: #304a38; }
+.hike-map-button span { font-size: 1.05rem; line-height: 1; }
+.hike-source-link {
+  border: 1px solid var(--line); background: rgba(255, 253, 247, .55); color: var(--ink-soft);
+}
+.hike-source-link:hover { border-color: var(--accent-warm); color: var(--ink); background: var(--card); }
+.hike-route-chip { --route-color: var(--accent-warm); }
+.hike-route-chip:has(input:checked) { border-color: var(--route-color); color: #9a521b; background: rgba(217, 123, 41, .12); }
+.hike-waypoint-label {
+  font-family: var(--font-body); font-size: .72rem; font-weight: 700;
+  background: var(--ink); color: #fff; border: 0; border-radius: 4px;
+  box-shadow: none; padding: .18rem .45rem;
+}
+.hike-waypoint-label::before { border-top-color: var(--ink); }
+
+.hike-map-button-secondary {
+  border-color: var(--line); background: rgba(255, 253, 247, .55); color: var(--ink);
+}
+.hike-map-button-secondary:hover { border-color: var(--fukushima); background: var(--card); color: var(--fukushima); }
+.cube-icon {
+  width: 13px; height: 13px; border: 1.5px solid currentColor; display: inline-block;
+  transform: rotate(30deg) skew(-4deg, -4deg); position: relative;
+}
+.cube-icon::after {
+  content: ""; position: absolute; inset: 2px -4px -4px 2px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+}
+
+/* Immersive hiking terrain: deliberately unframed, like a field map table. */
+.hike-terrain { margin: 0 0 1.25rem; }
+.terrain-viewer {
+  position: relative; height: 620px; overflow: hidden; isolation: isolate;
+  background: #17251d; border-top: 3px solid var(--ink); border-bottom: 1px solid rgba(255,255,255,.28);
+}
+#hike-terrain-canvas, #hike-terrain-map-2d { position: absolute; inset: 0; width: 100%; height: 100%; }
+#hike-terrain-canvas { display: block; touch-action: none; cursor: grab; }
+#hike-terrain-canvas:active { cursor: grabbing; }
+#hike-terrain-map-2d { z-index: 1; display: none; background: #17251d; }
+.terrain-viewer[data-view="2d"] #hike-terrain-map-2d .leaflet-top { top: 82px; }
+.terrain-viewer[data-view="2d"] #hike-terrain-canvas,
+.terrain-viewer[data-view="2d"] .terrain-label-layer { display: none; }
+.terrain-viewer[data-view="2d"] #hike-terrain-map-2d { display: block; }
+.terrain-label-layer { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.terrain-label {
+  position: absolute; display: flex; align-items: center; gap: .36rem;
+  transform: translate(-50%, -100%); color: #fff; white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0,0,0,.9); will-change: transform;
+}
+.terrain-label::before {
+  content: ""; width: 7px; height: 7px; flex: 0 0 auto; background: #8cff74;
+  border: 2px solid #fff; border-radius: 50%; box-shadow: 0 1px 5px rgba(0,0,0,.8);
+}
+.terrain-label strong {
+  display: inline-block; padding: .14rem .36rem; border-radius: 3px;
+  background: rgba(16, 24, 19, .78); font-size: .68rem; line-height: 1.25; font-weight: 700;
+}
+.terrain-label small { margin-left: .2rem; color: #dbe7dc; font-family: var(--font-jp); font-size: .62rem; }
+.terrain-label.is-summit::before { width: 10px; height: 10px; background: #f3a34b; }
+.terrain-label.is-detail { z-index: 2; }
+.terrain-topbar {
+  position: absolute; z-index: 5; inset: 0 0 auto; min-height: 82px;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
+  padding: 1rem 1.1rem; color: #fff; pointer-events: none;
+  background: rgba(14, 22, 17, .72); border-bottom: 1px solid rgba(255,255,255,.16);
+}
+.terrain-topbar h3 { font-size: 1.15rem; line-height: 1.3; letter-spacing: 0; }
+.terrain-topbar h3 .jp { margin-left: .25rem; color: #dce8dd; font-size: .9em; }
+.terrain-kicker {
+  display: block; margin-bottom: .18rem; color: #c8e7be;
+  font-family: var(--font-mono); font-size: .63rem; font-weight: 600; letter-spacing: .08em;
+}
+.terrain-view-switch {
+  display: grid; grid-template-columns: repeat(2, 48px); padding: 3px;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.34); border-radius: 5px;
+  pointer-events: auto;
+}
+.terrain-view-switch button {
+  min-height: 34px; border: 0; border-radius: 3px; background: transparent; color: #e4ece5;
+  font-family: var(--font-mono); font-size: .72rem; font-weight: 700; cursor: pointer;
+}
+.terrain-view-switch button:hover { background: rgba(255,255,255,.12); }
+.terrain-view-switch button.active { background: #f8f3e8; color: #213228; }
+.terrain-loading {
+  position: absolute; z-index: 6; inset: 50% auto auto 50%; transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: .65rem; padding: .65rem .85rem;
+  background: rgba(17, 26, 20, .86); color: #f4f0e6; border: 1px solid rgba(255,255,255,.22);
+  font-size: .76rem; pointer-events: none;
+}
+.terrain-loading[hidden] { display: none; }
+.terrain-loading-mark {
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.28); border-top-color: #8cff74;
+  border-radius: 50%; animation: weather-spin .8s linear infinite;
+}
+.terrain-guide {
+  position: absolute; z-index: 4; left: 1rem; bottom: 4.4rem;
+  display: flex; align-items: center; gap: .55rem; padding: .46rem .65rem;
+  background: rgba(18, 27, 21, .78); border-left: 3px solid #8cff74; color: #eef4ed;
+  font-size: .68rem; pointer-events: none;
+}
+.terrain-guide strong { font-family: var(--font-mono); color: #8cff74; }
+.terrain-reset {
+  position: absolute; z-index: 5; right: 1rem; top: 96px; width: 40px; height: 40px;
+  border: 1px solid rgba(255,255,255,.4); border-radius: 50%; background: rgba(18, 27, 21, .76);
+  color: #fff; font-size: 1.15rem; line-height: 1; cursor: pointer;
+}
+.terrain-reset:hover { background: #f8f3e8; color: #213228; }
+.terrain-readout {
+  position: absolute; z-index: 4; left: 1rem; bottom: 1rem;
+  display: flex; background: rgba(18, 27, 21, .82); border: 1px solid rgba(255,255,255,.2); color: #fff;
+}
+.terrain-readout div { min-width: 90px; padding: .42rem .65rem; border-right: 1px solid rgba(255,255,255,.18); }
+.terrain-readout div:last-child { border-right: 0; }
+.terrain-readout span { display: block; color: #b8c9bb; font-family: var(--font-mono); font-size: .52rem; }
+.terrain-readout strong { display: block; font-family: var(--font-mono); font-size: .75rem; }
+.terrain-attribution {
+  position: absolute; z-index: 4; right: .45rem; bottom: .3rem; max-width: 48%;
+  color: rgba(255,255,255,.72); font-size: .49rem; text-align: right; text-shadow: 0 1px 3px #000;
+}
+.terrain-caption {
+  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+  padding: .75rem 1rem; border-bottom: 1px solid var(--line); background: var(--paper-deep);
+  color: var(--ink-soft); font-size: .72rem;
+}
+.terrain-caption p { max-width: 820px; }
+.terrain-caption strong { color: var(--ink); }
+#terrain-source-status {
+  flex: 0 0 auto; font-family: var(--font-mono); font-size: .6rem; color: var(--fukushima);
+}
+.terrain-viewer[data-view="2d"] .terrain-guide,
+.terrain-viewer[data-view="2d"] .terrain-reset,
+.terrain-viewer[data-view="2d"] .terrain-loading { display: none; }
+.terrain-viewer[data-view="2d"] .terrain-readout { z-index: 510; }
+.terrain-viewer[data-view="2d"] .terrain-attribution { display: none; }
+#hike-terrain-map-2d .leaflet-control-attribution { font-size: 8px; }
+
+.hike-weather {
+  margin-bottom: 1rem; padding: 1.15rem 1.25rem 1rem;
+  background: #26382f; color: #f9f4e9; border: 1px solid #17241d;
+  box-shadow: 0 12px 30px -18px rgba(20, 31, 24, .8);
+}
+.weather-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+  padding-bottom: .8rem; border-bottom: 1px solid rgba(255,255,255,.16);
+}
+.weather-head .eyebrow { color: #d7a85f; }
+.weather-head h3 { font-size: 1.05rem; line-height: 1.35; }
+.weather-update { display: flex; align-items: center; gap: .55rem; color: #c7d1ca; font-size: .7rem; text-align: right; }
+.weather-refresh {
+  flex: 0 0 auto; width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.25);
+  border-radius: 50%; background: transparent; color: #fff; cursor: pointer;
+  font-size: 1.15rem; line-height: 1; transition: background .15s, transform .2s;
+}
+.weather-refresh:hover { background: rgba(255,255,255,.1); }
+.weather-refresh.loading { animation: weather-spin .8s linear infinite; }
+@keyframes weather-spin { to { transform: rotate(360deg); } }
+.weather-content { min-height: 148px; display: flex; align-items: stretch; }
+.weather-loading { width: 100%; display: grid; grid-template-columns: 1.3fr repeat(2, 1fr); gap: 1px; background: rgba(255,255,255,.12); }
+.weather-loading span { min-height: 120px; background: linear-gradient(110deg, #2c4136 20%, #385044 35%, #2c4136 50%); background-size: 200% 100%; animation: weather-shimmer 1.3s linear infinite; }
+@keyframes weather-shimmer { to { background-position-x: -200%; } }
+.weather-waiting {
+  width: 100%; display: grid; grid-template-columns: minmax(180px, .75fr) minmax(260px, 1.25fr);
+  align-items: center; gap: 1.4rem; padding: 1.2rem 0 .55rem;
+}
+.weather-countdown { display: flex; align-items: baseline; gap: .6rem; }
+.weather-countdown strong { font-family: var(--font-mono); font-size: 2.6rem; line-height: 1; color: #f0c070; }
+.weather-countdown span { color: #c7d1ca; font-size: .82rem; }
+.weather-wait-copy h4 { font-size: 1rem; margin-bottom: .25rem; }
+.weather-wait-copy p { color: #c7d1ca; font-size: .82rem; }
+.weather-now {
+  margin-top: .65rem; display: flex; flex-wrap: wrap; gap: .4rem .85rem;
+  font-family: var(--font-mono); font-size: .72rem; color: #f5d69e;
+}
+.weather-forecast {
+  width: 100%; display: grid; grid-template-columns: minmax(180px, .75fr) minmax(0, 1.4fr);
+  align-items: center; gap: 1.3rem; padding: 1rem 0 .45rem;
+}
+.weather-primary { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .8rem; }
+.weather-symbol { font-size: 3rem; line-height: 1; }
+.weather-condition { font-size: .8rem; color: #c7d1ca; }
+.weather-temp { font-family: var(--font-mono); font-size: 2rem; line-height: 1.2; color: #f0c070; }
+.weather-stats { display: grid; grid-template-columns: repeat(3, 1fr); border-left: 1px solid rgba(255,255,255,.16); }
+.weather-stat { padding: .35rem .8rem; border-right: 1px solid rgba(255,255,255,.16); }
+.weather-stat span { display: block; color: #c7d1ca; font-size: .68rem; }
+.weather-stat strong { display: block; margin-top: .12rem; font-family: var(--font-mono); font-size: .86rem; }
+.weather-advice {
+  grid-column: 1 / -1; margin-top: .25rem; padding: .55rem .7rem;
+  border-left: 3px solid #f0c070; background: rgba(255,255,255,.06); font-size: .76rem;
+}
+.weather-error { align-self: center; color: #f5d69e; font-size: .84rem; padding: 1rem 0; }
+.weather-context { margin-top: .6rem; color: #aebcb3; font-size: .7rem; }
+
+.checklist-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
+.checklist-reset {
+  border: 0; background: transparent; color: var(--ink-soft); cursor: pointer;
+  font-family: var(--font-body); font-size: .72rem; text-decoration: underline;
+}
+.checklist-progress { height: 6px; margin: .15rem 0 .25rem; background: var(--paper-deep); overflow: hidden; }
+.checklist-progress span { display: block; width: 0; height: 100%; background: var(--fukushima); transition: width .25s; }
+.checklist-count { font-family: var(--font-mono); font-size: .68rem; color: var(--ink-soft); margin-bottom: .65rem; }
+.hike-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.2rem; }
+.checklist-group h4 {
+  padding-bottom: .3rem; margin-bottom: .2rem; border-bottom: 1px solid var(--line);
+  font-size: .77rem; color: var(--fukushima);
+}
+.checklist-item {
+  display: grid; grid-template-columns: 1.1rem 1fr; gap: .5rem; align-items: start;
+  padding: .35rem 0; cursor: pointer;
+}
+.checklist-item input { width: 1rem; height: 1rem; margin-top: .22rem; accent-color: var(--fukushima); cursor: pointer; }
+.checklist-item strong { display: block; font-size: .78rem; font-weight: 650; line-height: 1.35; }
+.checklist-item small { display: block; color: var(--ink-soft); font-size: .68rem; line-height: 1.4; }
+.checklist-item:has(input:checked) strong { text-decoration: line-through; color: var(--ink-soft); }
+.checklist-source { margin-top: .75rem; padding-top: .55rem; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: .68rem; }
+.checklist-source a { color: var(--fukushima); font-weight: 700; text-decoration: none; }
+
+@media (max-width: 620px) {
+  .terrain-label.is-detail { display: none; }
+}
 
 /* ---------- events ---------- */
 .event-grid {
@@ -716,8 +966,11 @@ body {
   .map-layout { grid-template-columns: 1fr; }
   .place-list { max-height: 300px; }
   .hike-grid { grid-template-columns: 1fr; }
+  .terrain-viewer { height: 540px; }
   .hike-facts { grid-template-columns: 1fr 1fr; }
   .hike-grid-detail { grid-template-columns: 1fr; }
+  .weather-waiting, .weather-forecast { grid-template-columns: 1fr; }
+  .weather-stats { border-left: 0; }
   .hike-card-head { display: block; }
   .route-pill { display: inline-block; margin-bottom: .7rem; }
   .add-form { grid-template-columns: 1fr 1fr; }
@@ -887,3 +1140,33 @@ body {
 .day-cost .thb, .o-price .thb, .fare-num .thb, .b-nums .thb, .s-price .thb { font-size: .74rem; }
 .b-plan-thb { display: block; font-size: .72rem; text-align: right; margin-top: 2px; }
 .mini-table .thb { font-size: .76rem; }
+@media (max-width: 620px) {
+  .section-head-with-action { padding-right: 0; }
+  .section-collapse-button { position: static; max-width: 100%; margin: .8rem 0 0 1.1rem; }
+  .hike-actions { align-items: stretch; }
+  .terrain-viewer { height: 500px; }
+  .terrain-topbar { min-height: 78px; padding: .85rem; }
+  .terrain-topbar h3 { font-size: .96rem; }
+  .terrain-kicker { font-size: .55rem; letter-spacing: .04em; }
+  .terrain-view-switch { grid-template-columns: repeat(2, 42px); }
+  .terrain-reset { right: .7rem; top: 90px; }
+  .terrain-label small { display: none; }
+  .terrain-label strong { font-size: .6rem; }
+  .terrain-guide { left: .7rem; right: .7rem; bottom: 5.2rem; }
+  .terrain-guide span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .terrain-readout { left: .7rem; bottom: 1.2rem; }
+  .terrain-readout div { min-width: 72px; padding: .35rem .5rem; }
+  .terrain-attribution { right: .3rem; bottom: .2rem; max-width: 52%; font-size: .42rem; }
+  .terrain-caption { display: block; }
+  #terrain-source-status { display: block; margin-top: .3rem; }
+  .hike-map-button, .hike-source-link { justify-content: center; width: 100%; }
+  .weather-head { align-items: flex-start; }
+  .weather-update { max-width: 130px; }
+  .weather-content { min-height: 210px; }
+  .weather-waiting { gap: .8rem; }
+  .weather-stats { grid-template-columns: 1fr 1fr; }
+  .weather-stat { padding: .45rem .55rem; border-top: 1px solid rgba(255,255,255,.16); }
+  .weather-advice { grid-column: 1 / -1; }
+  .hike-checklist { grid-template-columns: 1fr; }
+  .hike-facts div { padding: .65rem .7rem; }
+}
