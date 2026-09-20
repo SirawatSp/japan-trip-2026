@@ -659,6 +659,7 @@ function placeMatches(p) {
     ? (includesNationwide ? true : p.area !== 'other')
     : p.area === activeArea;
   const typeOk = activeType === 'all'
+    || (activeType === 'architecture' && p.architecture === true)
     || (activeType === 'museum' && p.type === 'museum')
     || (activeType === 'taniguchi' && p.taniguchi === true)
     || (activeType === 'stay' && p.type === 'stay')
@@ -708,7 +709,7 @@ function renderPlaceList() {
     <div class="place-item" data-area="${p.area}" data-lat="${p.lat}" data-lng="${p.lng}">
       ${p.img ? `<img class="place-thumb" src="${esc(p.img)}" alt="" loading="lazy">` : ''}
       <div class="place-item-body">
-        <div class="p-name">${esc(placeName(p))} <span class="popup-ja">${esc(p.ja)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️</span>' : ''}</div>
+        <div class="p-name">${esc(placeName(p))} <span class="popup-ja">${esc(p.ja)}</span>${p.architecture ? ' <span class="popup-tag">📐</span>' : ''}${p.type === 'museum' ? ' <span class="popup-tag">🏛</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️</span>' : ''}</div>
         <div class="p-meta">${dayLabel(p)} · ${areaLabel(p.area)} — ${esc(placeDesc(p))}</div>
         ${placeTicket(p) ? `<div class="p-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
         <a class="p-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${p.url ? mt('official') : mt('search')} ↗</a>
@@ -730,6 +731,8 @@ $('#hike-route-toggle').addEventListener('change', refreshMap);
 /* ---------- map language switch (EN ⇄ ไทย) ---------- */
 function applyMapLang() {
   const ui = MAP_UI[mapLang];
+  const architectureChip = $('#type-filters [data-type="architecture"]');
+  if (architectureChip) architectureChip.textContent = ui.architecture;
   document.querySelector('#map .section-desc').textContent = ui.sectionDesc;
   $('#map-filters [data-filter="all"]').textContent = ui.all;
   const otherChip = $('#map-filters [data-filter="other"]');
