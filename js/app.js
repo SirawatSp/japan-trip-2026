@@ -1088,6 +1088,10 @@ function renderTransport() {
           <button class="btn-mini" data-seg="${si}" data-opt="${oi}">＋งบ</button>
         </div>`).join('')}
       </div>
+      ${seg.links?.length ? `<div class="seg-links" aria-label="แหล่งข้อมูล">
+        <span>ตรวจข้อมูล:</span>
+        ${seg.links.map((link) => `<a href="${esc(link.url)}" target="_blank" rel="noopener">${esc(link.label)} ↗</a>`).join('')}
+      </div>` : ''}
     </div>`).join('');
 
   { const el = $('#rail-total'); if (el) el.innerHTML = yenThb(RAIL_MAIN_TOTAL); }
