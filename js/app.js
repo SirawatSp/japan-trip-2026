@@ -601,6 +601,7 @@ const searchUrl = (p) => (mapLang === 'en'
   ? `https://www.google.com/search?q=${encodeURIComponent(placeName(p) + ' Japan')}&hl=en`
   : `https://www.google.com/search?q=${encodeURIComponent(p.name + ' ' + p.ja)}`);
 const gmapsUrl = (p) => `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}&hl=${mapLang}`;
+const placeLinkLabel = (p) => (p.linkKind === 'guide' ? mt('guide') : p.url ? mt('official') : mt('search'));
 
 function popupHtml(p) {
   return `
@@ -612,7 +613,7 @@ function popupHtml(p) {
     ${placeTicket(p) ? `<div class="popup-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
     ${p.pinnedByUser ? '<div class="popup-pinned">📍 หมุดนี้คือตำแหน่งที่พักจริงที่ปักไว้เอง</div>' : ''}
     ${p.type === 'stay' ? stayPopupBlock(p) : ''}
-    <a class="popup-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener">${p.url ? mt('official') : mt('search')} ↗</a>
+    <a class="popup-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener">${placeLinkLabel(p)} ↗</a>
     <a class="popup-link" href="${esc(gmapsUrl(p))}" target="_blank" rel="noopener">${mt('directions')} ↗</a>`;
 }
 
@@ -712,7 +713,7 @@ function renderPlaceList() {
         <div class="p-name">${esc(placeName(p))} <span class="popup-ja">${esc(p.ja)}</span>${p.architecture ? ' <span class="popup-tag">📐</span>' : ''}${p.type === 'museum' ? ' <span class="popup-tag">🏛</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️</span>' : ''}</div>
         <div class="p-meta">${dayLabel(p)} · ${areaLabel(p.area)} — ${esc(placeDesc(p))}</div>
         ${placeTicket(p) ? `<div class="p-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
-        <a class="p-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${p.url ? mt('official') : mt('search')} ↗</a>
+        <a class="p-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${placeLinkLabel(p)} ↗</a>
         <a class="p-link" href="${esc(gmapsUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${mt('directions')} ↗</a>
       </div>
     </div>`).join('') || `<p class="empty-note">${mt('empty')}</p>`;
