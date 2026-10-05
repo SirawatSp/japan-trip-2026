@@ -44,6 +44,7 @@ const MAP_UI = {
     empty: 'ไม่มีสถานที่ตามตัวกรองนี้',
     outsideTrip: 'นอกแผนทริป',
     official: 'เว็บทางการ', guide: 'คู่มือสถาปัตยกรรม', search: 'ค้นหา', directions: 'เปิดใน Google Maps',
+    accessOpen: 'เข้าภายในได้', accessPartial: 'เข้าบางพื้นที่', accessExterior: 'ชมภายนอก', accessClosed: 'ปิดถาวร',
     stayNights: 'คืน', stayNoPrice: 'ยังไม่ได้กรอกราคา', stayBook: 'เปิดใน Airbnb', stayPerPerson: '/คน/คืน',
   },
   en: {
@@ -54,6 +55,7 @@ const MAP_UI = {
     empty: 'No places match this filter',
     outsideTrip: 'Not on the trip route',
     official: 'Official site', guide: 'Architecture guide', search: 'Search', directions: 'Open in Google Maps',
+    accessOpen: 'Interior open', accessPartial: 'Limited access', accessExterior: 'Exterior only', accessClosed: 'Permanently closed',
     stayNights: 'nights', stayNoPrice: 'no price entered yet', stayBook: 'Open in Airbnb', stayPerPerson: '/person/night',
   },
 };
@@ -1091,6 +1093,33 @@ CAR_RENTALS.forEach((r) => PLACES.push({
   desc: `🚗 จุดรับรถสำหรับวันทะเลสาบ/วันเดินเขา — ${r.note} · หมุดโดยประมาณจากคำอธิบายทางเดินของสาขา`,
   en: { name: r.ja, ticket: r.walk, desc: '🚗 Pick-up point for the lakes and hiking days · pin position approximated from the branch\'s walking directions' },
 }));
+
+// Visitor access concerns the specific public route, not unrestricted entry to the whole building.
+const ARCHITECTURE_ACCESS = {
+  'Matsugamine Catholic Church': { kind: 'open', th: 'ทางการระบุว่าเข้าชมโบสถ์และบริเวณได้; งดรบกวนพิธีมิสซา', en: 'Church and grounds are open to visitors; do not interrupt Mass.', url: 'https://www.utsunomiya-cvb.org/spot/detail_10006.html' },
+  'Tamozawa Imperial Villa': { kind: 'open', th: 'ซื้อตั๋วเข้าชมห้องที่เปิดให้ชม; ไม่ใช่ทุกห้องในพระตำหนัก', en: 'Ticketed visitor route through the villa; not every room is open.', url: 'https://www.nikko-kankou.org/public/spot/18' },
+  'Italian Embassy Villa — Antonin Raymond': { kind: 'open', th: 'ซื้อตั๋วเข้าชมอาคารที่บูรณะและระเบียงริมทะเลสาบ', en: 'Ticketed access to the restored villa and lakeside veranda.', url: 'https://www.nikko-nsm.co.jp/th/italy.html' },
+  'Fukushima City Minka-en': { kind: 'partial', th: 'เดินชมพิพิธภัณฑ์กลางแจ้งและอาคารที่เปิดแสดง; เคารพส่วนที่กั้นไว้', en: 'Open-air museum and displayed houses; respect closed-off rooms.', url: 'https://fukushima.travel/destination/fukushima-city-minka-en-open-air-museum/124' },
+  'Former Horikiri Residence — Iizaka': { kind: 'partial', th: 'เข้าชมตัวบ้านและพื้นที่จัดแสดงฟรี; ห้องที่มีการใช้กิจกรรมอาจปิด', en: 'Free visitor access to the estate; rooms booked for activities may be closed.', url: 'https://kyu-horikiritei.fckk.co.jp/guide/' },
+  'Tokyo International Forum': { kind: 'partial', th: 'โถงกระจก พลาซ่า และทางเชื่อมเปิด 07:00–23:30; ห้ามเข้าห้องประชุม/พื้นที่เช่าเอง', en: 'Glass Building, plaza and concourse open 07:00–23:30; rental halls and meeting rooms are off-limits without an event.', url: 'https://www.t-i-forum.co.jp/en/contact/faq/' },
+  'SunnyHills Minami-Aoyama': { kind: 'open', th: 'เข้าชมร้านขนมและโครงไม้ด้านในได้ช่วงเปิดร้าน 11:00–19:00', en: 'Enter the shop and see the timber structure during store hours, 11:00–19:00.', url: 'https://shop.sunnyhills.co.jp/pages/stores' },
+  'Prada Aoyama': { kind: 'open', th: 'เข้าภายในได้ในฐานะลูกค้าร้าน 11:00–20:00; ไม่ใช่ทัวร์สถาปัตยกรรม', en: 'Enter as a shop visitor 11:00–20:00; no architecture tour.', url: 'https://www.prada.com/us/en/store-locator/japan/prada_tokyo_aoyama/S443.html' },
+  'Dior Omotesando': { kind: 'open', th: 'เข้าภายในได้ในฐานะลูกค้าร้าน 11:00–20:00; ส่วนหลังร้านไม่เปิด', en: 'Enter the boutique 11:00–20:00; back-of-house areas are private.', url: 'https://www.dior.com/fashion/stores/en_sg/japan/shibuya-ku/jingumae-5-9-11' },
+  'Ginza Place': { kind: 'partial', th: 'เข้าโซนร้านและร้านอาหารได้ตามเวลาแต่ละร้าน; ชั้นสมาชิก/สำนักงานไม่ใช่พื้นที่ท่องเที่ยว', en: 'Retail and restaurants follow individual hours; member-only and office floors are not public.', url: 'https://ginzaplace.jp/access/' },
+  'Mikimoto Ginza 2': { kind: 'open', th: 'เข้าชมร้านเครื่องประดับชั้น 1–2 ได้; ทางการแจ้งปิด 20 ต.ค. 2026', en: 'Jewellery shop on floors 1–2 is open to shoppers; official closure listed for 20 Oct 2026.', url: 'https://www.mikimoto.com/jp_jp/ginza2-store' },
+  'Asakusa Culture Tourist Information Center': { kind: 'partial', th: 'ศูนย์ข้อมูลและระเบียงชมวิวชั้น 8 ฟรี (09:00–22:00); ห้องประชุมไม่เปิดเดินชม', en: 'Information areas and free 8F terrace (09:00–22:00); meeting rooms are not open for casual visits.', url: 'https://www.city.taito.lg.jp/bunka_kanko/kankoinfo/info/oyakudachi/kankocenter/a-tic-gaiyo.html' },
+  'Asahi Super Dry Hall': { kind: 'partial', th: 'เข้าร้านอาหาร Flamme d’Or ได้ในฐานะลูกค้า; Asahi Art Square ชั้น 4–5 ปิดตั้งแต่ปี 2016', en: 'Flamme d’Or restaurant floors welcome customers; 4F–5F Asahi Art Square closed in 2016.', url: 'https://www.asahiartsquare.org/ja/notice/' },
+  'Toranomon Hills Station Tower': { kind: 'partial', th: 'เข้าโถงสถานี ร้านค้า และ T-MARKET ได้; TOKYO NODE ตามงาน/ตั๋ว และชั้นสำนักงานจำกัด', en: 'Station atrium, shops and T-MARKET are public; TOKYO NODE depends on the event/ticket and offices are restricted.', url: 'https://www.toranomonhills.com/information/index.html' },
+  'Za-Koenji Theatre': { kind: 'partial', th: 'เข้าโถงและคาเฟ่ชั้น 2 ได้; ห้องแสดงต้องมีบัตรหรือเข้าร่วมกิจกรรม', en: 'Lobby and 2F cafe are public; auditoriums require a performance ticket or event access.', url: 'https://za-koenji.jp/uncategorized/1175/' },
+  'Sumida Hokusai Museum': { kind: 'open', th: 'เข้าชมนิทรรศการภายในโดยซื้อตั๋ว; ตรวจวันปิดและราคาแต่ละงาน', en: 'Ticketed museum galleries; check closing days and exhibition-specific admission.', url: 'https://hokusai-museum.jp/' },
+  '21_21 DESIGN SIGHT': { kind: 'open', th: 'เข้าชมห้องนิทรรศการได้โดยซื้อตั๋วหน้างาน; ปิดวันอังคาร/ช่วงเปลี่ยนงาน', en: 'Exhibition galleries admit walk-ins with a ticket; closed Tuesdays and during installations.', url: 'https://2121designsight.jp/en/information/' },
+  'Oya History Museum': { kind: 'open', th: 'ซื้อตั๋วลงชมเหมืองใต้ดิน; บางโซนกั้นไว้และอาจปิดชั่วคราว', en: 'Ticketed underground quarry route; some sections are restricted and temporary closures are possible.', url: 'https://www.oya909.co.jp/' },
+  'Utsunomiya Museum of Art': { kind: 'open', th: 'เข้าชมภายในได้ด้วยบัตรตามนิทรรศการ; ตรวจวันเปิดก่อนเดินทาง', en: 'Museum interior is open with exhibition admission; check the visit date.', url: 'https://u-moa.jp/' },
+  'ศาลเจ้า Toshogu': { kind: 'partial', th: 'ซื้อตั๋วเข้าพื้นที่ศาลเจ้าและส่วนที่เปิดให้สักการะ; ห้องพิธี/ส่วนปิดไม่ใช่ทางชม', en: 'Ticketed shrine grounds and designated worship route; ceremonial and closed rooms are not for touring.', url: 'https://toshogu.jp/pages/25/' },
+  'IBM Makuhari Building': { kind: 'exterior', th: 'อาคารสำนักงานเอกชน ไม่เปิดทัวร์ภายใน; ชมจากพื้นที่สาธารณะเท่านั้น', en: 'Private office building with no public interior tour; view from public streets only.', url: 'https://www.ibm.com/jp-ja/about/office' },
+  'Shiseido Art House': { kind: 'closed', th: 'ปิดถาวรตั้งแต่ 4 ก.ค. 2026; ไม่สามารถเข้าชมนิทรรศการได้', en: 'Permanently closed on 4 July 2026; no exhibition visits.', url: 'https://corp.shiseido.com/art-house/en/' },
+};
+PLACES.forEach((place) => { if (ARCHITECTURE_ACCESS[place.name]) place.visitAccess = ARCHITECTURE_ACCESS[place.name]; });
 
 /* ---------- budget categories (planned, JPY) ---------- */
 const DEFAULT_BUDGET = [

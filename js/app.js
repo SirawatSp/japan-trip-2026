@@ -602,6 +602,17 @@ const searchUrl = (p) => (mapLang === 'en'
   : `https://www.google.com/search?q=${encodeURIComponent(p.name + ' ' + p.ja)}`);
 const gmapsUrl = (p) => `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}&hl=${mapLang}`;
 const placeLinkLabel = (p) => (p.linkKind === 'guide' ? mt('guide') : p.url ? mt('official') : mt('search'));
+const ACCESS_LABEL_KEYS = { open: 'accessOpen', partial: 'accessPartial', exterior: 'accessExterior', closed: 'accessClosed' };
+
+function visitAccessHtml(p, inList = false) {
+  if (!p.visitAccess) return '';
+  const access = p.visitAccess;
+  const note = mapLang === 'en' ? access.en : access.th;
+  return `<div class="visit-access">
+    <a class="visit-access-badge visit-access-${access.kind}" href="${esc(access.url)}" target="_blank" rel="noopener"${inList ? ' onclick="event.stopPropagation()"' : ''}>${esc(mt(ACCESS_LABEL_KEYS[access.kind]))} ↗</a>
+    <span class="visit-access-note">${esc(note)}</span>
+  </div>`;
+}
 
 function popupHtml(p) {
   return `
@@ -609,6 +620,7 @@ function popupHtml(p) {
     <div class="popup-title">${esc(placeName(p))}</div>
     <div class="popup-ja">${esc(p.ja)}</div>
     <div class="popup-desc">${esc(placeDesc(p))}</div>
+    ${visitAccessHtml(p)}
     <span class="popup-day">${dayLabel(p)} · ${areaLabel(p.area)}</span>${p.type === 'museum' ? ' <span class="popup-tag">🏛 Museum</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️ Taniguchi</span>' : ''}${p.type === 'stay' ? ' <span class="popup-tag popup-tag-stay">🛏</span>' : ''}${p.type === 'car' ? ' <span class="popup-tag popup-tag-car">🚗</span>' : ''}${p.type === 'cam' ? ' <span class="popup-tag popup-tag-cam">🔴 LIVE</span>' : ''}
     ${placeTicket(p) ? `<div class="popup-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
     ${p.pinnedByUser ? '<div class="popup-pinned">📍 หมุดนี้คือตำแหน่งที่พักจริงที่ปักไว้เอง</div>' : ''}
@@ -712,6 +724,7 @@ function renderPlaceList() {
       <div class="place-item-body">
         <div class="p-name">${esc(placeName(p))} <span class="popup-ja">${esc(p.ja)}</span>${p.architecture ? ' <span class="popup-tag">📐</span>' : ''}${p.type === 'museum' ? ' <span class="popup-tag">🏛</span>' : ''}${p.taniguchi ? ' <span class="popup-tag popup-tag-taniguchi">✏️</span>' : ''}</div>
         <div class="p-meta">${dayLabel(p)} · ${areaLabel(p.area)} — ${esc(placeDesc(p))}</div>
+        ${visitAccessHtml(p, true)}
         ${placeTicket(p) ? `<div class="p-ticket">🎫 ${esc(placeTicket(p))}</div>` : ''}
         <a class="p-link" href="${esc(p.url || searchUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${placeLinkLabel(p)} ↗</a>
         <a class="p-link" href="${esc(gmapsUrl(p))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${mt('directions')} ↗</a>

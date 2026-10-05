@@ -457,6 +457,17 @@ body {
   flex-shrink: 0; border: 1px solid var(--line); background: var(--paper-deep);
 }
 .p-ticket { font-size: .74rem; color: var(--ink-soft); margin-top: .2rem; }
+.visit-access { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .45rem; margin-top: .38rem; }
+.visit-access-badge {
+  flex: none; padding: .08rem .35rem; border-radius: 4px; font-size: .7rem; font-weight: 700;
+  text-decoration: none; border: 1px solid currentColor;
+}
+.visit-access-badge:hover { text-decoration: underline; }
+.visit-access-open { color: #285f43; background: #e8f3ec; }
+.visit-access-partial { color: #86520d; background: #fff2dd; }
+.visit-access-exterior { color: #315d70; background: #e8f1f4; }
+.visit-access-closed { color: #963b3a; background: #f8e9e8; }
+.visit-access-note { flex: 1 1 11rem; min-width: 0; font-size: .72rem; line-height: 1.4; color: var(--ink-soft); }
 .p-link {
   display: inline-block; font-size: .74rem; font-weight: 700; color: var(--tokyo);
   text-decoration: none; margin-top: .2rem;
