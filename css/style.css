@@ -158,6 +158,15 @@ body {
 }
 
 /* ---------- sections ---------- */
+.flight-band { background: var(--ink); color: #fff; }
+.flight-band-inner { max-width: 1160px; margin: 0 auto; padding: 1.1rem 1.5rem; display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 1rem 2rem; align-items: center; }
+.flight-intro, .flight-leg { display: flex; flex-direction: column; gap: .2rem; }
+.flight-kicker, .flight-leg > span:first-child { font-size: .75rem; color: #d1d8da; }
+.flight-intro strong, .flight-leg strong { font-family: var(--font-mono); font-size: 1.05rem; }
+.flight-intro > span:last-child, .flight-leg > span:last-child { font-size: .82rem; }
+.flight-note { grid-column: 1 / -1; color: #d1d8da; font-size: .76rem; border-top: 1px solid rgba(255,255,255,.22); padding-top: .6rem; }
+@media (max-width: 650px) { .flight-band-inner { grid-template-columns: 1fr 1fr; gap: .9rem; } .flight-intro { grid-column: 1 / -1; } }
+
 .section { max-width: 1180px; margin: 0 auto; padding: 4.2rem 1.2rem 1.5rem; }
 .section-head { margin-bottom: 1.8rem; position: relative; }
 .section-ja {
