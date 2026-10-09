@@ -68,7 +68,33 @@ function migrateFlightRows(days) {
   }
   return changed;
 }
-if (localStorage.getItem('jt26_itinerary') !== null && migrateFlightRows(itinerary)) {
+function migrateCityLuggageRows(days) {
+  const day = days.find((d) => d.day === 1);
+  if (!day?.items) return false;
+  const defaults = DEFAULT_ITINERARY[0].items;
+  const replacements = [
+    ['📦 ฝากกระเป๋าที่เคาน์เตอร์ Same-day Delivery', '🚄 N’EX จาก Narita Terminal 1'],
+    ['🔁 ถ้านัดญาติอยู่ใกล้สนามบิน:', '🧳 ฝากกระเป๋าในเมือง'],
+    ['ไปสถานี Tokyo/Ueno เตรียมขึ้นชินคันเซ็นเย็น', 'รับกระเป๋าจากล็อกเกอร์'],
+  ];
+  let changed = false;
+  for (const [oldStart, newStart] of replacements) {
+    const index = day.items.findIndex((i) => i.act?.startsWith(oldStart));
+    const replacement = defaults.find((i) => i.act.startsWith(newStart));
+    if (index >= 0 && replacement) { day.items[index] = structuredClone(replacement); changed = true; }
+  }
+  const redundant = day.items.findIndex((i) => i.act?.startsWith('เดินทางเข้าเมืองไปพบญาติ (ตัวเบา'));
+  if (redundant >= 0) { day.items.splice(redundant, 1); changed = true; }
+  const checkIn = day.items.find((i) => i.act?.startsWith('ถึง Utsunomiya · เช็คอิน Airbnb'));
+  if (checkIn?.note?.startsWith('กระเป๋าที่ส่งไว้เช้านี้')) {
+    checkIn.note = defaults.find((i) => i.act.startsWith('ถึง Utsunomiya · เช็คอิน Airbnb')).note;
+    changed = true;
+  }
+  return changed;
+}
+const flightRowsMigrated = migrateFlightRows(itinerary);
+const cityLuggageMigrated = migrateCityLuggageRows(itinerary);
+if (localStorage.getItem('jt26_itinerary') !== null && (flightRowsMigrated || cityLuggageMigrated)) {
   store.save('jt26_itinerary', itinerary);
   store.save('jt26_itinerary_v', ITINERARY_VERSION);
 }
@@ -90,15 +116,16 @@ function persistAll() {
 }
 
 TripSync.init((remote) => {
-  let flightRowsChanged = false;
+  let itineraryChanged = false;
   if (remote.shopping) shopping = remote.shopping;
   if (remote.planned) planned = remote.planned;
   if (remote.expenses) expenses = remote.expenses;
   if (typeof remote.rate === 'number') rate = remote.rate;
   if (remote.itinerary) {
     itinerary = normalizeItinerary(remote.itinerary);
-    flightRowsChanged = migrateFlightRows(itinerary);
-    if (flightRowsChanged) store.save('jt26_itinerary_v', ITINERARY_VERSION);
+    const flightRowsChanged = migrateFlightRows(itinerary);
+    itineraryChanged = migrateCityLuggageRows(itinerary) || flightRowsChanged;
+    if (itineraryChanged) store.save('jt26_itinerary_v', ITINERARY_VERSION);
   }
   if (remote.stays) stays = remote.stays;
   if (typeof remote.stayCap === 'number') stayCap = remote.stayCap;
@@ -117,7 +144,7 @@ TripSync.init((remote) => {
   renderMoneyViews();
   renderHikeChecklist();
   checkItineraryVersion();
-  if (flightRowsChanged) TripSync.push({ shopping, planned, expenses, rate, itinerary, stays, stayCap, hikeChecklist });
+  if (itineraryChanged) TripSync.push({ shopping, planned, expenses, rate, itinerary, stays, stayCap, hikeChecklist });
 });
 
 /* ============ countdown ============ */

@@ -68,7 +68,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 13;
+const ITINERARY_VERSION = 14;
 /* ป้ายประเภทกิจกรรมในแผนรายวัน — ใช้ดูภาพรวมว่าวันไหนออกนอกเมือง วันไหนอยู่ในเมือง */
 const ITEM_TAGS = {
   nature: { icon: '🌿', th: 'ธรรมชาติ', en: 'Nature',  color: '#3e5c46' },
@@ -83,15 +83,14 @@ const ITEM_TAG_KEYS = Object.keys(ITEM_TAGS);
 const DEFAULT_ITINERARY = [
   { day: 1, date: 'อ. 20 ต.ค.', area: 'tokyo', title: 'Narita → นัดข้าวกับญาติ → เย็นเข้า Utsunomiya (2 คืนรวด)', items: [
     { t: '07:30', act: 'ZG052 ถึง Narita Terminal 1 — ตม. / รับกระเป๋า / เติมเงิน Suica', note: 'ออกจาก Bangkok (BKK) 19 ต.ค. 23:10 · เวลาถึงตามตั๋วเป็นเวลาญี่ปุ่น เผื่อผ่าน ตม. และรับกระเป๋าก่อนเข้าเมือง', tag: 'move', cost: 0 },
-    { t: '09:00', act: '📦 ฝากกระเป๋าที่เคาน์เตอร์ Same-day Delivery ในสนามบิน (JAL ABC / Yamato / Sagawa)', note: 'ยื่นกระเป๋าช่วง 09:00-18:00 → ของถึงที่พัก Utsunomiya <strong>ภายในราว 21:00 คืนนี้เลย</strong> ไม่ต้องรอถึงพรุ่งนี้ · ราคาประมาณ ¥2,000-3,000/ใบ ขึ้นกับขนาด เช็คราคาจริงหน้าเคาน์เตอร์ · แจ้งที่อยู่ Airbnb + เบอร์เจ้าของที่พักไว้ล่วงหน้า', tag: 'other', cost: 2000 },
-    { t: '—', act: '🔁 ถ้านัดญาติอยู่ใกล้สนามบิน: ใช้ล็อกเกอร์ Narita แทน', note: 'เที่ยวบินลง Terminal 1; เช็กล็อกเกอร์ที่ Terminal 1 หน้างาน และต้องกลับมารับก่อนเข้า Utsunomiya หากฝากไว้ที่สนามบิน · ถ้านัดในโตเกียว การส่งตรงเข้าที่พักสะดวกกว่า', tag: 'other', cost: 0 },
-    { t: '10:00', act: 'เดินทางเข้าเมืองไปพบญาติ (ตัวเบา ไม่แบกกระเป๋าใหญ่แล้ว)', note: 'ปรับสถานีปลายทางตามที่นัดจริง — ตัวอย่างคือเข้า Tokyo Sta./Ueno ด้วย N\'EX หรือ Skyliner', tag: 'move', cost: 1000 },
+    { t: '09:15', act: '🚄 N’EX จาก Narita Terminal 1 → Shinjuku หรือ Shibuya พร้อมกระเป๋า', note: 'เลือกสถานีปลายทางหลังวินยืนยันจุดนัด · รถตรงทั้งสองสถานี ประมาณ 80–95 นาที ¥3,330/คน · เวลาขึ้นรถเป็นเป้าหมาย เผื่อ ตม./รับกระเป๋าและเช็กรอบจริง', tag: 'move', cost: 3330 },
+    { t: '11:00', act: '🧳 ฝากกระเป๋าในเมืองที่สถานีใกล้จุดนัด', note: 'Shinjuku: ล็อกเกอร์ JR ฝั่ง East Exit/ทางไปชานชาลา N’EX · Shibuya: ล็อกเกอร์ Tokyu แถว SHIBUYA109 หรือสถานี JR · เผื่อ ¥1,000/ใบใหญ่ เช็กขนาด/ช่องว่างหน้างาน และจดจุดฝากไว้เพื่อกลับมารับก่อนขึ้นรถเย็น', tag: 'other', cost: 1000 },
     { t: '12:00', act: '🍽 นัดข้าวเที่ยงกับญาติ', note: 'ช่วงเวลาหลักของวันนี้ — ไม่ต้องรีบ ปรับกิจกรรมอื่นทั้งวันรอบนัดนี้', tag: 'food', cost: 0 },
     { t: '14:00', act: 'ช่วงบ่ายว่าง — เดินเล่น/พักผ่อนแถวที่นัด', note: 'ตัวเบาไม่มีกระเป๋าแล้ว จะเดินเที่ยวเพิ่มหรือนั่งพักรอเวลาก็ได้ ไม่ต้องอัดโปรแกรม เผื่อเวลาคุยกับญาติเกินแผน', tag: 'city', cost: 0 },
-    { t: '17:30', act: 'ไปสถานี Tokyo/Ueno เตรียมขึ้นชินคันเซ็นเย็น', note: 'เผื่อเวลาเดินทางจากจุดนัดกลับมาสถานีต้นทาง', tag: 'move', cost: 0 },
+    { t: '16:45', act: 'รับกระเป๋าจากล็อกเกอร์ → ไป Tokyo Station', note: 'เผื่อเวลาเดินทางจาก Shinjuku/Shibuya พร้อมกระเป๋าอย่างน้อย 45–60 นาที ก่อนชินคันเซ็น; ถ้านัดยืดให้เลื่อนขบวนตามจริง', tag: 'move', cost: 250 },
     { t: '18:20', act: '🚄 Tohoku Shinkansen (Yamabiko/Nasuno) → Utsunomiya', note: '~50 นาที ¥5,020 (จองที่นั่ง) · ช่วงเย็นมีวิ่งราว 3 เที่ยว/ชม. เที่ยวท้าย ๆ ลากยาวถึงราว 21:00 — <strong>เช็ครอบแน่นอนใกล้วันเดินทาง</strong> เพราะปรับตามฤดูกาล', tag: 'move', cost: 5020 },
     { t: '—', act: '🔁 ไม่รีบ: JR Utsunomiya Line รถธรรมดา/รถด่วน', note: '~1 ชม. 30-50 นาที ¥2,090 ถูกกว่าชินคันเซ็นเกินครึ่ง ไม่ต้องเปลี่ยนขบวน วิ่งถึงดึกกว่าชินคันเซ็น เหมาะถ้าคุยกับญาติเพลินจนดึก', tag: 'move', cost: 0 },
-    { t: '19:15', act: 'ถึง Utsunomiya · เช็คอิน Airbnb (พัก 2 คืนรวด 20-22)', note: 'กระเป๋าที่ส่งไว้เช้านี้ควรถึงก่อนหรือใกล้เคียงเวลานี้ — เช็คับสถานะพัสดุจากเคาน์เตอร์ที่ Narita ได้', tag: 'move', cost: 0 },
+    { t: '19:15', act: 'ถึง Utsunomiya · เช็คอิน Airbnb (พัก 2 คืนรวด 20-22)', note: 'นำกระเป๋าที่รับคืนจากล็อกเกอร์ในโตเกียวขึ้นรถมาด้วย · ยืนยันเวลาเช็คอินค่ำกับที่พัก', tag: 'move', cost: 0 },
     { t: '20:00', act: '🥟 เย็น: เกี๊ยวซ่าร้านดัง (Minmin / Masashi)', note: 'ต่อคิวได้ ไปก่อนเวลาจะดีกว่า · Kirasse ลานรวมร้านเกี๊ยวซ่าปิดค่อนข้างเร็ว เช็คเวลาก่อน', tag: 'food', cost: 1500 },
   ]},
   { day: 2, date: 'พ. 21 ต.ค.', area: 'nikko', title: 'เดย์ทริป Nikko (ไป-กลับ ไม่ย้ายที่พัก)', items: [
@@ -401,14 +400,18 @@ const HIKING_CHECKLIST = [
 
 /* ---------- transport segments ---------- */
 const TRANSPORT = [
-  { title: 'สนามบิน → เข้าเมือง (ไปนัดข้าวกับญาติ)', day: 'DAY 1 · 20 ต.ค. (เช้า)', options: [
-    { method: "Narita Express (N'EX) → Tokyo Sta./Shinjuku ฯลฯ", note: 'ไปได้ตรงหลายสถานีใหญ่ ปรับตามจุดนัดจริง · ที่นั่งจอง แต่วันนี้ไม่มีกระเป๋าใหญ่ติดตัวแล้วเพราะส่งล่วงหน้าไปที่พักแล้ว', time: '~55-90 นาที', price: 3070 },
-    { method: 'Keisei Skyliner → Ueno/Nippori', note: 'เร็วและถูกกว่า N\'EX เล็กน้อย เหมาะถ้าจุดนัดอยู่ฝั่งเหนือของเมือง', time: '~41-60 นาที', price: 2580 },
-    { method: 'Keisei Access Express (รถธรรมดา)', note: '💰 ถูกที่สุด — วันนี้ตัวเบาไม่มีกระเป๋าใหญ่ ไม่ต้องกังวลเรื่องเปลี่ยนขบวน', time: '~70-80 นาที', price: 1300 },
+  { title: 'Narita → Shinjuku / Shibuya พร้อมกระเป๋า', day: 'DAY 1 · 20 ต.ค. (เช้า)', options: [
+    { method: "JR Narita Express (N'EX) — ตรงถึงจุดนัด", note: 'ตรงถึง Shibuya และ Shinjuku ไม่ต้องลากกระเป๋าเปลี่ยนขบวน · เลือกปลายทางหลังยืนยันจุดนัด · ค่าโดยสารทางการ ¥3,330/คน', time: '~80–95 นาที', price: 3330 },
+    { method: 'Keisei Skyliner → Nippori/Ueno → JR ต่อ', note: 'ต้องเปลี่ยนขบวนพร้อมกระเป๋า; อาจคุ้มเฉพาะถ้านัดใกล้ Ueno/Nippori · ราคานี้รวม JR ต่อโดยประมาณ เช็กปลายทางจริง', time: '~80–100 นาที', price: 2800 },
+  ], links: [
+    { label: 'JR East: N’EX และราคา', url: 'https://www.jreast.co.jp/en/multi/nex/tickets/' },
   ]},
-  { title: '📦 ส่งกระเป๋าล่วงหน้าจากสนามบิน (Same-day Delivery)', day: 'DAY 1 · 20 ต.ค. (เช้า)', options: [
-    { method: 'เคาน์เตอร์ JAL ABC / Yamato / Sagawa ที่ Narita', note: 'ยื่นกระเป๋าช่วง 09:00-18:00 → ถึงที่พัก Utsunomiya ภายในราว 21:00 คืนเดียวกัน · ราคาประมาณ ¥2,000-3,000/ใบ ตามขนาด/น้ำหนัก เช็คราคาจริงหน้าเคาน์เตอร์ · ต้องรู้ที่อยู่ Airbnb และเบอร์ติดต่อเจ้าของที่พักล่วงหน้า', time: 'ถึงที่พักภายใน ~21:00', price: 2000 },
-    { method: 'ล็อกเกอร์ที่ Narita Terminal 1', note: 'เที่ยวบิน ZG052 ลง Terminal 1 · ใช้ได้เฉพาะถ้าจะย้อนมารับกระเป๋าก่อนเข้า Utsunomiya; เช็กขนาด ราคา และเวลาบริการหน้างาน', time: 'รับคืนก่อนเข้าเมือง', price: 700 },
+  { title: '🧳 ฝากกระเป๋าในเมือง แล้วกลับมารับก่อนออกไป Utsunomiya', day: 'DAY 1 · 20 ต.ค.', options: [
+    { method: 'Shinjuku Station — ล็อกเกอร์ใหญ่', note: 'ใกล้ East Exit หรือทางไปชานชาลา N’EX · ประมาณ ¥900–1,000/ใบ; บางช่วงราคาสูงขึ้นและช่องอาจเต็ม · จดตำแหน่งล็อกเกอร์ไว้', time: 'ฝาก ~11:00 / รับ ~16:45', price: 1000 },
+    { method: 'Shibuya Station — ล็อกเกอร์ใหญ่', note: 'มีหลายจุดฝั่ง Tokyu/SHIBUYA109 และใกล้ JR · เช็กขนาด/ราคา/ช่องว่างหน้างาน · เผื่อ ¥1,000/ใบ', time: 'ฝาก ~11:00 / รับ ~16:45', price: 1000 },
+  ], links: [
+    { label: 'แผนที่ล็อกเกอร์ Shinjuku', url: 'https://media.jreast.co.jp/articles/5075' },
+    { label: 'แผนที่ล็อกเกอร์ Shibuya', url: 'https://www.tokyu.co.jp/area/shibuya/station/coin-locker/' },
   ]},
   { title: 'เย็น: Tokyo → Utsunomiya (หลังนัดข้าวกับญาติ)', day: 'DAY 1 · 20 ต.ค. (เย็น)', options: [
     { method: 'Tohoku Shinkansen (Yamabiko/Nasuno) — จองที่นั่ง', note: 'ช่วงเย็นวิ่งราว 3 เที่ยว/ชม. เที่ยวท้าย ๆ ลากยาวถึงราว 21:00 — เช็ครอบแน่นอนใกล้วันเดินทาง', time: '~50 นาที', price: 5020 },
@@ -474,13 +477,11 @@ const CAR_PLAN = {
          'calc' = คำนวณจากตารางค่าโดยสาร JR ตามระยะทาง (ยังไม่ยืนยันหน้างาน)
    ทุกแถวมีปุ่มเช็คราคาสดกับ Google Maps เพราะ JR ปรับราคาเป็นระยะ */
 const RAIL_FARES = [
-  { leg: 'Narita Airport → เข้าเมือง (ตัวเบา)', day: 'DAY 1 · 20 ต.ค. (เช้า)', from: 'Narita Airport Terminal 1 Station', to: 'Tokyo Station', options: [
-    { method: "JR Narita Express (N'EX)", time: '~55-90 นาที', xfer: '0 ครั้ง', price: 3070, conf: 'src',
-      note: 'ปรับสถานีปลายทางตามจุดนัดจริง — วันนี้ไม่มีกระเป๋าใหญ่ติดตัวแล้วเพราะส่งล่วงหน้าไปที่พักแล้ว' },
-    { method: 'Keisei Skyliner → Ueno/Nippori', time: '~41-60 นาที', xfer: '0-1 ครั้ง', price: 2580, conf: 'src',
-      note: 'เร็วและถูกกว่า N\'EX เล็กน้อย เหมาะถ้าจุดนัดอยู่ฝั่งเหนือของเมือง' },
-    { method: '💰 Keisei Access Express (รถธรรมดา)', time: '~70-80 นาที', xfer: '1 ครั้ง', price: 1300, conf: 'calc',
-      note: 'ถูกที่สุด — วันนี้ตัวเบาไม่มีกระเป๋าใหญ่ ไม่ต้องกังวลเรื่องเปลี่ยนขบวนพร้อมสัมภาระ' },
+  { leg: 'Narita Airport → Shinjuku / Shibuya พร้อมกระเป๋า', day: 'DAY 1 · 20 ต.ค. (เช้า)', from: 'Narita Airport Terminal 1 Station', to: 'Shinjuku Station Tokyo', options: [
+    { method: "JR Narita Express (N'EX) — Shinjuku / Shibuya", time: '~80–95 นาที', xfer: '0 ครั้ง', price: 3330, conf: 'src',
+      note: 'รถตรงทั้งสองสถานี; เลือกปลายทางตามจุดนัดจริง · มีชั้นวางกระเป๋าใหญ่บนรถ (จำนวนจำกัด)' },
+    { method: 'Keisei Skyliner → Nippori → JR', time: '~80–100 นาที', xfer: '1 ครั้ง', price: 2800, conf: 'calc',
+      note: 'ราคาประมาณรวม JR ต่อ; ต้องยกกระเป๋าเปลี่ยนขบวน จึงไม่ใช่ตัวเลือกหลักสำหรับ Shinjuku/Shibuya' },
   ]},
   { leg: 'เย็น: Tokyo → Utsunomiya', day: 'DAY 1 · 20 ต.ค. (เย็น)', from: 'Tokyo Station', to: 'Utsunomiya Station', options: [
     { method: 'Tohoku Shinkansen (Yamabiko / Nasuno) — ไม่จองที่นั่ง', time: '~50 นาที', xfer: '0 ครั้ง', price: 4490, conf: 'src',
@@ -537,11 +538,11 @@ const RAIL_LOCAL_NOTES = [
   { what: 'Inawashiro → Goshikinuma Iriguchi', detail: "บัส Bandai Toto ~30 นาที ~¥790 · วิ่งตามฤดูกาล เช็ครอบสุดท้ายทุกครั้ง" },
   { what: 'Nikko → Chuzenji Onsen', detail: 'Tobu Bus เที่ยวเดียว ~¥1,250 · Chuzenji Onsen Free Pass ~¥2,500 คุ้มกว่าถ้าแวะหลายจุด' },
   { what: 'Tobu-Nikko ↔ JR Nikko', detail: 'สองสถานีอยู่ติดกัน เดิน 3-5 นาที ไม่มีค่าใช้จ่าย' },
-  { what: 'ส่งกระเป๋าล่วงหน้าแบบ Same-day Delivery จาก Narita', detail: 'ยื่นเคาน์เตอร์ JAL ABC / Yamato / Sagawa ช่วง 09:00-18:00 → ถึงปลายทางภายใน ~21:00 คืนนั้นเลย ~¥2,000-3,000/ใบ' },
+  { what: 'ล็อกเกอร์ในเมืองวันแรก', detail: 'ฝากใกล้สถานีนัดที่ Shinjuku หรือ Shibuya ~¥900–1,000/ใบใหญ่ แล้วกลับมารับก่อนขึ้นรถไป Utsunomiya; ไม่ฝากที่ Narita' },
 ];
 
 /* เส้นทางรถไฟหลักที่ใช้เทียบกับ JR EAST PASS (¥30,000) */
-const RAIL_MAIN_TOTAL = 5020 + 1520 + 6250 + 9110 + 1170; // เย็นวันแรก Tokyo→Utsunomiya (ชินคันเซ็นจองที่นั่ง) + เดย์ทริป Nikko ไป-กลับ + Utsunomiya→Fukushima + Fukushima→Tokyo + Keisei Access Express กลับสนามบินจาก Oshiage (ไม่รวมขาเข้า เพราะวันแรกเข้าเมืองแบบเบาไม่ผ่าน route หลัก)
+const RAIL_MAIN_TOTAL = 5020 + 1520 + 6250 + 9110 + 1170; // เย็นวันแรก Tokyo→Utsunomiya + Nikko ไป-กลับ + Utsunomiya→Fukushima + Fukushima→Tokyo + Oshiage→Narita (ขาเข้า N'EX คิดแยกตามจุดนัด)
 
 
 /* ---------- คลังสถานที่จากการค้นคว้า + เงื่อนไขการเดินทาง ----------
@@ -1005,8 +1006,8 @@ const STAYS = [
     searchQuery: 'Utsunomiya Station, Tochigi, Japan',
     lat: 36.5591, lng: 139.8986,
     pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1392269349368841909?adults=4&children=0&infants=0&pets=0&check_in=2026-10-20&check_out=2026-10-22' },
-    note: 'พัก 2 คืนรวด 20-22 ต.ค. — 20 ต.ค. ถึงเย็นหลังนัดข้าวกับญาติที่โตเกียว (ต้องเช็คอินเองได้ตอนค่ำ) · กระเป๋าส่งล่วงหน้าแบบ same-day delivery จากสนามบินควรถึงก่อนหรือใกล้เคียงเวลาเช็คอิน · 21 ต.ค. เป็นเดย์ทริป Nikko ไป-กลับ ไม่ต้องย้ายที่พัก · 22 ต.ค. เช้าเที่ยว Oya แล้วบ่ายขึ้นชินคันเซ็นไป Fukushima ขอให้อยู่ฝั่งเดียวกับสถานีและมีที่ฝากกระเป๋า',
-    en: { city: 'Utsunomiya', station: 'JR Utsunomiya Sta. (shinkansen + JR Nikko Line)', note: 'Two nights (20-22 Oct) — arriving in the evening of day 1 after a Tokyo lunch with relatives, self check-in matters; luggage sent ahead as same-day delivery from the airport should land around check-in time. 21 Oct is a Nikko day trip and back · on 22 Oct we check out and take the afternoon shinkansen to Fukushima, so stay on the station side' },
+    note: 'พัก 2 คืนรวด 20-22 ต.ค. — 20 ต.ค. เข้าเมืองพร้อมกระเป๋า ฝากล็อกเกอร์ใกล้จุดนัดญาติที่ Shinjuku/Shibuya แล้วกลับมารับก่อนขึ้นชินคันเซ็นเย็น · ต้องเช็คอินเองได้ตอนค่ำ · 21 ต.ค. เดย์ทริป Nikko ไป-กลับ · 22 ต.ค. เช้าเที่ยว Oya แล้วบ่ายขึ้นชินคันเซ็นไป Fukushima ขอให้อยู่ฝั่งเดียวกับสถานีและมีที่ฝากกระเป๋า',
+    en: { city: 'Utsunomiya', station: 'JR Utsunomiya Sta. (shinkansen + JR Nikko Line)', note: 'Two nights (20-22 Oct). On arrival day, bring luggage into Tokyo, store it near the family meeting in Shinjuku or Shibuya, retrieve it before the evening shinkansen, then self check-in. 21 Oct is a Nikko day trip; on 22 Oct, check out and take the afternoon shinkansen to Fukushima.' },
   },
   {
     id: 'fukushima', city: 'Fukushima', ja: '福島', area: 'fukushima',
