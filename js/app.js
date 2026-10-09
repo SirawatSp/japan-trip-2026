@@ -46,20 +46,22 @@ let itinerary = store.load('jt26_itinerary', DEFAULT_ITINERARY);
 function migrateFlightRows(days) {
   let changed = false;
   const replacements = [
-    [1, 'ถึง Narita — ตม.', 'ZG052 ถึง Narita Terminal 1'],
-    [9, 'ข้าวเที่ยง + กลับไปเอากระเป๋า', 'ข้าวเที่ยงเร็ว ๆ + กลับไปเอากระเป๋า'],
-    [9, 'เดินไป Oshiage →', 'ไป Oshiage →'],
-    [9, 'ถึงสนามบิน · เช็คอิน', 'ถึง Narita Terminal 1 North Wing'],
-    [9, 'บินกลับ ✈', 'ZG051 Narita → Bangkok'],
+    [1, 'ถึง Narita — ตม.', 'ZG052 ถึง Narita Terminal 1', '08:00', 'เวลาเป็นสมมติฐาน'],
+    [9, 'ข้าวเที่ยง + กลับไปเอากระเป๋า', 'ออกจาก Ginza · กลับที่พักรับกระเป๋า', '12:00', ''],
+    [9, 'ข้าวเที่ยงเร็ว ๆ + กลับไปเอากระเป๋า', 'ออกจาก Ginza · กลับที่พักรับกระเป๋า', '11:00', 'วันบินกลับให้เผื่อเวลา'],
+    [9, 'เดินไป Oshiage →', 'ไป Oshiage →', '13:30', '💰 <strong>ข้อได้เปรียบใหญ่'],
+    [9, 'ถึงสนามบิน · เช็คอิน', 'ถึง Narita Terminal 1 North Wing', '15:00', ''],
+    [9, 'บินกลับ ✈', 'ZG051 Narita → Bangkok', '17:00', ''],
   ];
-  for (const [dayNumber, oldStart, newStart] of replacements) {
+  for (const [dayNumber, oldStart, newStart, oldTime, oldNoteStart] of replacements) {
     const day = days.find((d) => d.day === dayNumber);
     const replacement = DEFAULT_ITINERARY.find((d) => d.day === dayNumber)?.items.find((i) => i.act.startsWith(newStart));
-    const index = day?.items?.findIndex((i) => i.act?.startsWith(oldStart) && !i.act.startsWith(newStart));
+    const index = day?.items?.findIndex((i) => i.act?.startsWith(oldStart) && !i.act.startsWith(newStart)
+      && i.t === oldTime && (oldNoteStart ? (i.note || '').startsWith(oldNoteStart) : !i.note));
     if (index >= 0 && replacement) { day.items[index] = structuredClone(replacement); changed = true; }
   }
   const arrivalDay = days.find((d) => d.day === 1);
-  const oldLocker = arrivalDay?.items?.findIndex((i) => i.note?.includes('Terminal 3'));
+  const oldLocker = arrivalDay?.items?.findIndex((i) => i.note?.startsWith('ล็อกเกอร์ไซส์ XL ที่ Terminal 3'));
   if (oldLocker >= 0) {
     arrivalDay.items[oldLocker] = structuredClone(DEFAULT_ITINERARY[0].items[2]);
     changed = true;
