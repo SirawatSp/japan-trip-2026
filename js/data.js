@@ -68,7 +68,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 14;
+const ITINERARY_VERSION = 15;
 /* ป้ายประเภทกิจกรรมในแผนรายวัน — ใช้ดูภาพรวมว่าวันไหนออกนอกเมือง วันไหนอยู่ในเมือง */
 const ITEM_TAGS = {
   nature: { icon: '🌿', th: 'ธรรมชาติ', en: 'Nature',  color: '#3e5c46' },
@@ -148,38 +148,45 @@ const DEFAULT_ITINERARY = [
     { t: '15:00', act: 'รถออกตรงเวลา → ถึง Fukushima 16:00', note: 'รถไม่รอคนกลับช้า', tag: 'move', cost: 0 },
     { t: '17:00', act: 'Iizaka Onsen + ข้าวเย็นฉลอง 🍜', note: 'ถ้าวันศุกร์ยังไม่ได้ไป Sabakoyu (~¥200) คืนนี้เก็บได้ · หรือแช่ยาว ๆ ที่เรียวกังแบบ day-use', tag: 'food', cost: 2300 },
   ]},
-  { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', title: 'ครึ่งวัน ② — เช้าฟุกุชิมะ → ถึง Tokyo บ่าย 3 · เย็นนัดเพื่อน 🍽', items: [
-    { t: '08:00', act: 'เช็คเอาท์ · ฝากกระเป๋าล็อกเกอร์สถานี Fukushima', note: 'เอาของหนักลงก่อน จะได้เที่ยวเช้าตัวเบา', tag: 'move', cost: 700 },
-    { t: '09:00', act: 'Hanamiyama Park — วิวเมือง + เทือกอาซุมะ', note: 'บัสจากสถานี ~20 นาที · ขาล้าจากวันเดินเขาก็ยังไหว เดินไม่ชัน', tag: 'nature', cost: 500 },
-    { t: '—', act: '🔁 สลับเช้าวันนี้เป็นอย่างอื่นได้: เก็บแอปเปิล Fruit Line / Fukushima Prefectural Museum of Art / Mt. Shinobu', note: 'เก็บแอปเปิลต้องโทรจองสวนก่อน · พิพิธภัณฑ์ลง Iizaka Line ป้าย 美術館図書館前 · Mt. Shinobu เดินจากสถานีได้เลยถ้าขี้เกียจเดินทาง', tag: 'other', cost: 0 },
-    { t: '11:00', act: 'กลับสถานี · ของฝากฟุกุชิมะ', note: 'พีช/แอปเปิลอบแห้ง เหล้าสาเก ขนมประจำจังหวัด — ในสถานีมีครบ', tag: 'city', cost: 1500 },
-    { t: '12:00', act: 'ข้าวเที่ยงในสถานี · รับกระเป๋า', note: 'เผื่อเวลาขึ้นชานชาลา 15 นาที', tag: 'food', cost: 1200 },
-    { t: '13:20', act: '🚄 Tohoku Shinkansen (Yamabiko) → Tokyo', note: '~95 นาที · จองที่นั่งล่วงหน้าเพราะวันอาทิตย์คนกลับเยอะ', tag: 'move', cost: 9110 },
-    { t: '15:00', act: 'ลงที่ Ueno → Ginza Line → Asakusa → Tobu ไป Hikifune · เช็คอิน', note: '💡 <strong>ลงชินคันเซ็นที่ Ueno ไม่ต้องเลยไป Tokyo Sta.</strong> ใกล้ที่พักกว่า · Ueno → Asakusa (Ginza Line ~5 นาที) → Hikifune (Tobu Skytree Line 2 สถานี ~3 นาที) รวม ~20 นาที ~¥400 · แล้วเดินอีก ~480 ม. ถึง Jハウス', tag: 'move', cost: 400 },
-    { t: '16:30', act: 'อาบน้ำ พักขา เดินสำรวจย่านที่พัก', note: '', tag: 'other', cost: 0 },
-    { t: '18:30', act: '🍽 นัดกินข้าวกับเพื่อน', note: 'นัดร้านล่วงหน้า วันอาทิตย์ร้านดังเต็มเร็ว', tag: 'food', cost: 4000 },
+  { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', planRevision: 'tokyo-saved-2026-10-12', title: 'Fukushima → Ueno / Horyuji Treasures → นัดเพื่อน', items: [
+    { t: '09:00', act: 'ข้าวเช้า · เก็บกระเป๋า · ซื้อของฝากใกล้สถานี Fukushima', note: 'ตัดเที่ยวไกลช่วงเช้าเพื่อกลับโตเกียวเร็วขึ้น', tag: 'food', cost: 1200 },
+    { t: '10:30', act: 'เช็คเอาท์ · ไปสถานี Fukushima พร้อมกระเป๋า', note: 'เผื่อขึ้นชานชาลาอย่างน้อย 15 นาที', tag: 'move', cost: 0 },
+    { t: '11:00', act: 'Tohoku Shinkansen (Yamabiko): Fukushima → Ueno', note: 'เวลาเป้าหมาย ไม่ใช่ขบวนที่จองแล้ว · เลือกขบวนจอด Ueno และถึงประมาณ 13:00 · เผื่อ 90–110 นาทีและจองที่นั่ง · ค่าโดยสารประมาณการ เช็กราคาจริงตอนจอง', tag: 'move', cost: 9110 },
+    { t: '13:00', act: 'Ueno Station · ฝากกระเป๋าในเมือง · ข้าวกลางวัน', note: 'จดตำแหน่งล็อกเกอร์และเวลารับคืน · เผื่อประมาณ ¥1,000/ใบใหญ่ตามขนาด ไม่ฝากที่สนามบิน', tag: 'food', cost: 2200 },
+    { t: '14:00–15:30', act: 'Tokyo National Museum · Gallery of Horyuji Treasures', note: 'Yoshio Taniguchi (1999) · รวมในตั๋วคอลเลกชัน TNM ประมาณ ¥1,000 · https://www.tnm.jp/ · ถ้าถึง Ueno หลัง 14:30 ให้ข้ามพิพิธภัณฑ์เพื่อรักษาเวลานัด ไม่ย้ายไปจันทร์ 26 เพราะปิด', tag: 'city', cost: 1000 },
+    { t: '15:30', act: 'รับกระเป๋า Ueno → Asakusa → Hikifune → J House', note: 'Ginza Line ต่อ Tobu Skytree Line และเดินถึงที่พัก · เผื่อรวม 45–60 นาทีพร้อมกระเป๋า · ค่าเดินทางประมาณ ¥400', tag: 'move', cost: 400 },
+    { t: '16:30', act: 'เช็คอินที่พัก Mukojima · อาบน้ำพักขา', note: 'ยืนยันเวลาเช็คอินกับที่พักก่อนเดินทาง', tag: 'other', cost: 0 },
+    { t: '17:30', act: 'ออกจากที่พักไปยังร้านนัดเพื่อน', note: 'จุดนัดยังไม่ยืนยัน ปรับเวลาออกตามย่านร้าน เผื่อเดินทางประมาณ 45–60 นาที', tag: 'move', cost: 500 },
+    { t: '18:30', act: 'นัดกินข้าวกับเพื่อนในเมืองโตเกียว', note: 'นัดหลักของวันนี้ · ยืนยันร้านและจองโต๊ะสำหรับ 4 คน', tag: 'food', cost: 4000 },
   ]},
-  { day: 7, date: 'จ. 26 ต.ค.', area: 'tokyo', title: 'Asakusa + Ueno + Ryogoku', items: [
-    { t: '08:30', act: 'Asakusa — วัด Sensoji + ถนน Nakamise', note: 'ไปเช้าคนน้อย ถ่ายรูปสวย · 💡 <strong>วันนี้อยู่ติดที่พักพอดี</strong> — จาก Hikifune ไป Asakusa แค่ 2 สถานี ~3 นาที และ Tokyo Skytree เดินจากที่พักได้เลย ~700 ม.', tag: 'city', cost: 0 },
-    { t: '10:30', act: 'ข้ามแม่น้ำไป Sumida Hokusai Museum (Ryogoku)', note: 'อาคาร SANAA + งานโฮคุไซ', tag: 'city', cost: 1000 },
-    { t: '12:00', act: 'ข้าวเที่ยงแถว Ryogoku', note: 'ย่านซูโม่ — มีจังโกะนาเบะ', tag: 'food', cost: 1200 },
-    { t: '13:30', act: 'Ueno — Tokyo National Museum + Gallery of Hōryū-ji Treasures', note: 'ตั๋วเดียวเข้าได้ทั้งสอง (Taniguchi 1999) · นิทรรศการ Genji + Daitokuji ก็อยู่ที่นี่', tag: 'city', cost: 1000 },
-    { t: '15:30', act: 'National Museum of Western Art — นิทรรศการ Turner', note: 'คอลเลกชันถาวรฟรี · นิทรรศการพิเศษจ่ายแยก ~¥2,000', tag: 'city', cost: 2000 },
-    { t: '17:30', act: 'Ameyoko — ของกินริมทาง', note: '', tag: 'city', cost: 1000 },
-    { t: '19:00', act: 'เย็น: Akihabara', note: '', tag: 'city', cost: 1500 },
+  { day: 7, date: 'จ. 26 ต.ค.', area: 'tokyo', planRevision: 'tokyo-saved-2026-10-12', title: 'St. Mary’s Cathedral → Omotesando → Shibuya', items: [
+    { t: '08:00', act: 'Oshiage → Otemachi → Edogawabashi · เดินไป Cathedral', note: 'Hanzomon Line ต่อ Yurakucho Line · เผื่อเดินทางรวมประมาณ 60 นาทีและเดิน 15–20 นาทีจาก Edogawabashi', tag: 'move', cost: 400 },
+    { t: '09:00–10:00', act: 'St. Mary’s Cathedral, Tokyo · Kenzo Tange', note: 'ชมได้ทั่วไป 09:00–17:00 เมื่อไม่มีมิสซาหรือกิจกรรม · เคารพผู้สวดมนต์และกฎถ่ายภาพ · https://catholic-sekiguchi.jp/firstvisitors/', tag: 'city', cost: 0 },
+    { t: '10:00', act: 'เดินกลับ Edogawabashi → Omotesando', note: 'Yurakucho Line ต่อ Hanzomon Line ที่ Nagatacho · เผื่อเดินและเปลี่ยนรถรวม 45–60 นาที', tag: 'move', cost: 300 },
+    { t: '11:00', act: 'Omotesando / Harajuku · เดินชมอาคารและเลือกร้าน 2–3 ร้าน', note: 'จาก Saved Places: G.H.BASS TOKYO / Graphpaper TOKYO / grounds STORE 001 / DANTON TOKYO · เลือกตามของที่จะซื้อ ไม่ต้องเข้าครบ · พิพิธภัณฑ์หลายแห่งปิดวันจันทร์', tag: 'city', cost: 0 },
+    { t: '12:30', act: 'ข้าวกลางวันย่าน Omotesando', note: 'Sahsya Kanetanaka เป็นตัวเลือกจากลิสต์ เช็กเวลาและการจองก่อนเลือก', tag: 'food', cost: 1800 },
+    { t: '13:30', act: 'เดินสถาปัตยกรรม Omotesando → Miyashita Park', note: 'ชมภายนอก Dior / Prada ตามเส้นทางที่เลือก · เผื่อเดิน 30–45 นาทีและพักระหว่างทาง', tag: 'city', cost: 0 },
+    { t: '15:00–18:00', act: 'Shibuya · PARCO / Vivienne Westwood / Tower Records', note: 'เลือก 2–3 จุดตามความสนใจ · ไม่ใส่ Shibuya Sky เป็นตั๋วที่จองแล้ว · ของช้อปปิงบันทึกแยกในลิสต์ซื้อของ', tag: 'city', cost: 0 },
+    { t: 'ทางเลือก', act: 'แทนช่วงท้าย Shibuya: TRAVELER’S FACTORY Nakameguro', note: 'ออกจาก Shibuya ราว 17:00 ไป Toyoko Line ลง Nakameguro · ร้านเปิด 12:00–20:00 และปิดอังคาร 27 · ลดเวลาช้อปเดิม ไม่บวกทับ · Tsutaya Daikanyama ใช้เป็นอีกตัวเลือกแทนได้ · https://www.travelers-factory.com/access/', tag: 'other', cost: 0 },
+    { t: '18:30', act: 'ข้าวเย็น Shibuya', note: 'ถ้าเลือก Nakameguro ให้กินเย็นแถวนั้นแทน', tag: 'food', cost: 2000 },
+    { t: '20:00', act: 'กลับที่พัก · Shibuya → Oshiage สาย Hanzomon', note: 'เผื่อรถไฟและเดินรวม 50–65 นาที · ถ้ากลับจาก Nakameguro ให้ต่อรถที่ Shibuya', tag: 'move', cost: 400 },
   ]},
-  { day: 8, date: 'อ. 27 ต.ค.', area: 'tokyo', title: 'Harajuku — Shibuya — Shinjuku', items: [
-    { t: '09:00', act: 'ศาลเจ้า Meiji Jingu', note: 'ป่ากลางเมือง เดินสบาย เข้าฟรี', tag: 'city', cost: 0 },
-    { t: '11:00', act: 'Harajuku — Takeshita St.', note: '', tag: 'city', cost: 1500 },
-    { t: '12:30', act: 'ข้าวเที่ยงย่าน Omotesando', note: '', tag: 'food', cost: 1200 },
-    { t: '14:00', act: 'Nezu Museum (Kengo Kuma + สวนญี่ปุ่น)', note: 'เดิน 8 นาทีจากสถานี Omotesando', tag: 'city', cost: 1500 },
-    { t: '16:00', act: 'Shibuya — แยกไฟแดง + Shibuya Sky', note: 'Shibuya Sky ต้องจองรอบล่วงหน้า ~¥2,500', tag: 'city', cost: 2500 },
-    { t: '18:30', act: 'เย็น: Shinjuku — Omoide Yokocho', note: '', tag: 'city', cost: 3000 },
+  { day: 8, date: 'อ. 27 ต.ค.', area: 'tokyo', planRevision: 'tokyo-saved-2026-10-12', title: 'Setagaya ครึ่งวัน / Kinuta Park → Shinjuku', items: [
+    { t: '08:30', act: 'Oshiage → Yoga · Hanzomon / Tokyu Den-en-toshi Line', note: 'เลือกขบวนวิ่งต่อสายหรือเปลี่ยนที่ Shibuya · เผื่อรวมถึงพิพิธภัณฑ์ 75–90 นาที · จาก Yoga เดิน 17 นาที หรือบัสไป Bijutsukan แล้วเดิน 3 นาที', tag: 'move', cost: 600 },
+    { t: '10:00–12:00', act: 'Setagaya Art Museum · Swedish Textiles', note: 'นิทรรศการ 19 ก.ย.–15 พ.ย. 2026 · ผู้ใหญ่ ¥1,400 · เปิด 10:00–18:00 เข้าก่อน 17:30 · วันที่ 26 ปิดจันทร์ จึงมาวันนี้ · https://www.setagayaartmuseum.or.jp/exhibition/special/detail.php?id=sp00230', tag: 'city', cost: 1400 },
+    { t: '12:00', act: 'ข้าวกลางวันบริเวณพิพิธภัณฑ์ / Yoga', note: 'เผื่อคิวและเลือกจุดกินตามเส้นทางจริง', tag: 'food', cost: 1500 },
+    { t: '13:00–13:45', act: 'Kinuta Park · เดินเล่นพักหลังชมงาน', note: 'อยู่ในสวนเดียวกับพิพิธภัณฑ์ ไม่ต้องนั่งรถเพิ่ม', tag: 'nature', cost: 0 },
+    { t: 'ทางเลือก', act: 'เพิ่ม Food and Agriculture Museum แทนเวลาช้อปบางส่วน', note: 'Tokyo University of Agriculture · ฟรี 09:30–16:30 ปิดจันทร์/วันหยุดมหาวิทยาลัย · ไม่ต้องจอง · มีงานภายนอกอาคารช่วงนี้ เช็กประกาศก่อน · https://www.nodai.ac.jp/campus/facilities/syokutonou/', tag: 'other', cost: 0 },
+    { t: '14:00', act: 'กลับ Yoga → Shibuya → Shinjuku', note: 'Den-en-toshi Line ต่อ JR Yamanote Line · เผื่อเดินและเปลี่ยนรถรวม 60–75 นาที ถ้าเพิ่มพิพิธภัณฑ์ให้เลื่อนช่วงช้อป', tag: 'move', cost: 500 },
+    { t: '15:30–18:00', act: 'Shinjuku · BEAMS Japan + Sekaido', note: 'เลือกสองร้านเป็นหลัก · Junky Special / ABC-MART / tk.TAKEO KIKUCHI เป็นจุดสลับ ไม่ต้องเก็บครบ', tag: 'city', cost: 0 },
+    { t: 'ทางเลือก', act: 'แทน Shinjuku: Shimokitazawa + Masako Jazz / Qusamura Tokyo', note: 'ใช้เวลาช่วงบ่ายประมาณ 2–3 ชม. · เช็กรอบเปิดร้าน · ไม่เพิ่มทับ Shinjuku ในบ่ายเดียว', tag: 'other', cost: 0 },
+    { t: '18:30', act: 'ข้าวเย็น Shinjuku', note: 'ถ้าเลือก Shimokitazawa ให้กินแถวนั้นแทน', tag: 'food', cost: 2000 },
+    { t: '20:00', act: 'กลับที่พัก Mukojima · เตรียมกระเป๋าบินกลับ', note: 'Shinjuku → Oshiage ผ่าน Oedo / Hanzomon ตามเส้นทางที่เลือก เผื่อ 50–65 นาทีรวมเดิน', tag: 'move', cost: 400 },
   ]},
-  { day: 9, date: 'พ. 28 ต.ค.', area: 'tokyo', title: 'Ginza ช้อปปิ้ง → เดินทางกลับ ✈ 17:00', items: [
-    { t: '08:30', act: 'Ginza + GINZA SIX (Taniguchi) + สวนดาดฟ้า', note: 'ร้านส่วนใหญ่เปิด 10:00-11:00 — ช่วงแรกเดินชมอาคารก่อน', tag: 'city', cost: 0 },
-    { t: '10:30', act: 'Don Quijote / drugstore — ของฝากรอบสุดท้าย', note: 'พกพาสปอร์ตไว้ทำ tax-free', tag: 'city', cost: 5000 },
-    { t: '11:00', act: 'ออกจาก Ginza · กลับที่พักรับกระเป๋า', note: 'ซื้ออาหารแบบเร็วระหว่างทาง · ถ้าร้านเปิดช้าหรือช้อปไม่ทัน ให้ตัดร้านสุดท้ายออกเพื่อรักษาเวลารถไฟ', tag: 'move', cost: 1200 },
+  { day: 9, date: 'พ. 28 ต.ค.', area: 'tokyo', planRevision: 'tokyo-saved-2026-10-12', title: 'Mukojima / Asakusa → Narita T1 · ZG051 17:00', items: [
+    { t: '08:30–10:00', act: 'เดินเล่นใกล้ที่พัก · Mukojima / Skytree หรือ Asakusa', note: 'เลือกเพียงหนึ่งย่าน ไม่ไปพิพิธภัณฑ์ไกลหรือรอร้านที่เปิดสาย · ถ้าไป Asakusa ต้องเผื่อเวลากลับที่พัก', tag: 'city', cost: 0 },
+    { t: '10:00', act: 'ข้าวเช้า/มื้อกลางวันเร็วใกล้ที่พัก', note: 'ซื้ออาหารและน้ำสำหรับเดินทาง', tag: 'food', cost: 1200 },
+    { t: '10:45', act: 'กลับ J House · รับกระเป๋า · เช็คเอาท์', note: 'ตรวจพาสปอร์ต ตั๋ว และสัมภาระครบทั้ง 4 คนก่อนออก', tag: 'move', cost: 0 },
     { t: '11:45', act: 'ไป Oshiage → 🚃 รถไฟตรงไป Narita Terminal 1', note: 'เดินจากที่พัก ~610 ม. · เลือกขบวนที่ถึง Terminal 1 ไม่เกิน 14:00; เช็กรอบและเวลาจริงก่อนเดินทาง ไม่ควรยึดเวลา 46 นาทีเป็นหลัก · ค่าโดยสารประมาณ ¥1,170/คน', tag: 'move', cost: 1170 },
     { t: '13:30', act: 'ถึง Narita Terminal 1 North Wing ชั้น 4 · เช็กอิน ZIPAIR', note: 'ตั้งเป้าถึง 13:30–14:00 สำหรับไฟลต์ 17:00; เคาน์เตอร์เปิดราว 14:00 และปิดก่อนออก 1 ชม. เช็กสถานะเที่ยวบินและจุดรับกระเป๋าอีกครั้ง', tag: 'move', cost: 0 },
     { t: '17:00', act: 'ZG051 Narita → Bangkok (BKK) ✈', note: 'ถึงกรุงเทพฯ 22:15 ตามตั๋ว (เวลาท้องถิ่น)', tag: 'move', cost: 0 },
@@ -1016,7 +1023,7 @@ const STAYS = [
     searchQuery: 'Fukushima Station, Fukushima, Japan',
     lat: 37.7543, lng: 140.4590,
     pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1500308318751323061?adults=4&children=0&infants=0&pets=0&check_in=2026-10-22&check_out=2026-10-25' },
-    note: 'อยู่ 4 วัน 3 คืน แบบ ครึ่งวัน–เต็มวัน–เต็มวัน–ครึ่งวัน · เข้าพักบ่าย 22 ต.ค. · คืนที่สำคัญสุดคือคืนศุกร์ เพราะเช้าเสาร์ต้องออกก่อน 08:15 ให้ทัน Sky Access ที่ West Exit · เช้าอาทิตย์เช็คเอาท์แล้วขึ้นชินคันเซ็น 13:20 ถึงโตเกียวบ่าย 3',
+    note: 'พัก 3 คืน 22–25 ต.ค. · เข้าพักบ่าย 22 ต.ค. · เช้า 25 เช็คเอาท์แล้วเลือกชินคันเซ็นราว 11:00 ให้ถึง Ueno ประมาณ 13:00 เพื่อชม Horyuji ก่อนนัดเพื่อนเย็น; เวลาเป็นเป้าหมาย ต้องเช็กขบวนจริงก่อนจอง',
     en: { city: 'Fukushima', station: 'JR Fukushima Sta. — mountain bus leaves the West Exit at 08:30', note: 'The most important location of the trip: on hiking day we must leave by 08:15 to catch Sky Access at the West Exit' },
   },
   {
@@ -1121,6 +1128,24 @@ const ARCHITECTURE_ACCESS = {
   'Shiseido Art House': { kind: 'closed', th: 'ปิดถาวรตั้งแต่ 4 ก.ค. 2026; ไม่สามารถเข้าชมนิทรรศการได้', en: 'Permanently closed on 4 July 2026; no exhibition visits.', url: 'https://corp.shiseido.com/art-house/en/' },
 };
 PLACES.forEach((place) => { if (ARCHITECTURE_ACCESS[place.name]) place.visitAccess = ARCHITECTURE_ACCESS[place.name]; });
+
+// Align the existing Tokyo pins with the saved-place itinerary; keep other stops as options.
+const TOKYO_PLAN_PIN_DAYS = {
+  'Ueno Park / Ameyoko': 6,
+  'Gallery of Hōryū-ji Treasures': 6,
+  'Prada Aoyama': 7,
+  'Dior Omotesando': 7,
+  'Shibuya Crossing + Sky': 7,
+  'Setagaya Art Museum — พิพิธภัณฑ์ศิลปะเซตากายะ': 8,
+  'สวน Kinuta — เดินเล่นหลังชมพิพิธภัณฑ์': 8,
+  'Shinjuku': 8,
+  'วัด Sensoji (Asakusa)': 9,
+};
+PLACES.forEach((place) => {
+  if (place.area !== 'tokyo' || place.type === 'stay') return;
+  if (place.day >= 6 && place.day <= 9) delete place.day;
+  if (TOKYO_PLAN_PIN_DAYS[place.name]) place.day = TOKYO_PLAN_PIN_DAYS[place.name];
+});
 
 /* ---------- budget categories (planned, JPY) ---------- */
 const DEFAULT_BUDGET = [

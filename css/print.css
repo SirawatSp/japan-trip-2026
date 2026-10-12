@@ -1,0 +1,59 @@
+.itinerary-toolbar { flex-wrap: wrap; }
+.print-itinerary-btn { margin-left: auto; }
+#trip-print-dialog {
+  width: min(1000px, calc(100% - 24px)); max-height: calc(100dvh - 32px);
+  margin: auto; padding: 0; border: 1px solid var(--line); border-radius: 8px;
+  color: var(--ink); background: var(--card); font-family: var(--font-body);
+}
+#trip-print-dialog::backdrop { background: rgb(0 0 0 / 55%); }
+.print-dialog-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; gap: 16px; }
+.print-dialog-head h2 { font-size: 1.15rem; }
+.print-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 12px 20px; border-block: 1px solid var(--line); }
+.print-controls label { display: flex; align-items: center; gap: 8px; font-size: .88rem; }
+.print-controls select { max-width: 100%; padding: 7px; font: inherit; }
+.print-controls input { width: 16px; height: 16px; accent-color: var(--accent); }
+.print-controls .btn { margin-left: auto; }
+#trip-print-preview { padding: 20px; overflow: auto; background: #e8e8e8; }
+#trip-print-report { color: #111; background: white; padding: 24px; font: 14px/1.6 'Anuphan', 'Tahoma', sans-serif; letter-spacing: 0; }
+body > #trip-print-report { display: none; }
+.trip-print-header { margin-bottom: 20px; }
+.print-eyebrow { font-size: 11px; color: #555; }
+.trip-print-header h1 { font-size: 22px; line-height: 1.4; margin: 4px 0 8px; }
+.print-flight-summary { border-block: 1px solid #888; margin: 12px 0; padding: 8px 0; }
+.print-meta { color: #444; font-size: 12px; margin-top: 4px; }
+.trip-print-table { border-collapse: collapse; table-layout: fixed; width: 100%; margin: 0 0 24px; }
+.trip-print-table th, .trip-print-table td { border: 1px solid #999; padding: 7px 9px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.trip-print-table th { background: #f1f1f1; }
+.trip-print-table .print-day-heading { background: #fff; padding-block: 10px; }
+.print-day-heading h2 { font-size: 16px; line-height: 1.5; }
+.print-day-heading p { font-weight: 500; }
+.print-day-heading .print-stay { font-weight: 400; font-size: 12px; margin-top: 4px; }
+.print-time-col { width: 15%; }
+.print-kind-col { width: 12%; }
+.print-cost-col { width: 11%; }
+.print-time { font-variant-numeric: tabular-nums; }
+.print-item-note { font-weight: 400; font-size: 12px; white-space: pre-line; margin-top: 4px; }
+.print-cost { text-align: right !important; font-variant-numeric: tabular-nums; }
+@media (max-width: 600px) {
+  .print-controls .btn { width: 100%; margin-left: 0; }
+  #trip-print-preview { padding: 8px; }
+  #trip-print-report { padding: 12px; font-size: 12px; }
+  .trip-print-header h1 { font-size: 18px; }
+  .trip-print-table th, .trip-print-table td { padding: 5px; }
+}
+@page { size: A4 portrait; margin: 12mm; }
+@media print {
+  html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+  body > :not(#trip-print-report) { display: none !important; }
+  body > #trip-print-report { display: block !important; padding: 0; font-size: 10pt; line-height: 1.5; }
+  .trip-print-header h1 { font-size: 17pt; }
+  .print-meta, .print-item-note, .print-day-heading .print-stay { font-size: 8.5pt; }
+  .print-day-heading h2 { font-size: 12pt; }
+  .trip-print-table th, .trip-print-table td { padding: 5pt 6pt; }
+  .trip-print-table { break-inside: avoid; margin-bottom: 14pt; }
+  #trip-print-report.has-print-details .trip-print-table { break-inside: auto; }
+  .trip-print-table thead { display: table-header-group; }
+  .trip-print-table tr { break-inside: avoid; }
+  .trip-print-header { break-inside: avoid; }
+  .print-flight-summary { color: #000; }
+}

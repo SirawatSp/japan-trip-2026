@@ -94,7 +94,21 @@ function migrateCityLuggageRows(days) {
 }
 const flightRowsMigrated = migrateFlightRows(itinerary);
 const cityLuggageMigrated = migrateCityLuggageRows(itinerary);
-if (localStorage.getItem('jt26_itinerary') !== null && (flightRowsMigrated || cityLuggageMigrated)) {
+function applyTokyoSavedPlan(days) {
+  const pending = days.filter((day) => day.day >= 6 && day.day <= 9
+    && day.planRevision !== 'tokyo-saved-2026-10-12');
+  if (!pending.length) return false;
+  if (localStorage.getItem('jt26_tokyo_plan_backup') === null) {
+    store.save('jt26_tokyo_plan_backup', pending);
+  }
+  for (const day of pending) {
+    const updated = DEFAULT_ITINERARY.find((d) => d.day === day.day);
+    Object.assign(day, structuredClone(updated));
+  }
+  return true;
+}
+const tokyoPlanMigrated = applyTokyoSavedPlan(itinerary);
+if (localStorage.getItem('jt26_itinerary') !== null && (flightRowsMigrated || cityLuggageMigrated || tokyoPlanMigrated)) {
   store.save('jt26_itinerary', itinerary);
   store.save('jt26_itinerary_v', ITINERARY_VERSION);
 }
@@ -125,6 +139,7 @@ TripSync.init((remote) => {
     itinerary = normalizeItinerary(remote.itinerary);
     const flightRowsChanged = migrateFlightRows(itinerary);
     itineraryChanged = migrateCityLuggageRows(itinerary) || flightRowsChanged;
+    itineraryChanged = applyTokyoSavedPlan(itinerary) || itineraryChanged;
     if (itineraryChanged) store.save('jt26_itinerary_v', ITINERARY_VERSION);
   }
   if (remote.stays) stays = remote.stays;
@@ -363,6 +378,46 @@ $('#expand-all-btn')?.addEventListener('click', () => {
   collapsedDays.clear();
   saveCollapsedDays();
   renderItinerary();
+});
+
+/* Print from the current editable state, not the default itinerary. */
+function selectedPrintDays() {
+  const scope = $('#print-scope').value;
+  if (scope === 'all') return itinerary;
+  if (scope === 'tokyo') return itinerary.filter((d) => d.day >= 6 && d.day <= 9);
+  return itinerary.filter((d) => String(d.day) === scope);
+}
+function updatePrintPreview() {
+  const days = selectedPrintDays();
+  $('#trip-print-report').classList.toggle('has-print-details', $('#print-details').checked);
+  $('#trip-print-report').innerHTML = TripPrint.render(days, {
+    details: $('#print-details').checked,
+    costs: $('#print-costs').checked,
+  });
+  $('#confirm-print-btn').disabled = !days.length;
+}
+on('#print-itinerary-btn', 'click', () => {
+  document.activeElement?.blur();
+  $('#print-scope').innerHTML = '<option value="all">ทั้งทริป</option><option value="tokyo">25–28 ต.ค. · โตเกียว</option>'
+    + itinerary.map((d) => `<option value="${d.day}">DAY ${d.day} · ${esc(d.date)}</option>`).join('');
+  updatePrintPreview();
+  $('#trip-print-dialog').showModal();
+});
+['#print-scope', '#print-details', '#print-costs'].forEach((id) => on(id, 'change', updatePrintPreview));
+on('#close-print-btn', 'click', () => $('#trip-print-dialog').close());
+on('#confirm-print-btn', 'click', async () => {
+  updatePrintPreview();
+  if (!selectedPrintDays().length) return;
+  if (document.fonts) await document.fonts.ready;
+  window.print();
+});
+window.addEventListener('beforeprint', () => {
+  updatePrintPreview();
+  // Keep the printable report outside the modal's top layer for reliable pagination.
+  document.body.append($('#trip-print-report'));
+});
+window.addEventListener('afterprint', () => {
+  $('#trip-print-preview').append($('#trip-print-report'));
 });
 
 
