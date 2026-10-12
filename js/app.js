@@ -387,14 +387,31 @@ function selectedPrintDays() {
   if (scope === 'tokyo') return itinerary.filter((d) => d.day >= 6 && d.day <= 9);
   return itinerary.filter((d) => String(d.day) === scope);
 }
-function updatePrintPreview() {
+const printEnglish = store.load('jt26_print_english', {});
+function updatePrintPreview({ refreshTranslations = true } = {}) {
   const days = selectedPrintDays();
-  $('#trip-print-report').classList.toggle('has-print-details', $('#print-details').checked);
-  $('#trip-print-report').innerHTML = TripPrint.render(days, {
+  const language = $('#print-language').value;
+  const options = {
     details: $('#print-details').checked,
     costs: $('#print-costs').checked,
-  });
-  $('#confirm-print-btn').disabled = !days.length;
+    language,
+    overrides: printEnglish,
+  };
+  const missing = language === 'en' ? TripPrint.missing(days, options) : [];
+  $('#trip-print-report').classList.toggle('has-print-details', $('#print-details').checked);
+  $('#trip-print-report').lang = language;
+  $('#trip-print-report').innerHTML = TripPrint.render(days, options);
+  $('#confirm-print-btn').disabled = !days.length || missing.length > 0;
+  $('#print-translations-title').textContent = missing.length
+    ? `คำแปล English ของข้อความที่แก้เอง · ยังขาด ${missing.length} รายการ`
+    : 'คำแปล English ครบแล้ว';
+  if (refreshTranslations) {
+    $('#print-translations').hidden = !missing.length;
+    $('#print-translations').open = missing.length > 0;
+    $('#print-translation-fields').innerHTML = missing.map(({ source, label }) =>
+      `<label class="print-translation-field"><span>${esc(label)}</span><span lang="th">${esc(source)}</span>
+      <textarea lang="en" data-print-source="${esc(source)}" aria-label="${esc(label)} · English" placeholder="English translation" rows="2">${esc(printEnglish[source] || '')}</textarea></label>`).join('');
+  }
 }
 on('#print-itinerary-btn', 'click', () => {
   document.activeElement?.blur();
@@ -403,11 +420,18 @@ on('#print-itinerary-btn', 'click', () => {
   updatePrintPreview();
   $('#trip-print-dialog').showModal();
 });
-['#print-scope', '#print-details', '#print-costs'].forEach((id) => on(id, 'change', updatePrintPreview));
+['#print-language', '#print-scope', '#print-details', '#print-costs'].forEach((id) => on(id, 'change', updatePrintPreview));
+on('#print-translation-fields', 'input', (event) => {
+  const input = event.target.closest('[data-print-source]');
+  if (!input) return;
+  printEnglish[input.dataset.printSource] = input.value;
+  store.save('jt26_print_english', printEnglish);
+  updatePrintPreview({ refreshTranslations: false });
+});
 on('#close-print-btn', 'click', () => $('#trip-print-dialog').close());
 on('#confirm-print-btn', 'click', async () => {
   updatePrintPreview();
-  if (!selectedPrintDays().length) return;
+  if ($('#confirm-print-btn').disabled) return;
   if (document.fonts) await document.fonts.ready;
   window.print();
 });

@@ -85,16 +85,87 @@ test('Tokyo migration and editable A4 print report', async () => {
     await page.pdf({ path: path.join(artifacts, 'trip-plan-detailed.pdf'), preferCSSPageSize: true });
     await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
     await page.emulateMedia({ media: 'screen' });
+    // English must cover the complete default plan, not just table headings.
+    assert.deepEqual(await page.evaluate(() => TripPrint.missing(DEFAULT_ITINERARY, { details: true })), []);
+    assert.equal(await page.evaluate(() => {
+      const el = document.createElement('div');
+      el.innerHTML = TripPrint.render(DEFAULT_ITINERARY, { language: 'en', details: true, costs: true });
+      return /[\u0E00-\u0E7F]/u.test(el.textContent);
+    }), false);
+    const savedThai = await page.evaluate(() => JSON.stringify(itinerary));
+    await page.locator('#print-language').selectOption('en');
+    assert.equal(await page.locator('#trip-print-report').getAttribute('lang'), 'en');
+    const english = await page.locator('#trip-print-report').innerText();
+    assert.doesNotMatch(english, /[\u0E00-\u0E7F]/u);
+    assert.match(english, /Outbound ZIPAIR ZG052/);
+    assert.match(english, /Return ZIPAIR ZG051/);
+    assert.match(english, /Tue 20 Oct 2026/);
+    assert.match(english, /Always ask about wind, trail conditions, ice and volcanic notices/);
+    assert.match(english, /CUSTOM TOKYO AFTER UPDATE/);
+    assert.equal(await page.locator('#confirm-print-btn').isEnabled(), true);
+    await page.locator('#print-costs').check();
+    assert.match(await page.locator('#trip-print-report').innerText(), /JPY\s*\/\s*person/);
+    await page.screenshot({ path: path.join(artifacts, 'print-preview-english.png') });
+    await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
+    await page.emulateMedia({ media: 'print' });
+    await page.pdf({ path: path.join(artifacts, 'trip-plan-english.pdf'), preferCSSPageSize: true });
+    await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    await page.emulateMedia({ media: 'screen' });
+    assert.equal(await page.evaluate(() => JSON.stringify(itinerary)), savedThai);
+    // Custom Thai must never reuse a stale English translation. It can be supplied
+    // separately for export, without changing the saved trip.
+    await page.evaluate(() => {
+      itinerary[6].title = 'เที่ยวตามใจวันนี้';
+      itinerary[6].items[0].act = 'ไปคาเฟ่ใหม่กับเพื่อน';
+      itinerary[6].items[0].note = 'จองโต๊ะเวลา 10:00';
+      itinerary[6].items[0].t = 'หลังอาหาร';
+    });
+    await page.locator('#print-scope').selectOption('7');
+    assert.equal(await page.locator('#print-translation-fields textarea').count(), 4);
+    assert.equal(await page.locator('#confirm-print-btn').isDisabled(), true);
+    assert.match(await page.locator('#trip-print-report').innerText(), /translations are incomplete/);
+    const customTranslations = {
+      'เที่ยวตามใจวันนี้': 'Flexible day in Tokyo',
+      'ไปคาเฟ่ใหม่กับเพื่อน': 'Visit a new cafe with friends <img src=x onerror=alert(1)>',
+      'จองโต๊ะเวลา 10:00': 'Table reserved for 10:00',
+      'หลังอาหาร': 'After breakfast',
+    };
+    for (const field of await page.locator('#print-translation-fields textarea').all()) {
+      await field.fill(customTranslations[await field.getAttribute('data-print-source')]);
+    }
+    assert.equal(await page.locator('#confirm-print-btn').isEnabled(), true);
+    const translated = await page.locator('#trip-print-report').innerText();
+    assert.match(translated, /Flexible day in Tokyo/);
+    assert.match(translated, /Visit a new cafe with friends/);
+    assert.match(translated, /Table reserved for 10:00/);
+    assert.match(translated, /After breakfast/);
+    assert.doesNotMatch(translated, /[\u0E00-\u0E7F]/u);
+    assert.equal(await page.locator('#trip-print-report img').count(), 0);
+    await page.evaluate(() => {
+      itinerary[6].items[0].act = 'เปลี่ยนคาเฟ่อีกแล้ว';
+      updatePrintPreview();
+    });
+    assert.equal(await page.locator('#confirm-print-btn').isDisabled(), true);
+    assert.equal(await page.locator('#print-translation-fields textarea').count(), 1);
+    await page.evaluate((data) => { itinerary = JSON.parse(data); updatePrintPreview(); }, savedThai);
+    await page.locator('#print-language').selectOption('th');
+    assert.match(await page.locator('#trip-print-report').innerText(), /เวลาเที่ยวบินเป็นเวลาท้องถิ่น/);
+    assert.equal(await page.evaluate(() => JSON.stringify(itinerary)), savedThai);
     await page.locator('#close-print-btn').click();
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => typeof itinerary !== 'undefined');
     assert.equal(await page.evaluate(() => itinerary[6].title), 'CUSTOM TOKYO AFTER UPDATE');
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('jt26_print_english'))['เที่ยวตามใจวันนี้']), 'Flexible day in Tokyo');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.locator('#print-itinerary-btn').click();
     await page.locator('#print-scope').selectOption('8');
     assert.equal(await page.evaluate(() => document.querySelector('#trip-print-dialog').scrollWidth <= document.querySelector('#trip-print-dialog').clientWidth), true);
     await page.screenshot({ path: path.join(artifacts, 'print-preview-mobile.png') });
-    console.log('Verified: scoped/idempotent migration, backup, custom edits, all/Tokyo/day scopes, optional details/costs, safe text, print button, A4 PDFs and mobile preview.');
+    await page.locator('#print-language').selectOption('en');
+    assert.equal(await page.evaluate(() => document.querySelector('#trip-print-dialog').scrollWidth <= document.querySelector('#trip-print-dialog').clientWidth), true);
+    assert.doesNotMatch(await page.locator('#trip-print-report').innerText(), /[\u0E00-\u0E7F]/u);
+    await page.screenshot({ path: path.join(artifacts, 'print-preview-mobile-english.png') });
+    console.log('Verified: migration, custom edits, scopes, details/costs, Thai/English A4 PDFs, complete English content, safe persistent custom translations, unchanged itinerary and mobile preview.');
   } finally {
     await browser.close();
     await new Promise((resolve) => server.close(resolve));

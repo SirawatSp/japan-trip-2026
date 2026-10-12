@@ -13,6 +13,13 @@
 .print-controls select { max-width: 100%; padding: 7px; font: inherit; }
 .print-controls input { width: 16px; height: 16px; accent-color: var(--accent); }
 .print-controls .btn { margin-left: auto; }
+#print-translations { margin: 12px 20px; }
+#print-translations summary { cursor: pointer; font-size: .88rem; font-weight: 600; }
+#print-translation-fields { display: grid; gap: 16px; padding-top: 12px; }
+.print-translation-field { display: grid; gap: 5px; min-width: 0; font-size: .85rem; overflow-wrap: anywhere; }
+.print-translation-field > span:first-child { font-weight: 600; }
+.print-translation-field textarea { width: 100%; min-width: 0; padding: 8px; resize: vertical; font: inherit; border: 1px solid var(--line); border-radius: 4px; }
+.print-translation-warning { font-size: 12px; padding: 8px 0; border-block: 1px solid #888; font-weight: 600; }
 #trip-print-preview { padding: 20px; overflow: auto; background: #e8e8e8; }
 #trip-print-report { color: #111; background: white; padding: 24px; font: 14px/1.6 'Anuphan', 'Tahoma', sans-serif; letter-spacing: 0; }
 body > #trip-print-report { display: none; }
@@ -36,6 +43,8 @@ body > #trip-print-report { display: none; }
 .print-cost { text-align: right !important; font-variant-numeric: tabular-nums; }
 @media (max-width: 600px) {
   .print-controls .btn { width: 100%; margin-left: 0; }
+  .print-time-col, .print-kind-col { width: 18%; }
+  .print-cost-col { width: 15%; }
   #trip-print-preview { padding: 8px; }
   #trip-print-report { padding: 12px; font-size: 12px; }
   .trip-print-header h1 { font-size: 18px; }

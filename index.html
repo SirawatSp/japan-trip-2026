@@ -111,11 +111,16 @@
     <button type="button" class="icon-btn" id="close-print-btn" title="ปิดตัวอย่าง" aria-label="ปิดตัวอย่าง">✕</button>
   </div>
   <div class="print-controls">
+    <label>ภาษา PDF <select id="print-language"><option value="th">ไทย</option><option value="en">English</option></select></label>
     <label>ช่วงวัน <select id="print-scope"><option value="all">ทั้งทริป</option></select></label>
     <label><input type="checkbox" id="print-details"> รายละเอียดเพิ่มเติม</label>
     <label><input type="checkbox" id="print-costs"> ค่าใช้จ่าย</label>
     <button type="button" class="btn" id="confirm-print-btn">พิมพ์ / บันทึก PDF</button>
   </div>
+  <details id="print-translations" hidden>
+    <summary id="print-translations-title"></summary>
+    <div id="print-translation-fields"></div>
+  </details>
   <div id="trip-print-preview"><div id="trip-print-report"></div></div>
 </dialog>
 
@@ -474,6 +479,7 @@
 <script src="js/firebase-config.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/data.js"></script>
+<script src="js/itinerary-en.js"></script>
 <script src="js/itinerary-print.js"></script>
 <script src="js/app.js"></script>
 <script type="module" src="js/hike-terrain.js"></script>
