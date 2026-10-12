@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
+const legacyDay4 = require('./fixtures/day4-transit.json');
 const root = path.resolve(__dirname, '..');
 const artifacts = path.join(root, 'test-results');
 
@@ -25,14 +26,15 @@ test('Tokyo migration and editable A4 print report', async () => {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
     await page.goto(`http://127.0.0.1:${server.address().port}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => typeof itinerary !== 'undefined' && document.querySelectorAll('.day-card').length === 9);
-    const old = await page.evaluate(() => {
+    const old = await page.evaluate((day4) => {
       const data = structuredClone(DEFAULT_ITINERARY);
+      data[3] = day4;
       data.forEach((d) => { delete d.planRevision; });
       data[0].title = 'KEEP CUSTOM NORTH';
       data[5].title = 'OLD TOKYO';
       localStorage.setItem('jt26_itinerary', JSON.stringify(data));
       return data;
-    });
+    }, legacyDay4);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => typeof itinerary !== 'undefined');
     assert.equal(await page.evaluate(() => itinerary[0].title), old[0].title);
@@ -87,6 +89,7 @@ test('Tokyo migration and editable A4 print report', async () => {
     await page.emulateMedia({ media: 'screen' });
     // English must cover the complete default plan, not just table headings.
     assert.deepEqual(await page.evaluate(() => TripPrint.missing(DEFAULT_ITINERARY, { details: true })), []);
+    assert.deepEqual(await page.evaluate(() => TripPrint.missing([itinerary[3]], { details: true })), []);
     assert.equal(await page.evaluate(() => {
       const el = document.createElement('div');
       el.innerHTML = TripPrint.render(DEFAULT_ITINERARY, { language: 'en', details: true, costs: true });
@@ -105,6 +108,22 @@ test('Tokyo migration and editable A4 print report', async () => {
     assert.equal(await page.locator('#confirm-print-btn').isEnabled(), true);
     await page.locator('#print-costs').check();
     assert.match(await page.locator('#trip-print-report').innerText(), /JPY\s*\/\s*person/);
+    await page.locator('#print-scope').selectOption('4');
+    const legacyEnglish = await page.locator('#trip-print-report').innerText();
+    assert.doesNotMatch(legacyEnglish, /[\u0E00-\u0E7F]/u);
+    assert.match(legacyEnglish, /Urabandai lakes by train and bus/);
+    assert.match(legacyEnglish, /Bandai Toto bus → Goshikinuma Iriguchi stop/);
+    assert.match(legacyEnglish, /Check the last return bus/);
+    assert.doesNotMatch(legacyEnglish, /Drive back to Fukushima|park the car/);
+    assert.deepEqual(await page.locator('.trip-print-table .print-time').allTextContents(), legacyDay4.items.map((item) => item.t));
+    assert.deepEqual(await page.locator('.trip-print-table .print-cost').allTextContents(), legacyDay4.items.map((item) => item.cost > 0 ? item.cost.toLocaleString('en-US') : '-'));
+    assert.equal(await page.locator('#confirm-print-btn').isEnabled(), true);
+    assert.equal(await page.locator('#print-translations').isVisible(), false);
+    await page.screenshot({ path: path.join(artifacts, 'print-day4-transit-english.png') });
+    await page.locator('#print-details').uncheck();
+    assert.doesNotMatch(await page.locator('#trip-print-report').innerText(), /[\u0E00-\u0E7F]/u);
+    await page.locator('#print-details').check();
+    await page.locator('#print-scope').selectOption('all');
     await page.screenshot({ path: path.join(artifacts, 'print-preview-english.png') });
     await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
     await page.emulateMedia({ media: 'print' });
@@ -165,6 +184,10 @@ test('Tokyo migration and editable A4 print report', async () => {
     assert.equal(await page.evaluate(() => document.querySelector('#trip-print-dialog').scrollWidth <= document.querySelector('#trip-print-dialog').clientWidth), true);
     assert.doesNotMatch(await page.locator('#trip-print-report').innerText(), /[\u0E00-\u0E7F]/u);
     await page.screenshot({ path: path.join(artifacts, 'print-preview-mobile-english.png') });
+    await page.locator('#print-scope').selectOption('4');
+    assert.equal(await page.evaluate(() => document.querySelector('#trip-print-dialog').scrollWidth <= document.querySelector('#trip-print-dialog').clientWidth), true);
+    assert.doesNotMatch(await page.locator('#trip-print-report').innerText(), /[\u0E00-\u0E7F]/u);
+    await page.screenshot({ path: path.join(artifacts, 'print-day4-transit-mobile.png') });
     console.log('Verified: migration, custom edits, scopes, details/costs, Thai/English A4 PDFs, complete English content, safe persistent custom translations, unchanged itinerary and mobile preview.');
   } finally {
     await browser.close();

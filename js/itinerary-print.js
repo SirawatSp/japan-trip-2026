@@ -9,6 +9,7 @@ const TripPrint = (() => {
   }
   const hasThai = (value) => /[\u0E00-\u0E7F]/u.test(value);
   const translations = new Map([['ทางเลือก', 'Alternative']]);
+  ITINERARY_EN_SAVED.forEach(([source, english]) => translations.set(plainText(source), english));
   function sourceHash(day) {
     const text = JSON.stringify([day.date, day.title, ...day.items.flatMap((item) => [item.act, item.note])]);
     let hash = 2166136261;

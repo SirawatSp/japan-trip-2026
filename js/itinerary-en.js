@@ -112,3 +112,31 @@ const ITINERARY_EN = [
     ['ZG051 Narita → Bangkok (BKK)', 'Arrival in Bangkok at 22:15, local time, as shown on the ticket.'],
   ]},
 ];
+
+/* Saved public-transport plan from before the rental-car default. Match exact
+   source text, not row positions, so saved plans need no migration or reset. */
+const ITINERARY_EN_SAVED = [
+  ['เต็มวัน ① — ธรรมชาติแบบชิว: ทะเลสาบ Urabandai', 'Relaxed nature day · Urabandai lakes by train and bus'],
+  ['ซื้อข้าวเช้า/น้ำที่สถานี Fukushima', 'Buy breakfast and water at Fukushima Station'],
+  ['ชินคันเซ็น Fukushima → Koriyama', 'Shinkansen: Fukushima → Koriyama'],
+  ['~13 นาที ~¥1,800 · ประหยัดได้: รถไฟธรรมดาสาย Tohoku ~50 นาที ~¥990 (ออกเช้ากว่านี้ ~1 ชม.)', 'About 13 minutes, approximately JPY 1,800. Cheaper alternative: a conventional Tohoku Line train, about 50 minutes / JPY 990; leave roughly one hour earlier.'],
+  ["Ban'etsu West Line → สถานี Inawashiro", "Ban'etsu West Line → Inawashiro Station"],
+  ['~35 นาที · ขบวนห่างกันพอสมควร เช็ครอบก่อนวันเดินทาง', 'About 35 minutes. Trains are relatively infrequent; check the timetable before travel.'],
+  ['บัส Bandai Toto → ป้าย Goshikinuma Iriguchi', 'Bandai Toto bus → Goshikinuma Iriguchi stop'],
+  ['~30 นาที ¥790 · บัสสายนี้วิ่งต่อไป Urabandai Kogen-eki ปลายอีกฝั่งของเส้นทางเดิน', 'About 30 minutes, JPY 790. This bus continues to Urabandai Kogen-eki at the other end of the walking trail.'],
+  ['เดินเส้น Goshiki-numa — บึงห้าสี 3.6 กม.', 'Walk the Goshiki-numa Five-Coloured Ponds trail · 3.6 km'],
+  ['ทางราบ ไม่ต้องปีน ใช้เวลา 80–90 นาที · เดินจาก Goshikinuma Iriguchi ไปออก Urabandai Kogen-eki ผ่าน Bishamon-numa บึงใหญ่สุดที่มองเห็นภูเขาบันได · ใบไม้พีคกลาง ต.ค.–ต้น พ.ย.', 'A level walk without climbing, taking 80–90 minutes. Walk from Goshikinuma Iriguchi to Urabandai Kogen-eki via Bishamon-numa, the largest pond with views of Mt. Bandai. Foliage usually peaks from mid-October to early November.'],
+  ['ข้าวเที่ยงแถว Urabandai Kogen', 'Lunch near Urabandai Kogen'],
+  ['ร้านอาหาร/คาเฟ่อยู่รวมกันแถวปลายทางเดิน', 'Restaurants and cafes are clustered near the end of the trail.'],
+  ['เปิดปลาย เม.ย.–ต้น พ.ย. — ปลาย ต.ค. ยังทัน · ~¥1,500 · วิวใบไม้เปลี่ยนสีจากกลางทะเลสาบที่เดินไม่ถึง', 'Season noted in the plan: late April to early November, including late October. Approximately JPY 1,500. View autumn foliage from the lake, beyond the reach of walking trails.'],
+  ['วันนี้ตั้งใจให้เหลือเวลาไม่ต้องรีบ — ต่างจากวันเดินเขาที่มีเดดไลน์รถ', 'Keep today relaxed and unhurried, unlike hiking day with its transfer deadline.'],
+  ['บัสกลับสถานี Inawashiro', 'Bus back to Inawashiro Station'],
+  ['เช็ครอบบัสเที่ยวสุดท้ายตั้งแต่ตอนลงรถขามา', 'Check the last return bus when getting off the outbound bus.'],
+  ['รวม ~1 ชม. 15 นาที', 'About 1 hour 15 minutes in total.'],
+  ['A) Iizaka Onsen + Sabakoyu (~¥200 + ค่ารถ) · B) light-up อุโมงค์แปะก๊วย Azuma Sports Park (17:00–20:00) · C) กลับที่พักเลย เตรียมของวันเดินเขา', 'A) Iizaka Onsen and Sabakoyu (about JPY 200 plus transport). B) Azuma Sports Park ginkgo illumination, 17:00–20:00. C) Return directly to the accommodation and prepare hiking gear.'],
+  ['พรุ่งนี้ตื่น 07:00', 'Wake up at 07:00 tomorrow.'],
+  ['ถ้าไม่อยากเดินทางไกล: ทะเลสาบ Inawashiro อย่างเดียว', 'Shorter travel alternative: Lake Inawashiro only'],
+  ['ลงสถานี Inawashiro แล้วบัสสั้น ๆ ไปริมทะเลสาบ — ตัดช่วง Urabandai ออก ประหยัดทั้งเวลาและเงิน · ปลาย ต.ค. หงส์อพยพเริ่มมา', 'Get off at Inawashiro Station and take a short bus ride to the lakeshore. Skip Urabandai to save time and money. Migratory swans start arriving in late October.'],
+  ['ถ้ามีรถ/บัสฤดูกาล: แวะหุบเขา Nakatsugawa บน Bandai Lake Line', 'With a car or seasonal bus: Nakatsugawa Gorge on the Bandai Lake Line'],
+  ['จุดใบไม้แดงดังของ Urabandai — ต่อจาก Lake Hibara ได้ถ้าขับรถเอง', 'A well-known autumn foliage spot in Urabandai. Can follow Lake Hibara if self-driving.'],
+];
