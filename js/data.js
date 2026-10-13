@@ -68,7 +68,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 15;
+const ITINERARY_VERSION = 16;
 /* ป้ายประเภทกิจกรรมในแผนรายวัน — ใช้ดูภาพรวมว่าวันไหนออกนอกเมือง วันไหนอยู่ในเมือง */
 const ITEM_TAGS = {
   nature: { icon: '🌿', th: 'ธรรมชาติ', en: 'Nature',  color: '#3e5c46' },
@@ -148,7 +148,7 @@ const DEFAULT_ITINERARY = [
     { t: '15:00', act: 'รถออกตรงเวลา → ถึง Fukushima 16:00', note: 'รถไม่รอคนกลับช้า', tag: 'move', cost: 0 },
     { t: '17:00', act: 'Iizaka Onsen + ข้าวเย็นฉลอง 🍜', note: 'ถ้าวันศุกร์ยังไม่ได้ไป Sabakoyu (~¥200) คืนนี้เก็บได้ · หรือแช่ยาว ๆ ที่เรียวกังแบบ day-use', tag: 'food', cost: 2300 },
   ]},
-  { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', planRevision: 'tokyo-saved-2026-10-12', title: 'Fukushima → Ueno / Horyuji Treasures → นัดเพื่อน', items: [
+  { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', planRevision: 'ginza-night-2026-10-13', title: 'Fukushima → Ueno / Horyuji Treasures → Ginza · อิซากายะถึงดึก', items: [
     { t: '09:00', act: 'ข้าวเช้า · เก็บกระเป๋า · ซื้อของฝากใกล้สถานี Fukushima', note: 'ตัดเที่ยวไกลช่วงเช้าเพื่อกลับโตเกียวเร็วขึ้น', tag: 'food', cost: 1200 },
     { t: '10:30', act: 'เช็คเอาท์ · ไปสถานี Fukushima พร้อมกระเป๋า', note: 'เผื่อขึ้นชานชาลาอย่างน้อย 15 นาที', tag: 'move', cost: 0 },
     { t: '11:00', act: 'Tohoku Shinkansen (Yamabiko): Fukushima → Ueno', note: 'เวลาเป้าหมาย ไม่ใช่ขบวนที่จองแล้ว · เลือกขบวนจอด Ueno และถึงประมาณ 13:00 · เผื่อ 90–110 นาทีและจองที่นั่ง · ค่าโดยสารประมาณการ เช็กราคาจริงตอนจอง', tag: 'move', cost: 9110 },
@@ -156,8 +156,12 @@ const DEFAULT_ITINERARY = [
     { t: '14:00–15:30', act: 'Tokyo National Museum · Gallery of Horyuji Treasures', note: 'Yoshio Taniguchi (1999) · รวมในตั๋วคอลเลกชัน TNM ประมาณ ¥1,000 · https://www.tnm.jp/ · ถ้าถึง Ueno หลัง 14:30 ให้ข้ามพิพิธภัณฑ์เพื่อรักษาเวลานัด ไม่ย้ายไปจันทร์ 26 เพราะปิด', tag: 'city', cost: 1000 },
     { t: '15:30', act: 'รับกระเป๋า Ueno → Asakusa → Hikifune → J House', note: 'Ginza Line ต่อ Tobu Skytree Line และเดินถึงที่พัก · เผื่อรวม 45–60 นาทีพร้อมกระเป๋า · ค่าเดินทางประมาณ ¥400', tag: 'move', cost: 400 },
     { t: '16:30', act: 'เช็คอินที่พัก Mukojima · อาบน้ำพักขา', note: 'ยืนยันเวลาเช็คอินกับที่พักก่อนเดินทาง', tag: 'other', cost: 0 },
-    { t: '17:30', act: 'ออกจากที่พักไปยังร้านนัดเพื่อน', note: 'จุดนัดยังไม่ยืนยัน ปรับเวลาออกตามย่านร้าน เผื่อเดินทางประมาณ 45–60 นาที', tag: 'move', cost: 500 },
-    { t: '18:30', act: 'นัดกินข้าวกับเพื่อนในเมืองโตเกียว', note: 'นัดหลักของวันนี้ · ยืนยันร้านและจองโต๊ะสำหรับ 4 คน', tag: 'food', cost: 4000 },
+    { t: '17:15', act: 'ออกจากที่พัก · Oshiage → Higashi-ginza', note: 'เดินไป Oshiage แล้วขึ้น Toei Asakusa Line ฝั่ง Nishi-magome / Haneda ลง Higashi-ginza · รถราว 20 นาที เผื่อรวมเดินและรอ 40–50 นาที · ตั้งงบค่าเดินทาง ¥300/คน', tag: 'move', cost: 300 },
+    { t: '18:00–19:15', act: 'เดิน Ginza · Ginza 4-chome / GINZA SIX → Corridor Street', note: 'เดินชมอาคารและเลือกร้านที่สนใจ 1–2 จุดตามเวลาเปิด แล้วเดินไปนัดเพื่อนแถว Ginza Corridor Street · กระเป๋าใหญ่ฝากไว้ที่พักแล้ว', tag: 'city', cost: 0 },
+    { t: '19:30–22:30', act: 'นัดเพื่อนกินอิซากายะแถว Ginza / Corridor Street', note: 'ตัวเลือก: Ginza Godaigo (銀座ごだいご) — โอเด้งสไตล์เกียวโต ยากิโทริ และสาเก · ร้านแจ้งวันอาทิตย์ 17:00–23:00 · ยืนยันร้าน จองโต๊ะ 4 คน ระยะเวลาใช้โต๊ะ และเวลาสั่งสุดท้าย · ตั้งงบอาหารและเครื่องดื่มประมาณ ¥5,000/คน · https://daiwa-j.com/brands/godaigo/ginza/', tag: 'food', cost: 5000 },
+    { t: '22:30–22:45', act: 'เช็คบิล · เดินจาก Corridor Street ไปสถานี Shimbashi', note: 'เริ่มเดินกลับประมาณ 22:30 · เผื่อเดิน 10–15 นาทีและหาทางเข้าสาย Toei Asakusa Line ฝั่ง Oshiage / Keisei', tag: 'move', cost: 0 },
+    { t: '~23:00', act: 'Shimbashi → Oshiage · Toei Asakusa Line วิ่งตรง', note: 'ตั้งเป้ารถประมาณ 23:00 (ไม่ใช่ขบวนที่จองแล้ว) · บนรถราว 20 นาที ไม่ต้องเปลี่ยนขบวน · เลือกฝั่ง Oshiage / Aoto / Keisei-Takasago · ตารางวันเสาร์–อาทิตย์ปัจจุบันมีขบวน 23:00, 23:11, 23:19 และขบวนสุดท้าย 00:09; ตรวจอีกครั้งวันที่เดินทางและอย่ารอขบวนสุดท้าย · ตั้งงบ ¥300/คน · https://www.kotsu.metro.tokyo.jp/subway/timetable/asakusa/A10NH.html', tag: 'move', cost: 300 },
+    { t: '23:30–23:45', act: 'เดินจาก Oshiage กลับที่พัก Mukojima · พักผ่อน', note: 'เผื่อเดินจากสถานีถึง J House ประมาณ 15–20 นาที · เวลาถึงขึ้นกับรถที่ขึ้นจริง', tag: 'other', cost: 0 },
   ]},
   { day: 7, date: 'จ. 26 ต.ค.', area: 'tokyo', planRevision: 'tokyo-saved-2026-10-12', title: 'St. Mary’s Cathedral → Omotesando → Shibuya', items: [
     { t: '08:00', act: 'Oshiage → Otemachi → Edogawabashi · เดินไป Cathedral', note: 'Hanzomon Line ต่อ Yurakucho Line · เผื่อเดินทางรวมประมาณ 60 นาทีและเดิน 15–20 นาทีจาก Edogawabashi', tag: 'move', cost: 400 },
@@ -243,6 +247,10 @@ const PLACES = [
     en: { name: 'Shinjuku', desc: 'Omoide Yokocho, Kabukicho and huge department-store shopping' } },
   { name: 'Ginza', ja: '銀座', area: 'tokyo', lat: 35.6717, lng: 139.7650, day: 9, desc: 'ย่านช้อปไฮเอนด์ + Uniqlo 12 ชั้น, Itoya',
     en: { name: 'Ginza', desc: 'High-end shopping district — 12-floor Uniqlo, Itoya stationery' } },
+  { name: 'Ginza Godaigo', ja: '銀座ごだいご', area: 'tokyo', lat: 35.6714608, lng: 139.7601995, day: 6,
+    url: 'https://daiwa-j.com/brands/godaigo/ginza/', ticket: 'ตั้งงบอาหารและเครื่องดื่ม ~¥5,000/คน · วันอาทิตย์ 17:00–23:00 · ยังไม่จอง',
+    desc: 'ตัวเลือกอิซากายะสำหรับนัดเพื่อนคืน 25 ต.ค. แถว Ginza Corridor Street — โอเด้งสไตล์เกียวโต ยากิโทริ และสาเก · จองโต๊ะ 4 คนและยืนยันระยะเวลาใช้โต๊ะ/เวลาสั่งสุดท้าย · เช็คบิลราว 22:30 แล้วเดินไป Shimbashi ขึ้นสาย Asakusa ตรงถึง Oshiage ราว 23:00',
+    en: { name: 'Ginza Godaigo — izakaya option', ticket: 'Food/drinks budget ~JPY 5,000/person · Sunday 17:00–23:00 · not booked', desc: 'Dinner option with friends on 25 Oct around Ginza Corridor Street: Kyoto-style oden, yakitori and sake. Reserve a table for four and confirm seating duration and last orders. Settle around 22:30, then walk to Shimbashi for a direct Asakusa Line train to Oshiage around 23:00.' } },
   { name: 'GINZA SIX', ja: 'ギンザシックス', area: 'tokyo', lat: 35.6699, lng: 139.7638, day: 9, taniguchi: true, img: commonsImg('GINZA_SIX_Office_Building.jpg'), ticket: 'ฟรี (เดินชมอาคาร+สวนดาดฟ้าได้ไม่มีค่าใช้จ่าย)', url: 'https://ginza6.tokyo/', desc: '🏛 ภายนอกอาคารออกแบบโดย Taniguchi (ร่วมกับ Kajima Design, 2017) — ชายคาสเตนเลสรอบชั้นออฟฟิศ + สวนดาดฟ้า อยู่ในย่าน Ginza ที่จะไปช้อปอยู่แล้ว',
     en: { name: 'GINZA SIX', ticket: 'Free (building and rooftop garden open to walk-ins)', desc: '🏛 Exterior by Taniguchi with Kajima Design (2017) — stainless eaves wrapping the office floors, plus a rooftop garden. Right in the Ginza shopping area already on the plan' } },
   { name: '21_21 DESIGN SIGHT', ja: '21_21 デザインサイト', area: 'tokyo', lat: 35.6674127, lng: 139.7301349, day: 8, type: 'museum', architecture: true, img: commonsImg('21_21_DESIGN_SIGHT.jpg'), ticket: 'เช็คราคาที่เว็บ (เปลี่ยนตามนิทรรศการ)', url: 'https://2121designsight.jp/', desc: '🏛 ออกแบบโดย Tadao Ando (2007) — หลังคาเหล็กแผ่นเดียวพับตามแนวคิด "ผ้าหนึ่งผืน" ของ Issey Miyake ส่วนใหญ่ฝังอยู่ใต้ดิน ใน Tokyo Midtown, Roppongi (นอกเส้นทางหลัก แต่คุ้มถ้าชอบงานสถาปัตย์ — เดินทางต่อจาก Shibuya/Harajuku ได้)',
@@ -451,8 +459,9 @@ const TRANSPORT = [
     { method: '🚕 บัสประจำทางไป Takayu Onsen + แท็กซี่ต่อ', note: 'บัส Fukushima → Takayu Onsen มีวิ่งประจำ (ถูก) แต่จาก Takayu ถึง Jododaira ยังเหลืออีก 15 กม. บน Skyline ต้องต่อแท็กซี่และ⚠️นัดเที่ยวกลับล่วงหน้า — เช็คกับศูนย์ข้อมูลก่อนว่ามีรถจริงในวันนั้น', time: '~90 นาที/เที่ยว', price: 6000 },
     { method: '🚖 แท็กซี่ท่องเที่ยวจากสถานี Fukushima', note: 'เริ่มราว ¥15,900 ต่อคัน/3 ชม. — เวลาไม่พอสำหรับเดินเขา 4-5 ชม. ต้องเหมายาวขึ้นซึ่งแพงกว่าเช่ารถมาก', time: 'เหมาเป็นชั่วโมง', price: 15900 },
   ]},
-  { title: 'Fukushima → Tokyo (นัดเพื่อนเย็นนี้)', day: 'DAY 6 · 25 ต.ค.', options: [
-    { method: 'Tohoku Shinkansen (Yamabiko) — ขบวนสาย', note: 'นั่งยาวถึง Tokyo Sta. เลย ออกช่วงสาย ๆ ให้ถึงโตเกียวบ่ายโมง เผื่อเวลาพักก่อนนัดมื้อเย็น', time: '~95 นาที', price: 9110 },
+  { title: 'Fukushima → Ueno → Mukojima → Ginza', day: 'DAY 6 · 25 ต.ค.', options: [
+    { method: 'Tohoku Shinkansen (Yamabiko) — ขบวนสาย', note: 'เลือกขบวนจอด Ueno ถึงราว 13:00 ตามแผน Horyuji · กลับไปเช็คอิน Mukojima ก่อนออกไปเดิน Ginza และนัดอิซากายะ 19:30 · เวลา/ค่าโดยสารเป็นเป้าหมาย เช็กขบวนจริงก่อนจอง', time: '~90–110 นาที', price: 9110 },
+    { method: 'กลับดึก: Shimbashi → Oshiage — Toei Asakusa Line', note: 'เดินจาก Corridor Street มาขึ้นรถตรงราว 23:00 · บนรถราว 20 นาที แล้วเดินถึงที่พัก 15–20 นาที · ตั้งงบค่าเดินทาง ¥300/คน · ตรวจตารางวันอาทิตย์: https://www.kotsu.metro.tokyo.jp/subway/timetable/asakusa/A10NH.html', time: '~45–60 นาทีรวมเดิน/รอ', price: 300 },
   ]},
   { title: 'ที่พัก Mukojima → สนามบิน', day: 'DAY 9 · 28 ต.ค.', options: [
     { method: '🚃 Keisei Access Express จาก Oshiage — วิ่งตรง', note: '💰 <strong>ถูกและง่ายจากที่พักนี้</strong> ไป Narita Terminal 1 ราว 50–60 นาทีตามรอบรถ ¥1,170 · เดินจากที่พักไป Oshiage ~610 ม. · เลือกรอบที่ถึงไม่เกิน 14:00 สำหรับเที่ยวบิน 17:00', time: '~50–60 นาที', price: 1170 },
@@ -524,11 +533,15 @@ const RAIL_FARES = [
     { method: "JR Ban'etsu West Line", time: '~35 นาที', xfer: '0 ครั้ง', price: 770, conf: 'calc',
       note: '⚠️ ขบวนห่างกันมาก บางช่วงเว้น 1-2 ชม. เช็ครอบทั้งขาไปขากลับตั้งแต่ก่อนออกเดินทาง' },
   ]},
-  { leg: 'Fukushima → Tokyo', day: 'DAY 6 · 25 ต.ค.', from: 'Fukushima Station', to: 'Tokyo Station', options: [
-    { method: 'Tohoku Shinkansen (Yamabiko) — ไม่จองที่นั่ง', time: '~95 นาที', xfer: '0 ครั้ง', price: 8580, conf: 'src',
-      note: '⚠️ ขบวน Hayabusa บางขบวนไม่จอด Fukushima — ดูขบวน Yamabiko เป็นหลัก' },
-    { method: 'Tohoku Shinkansen — จองที่นั่ง', time: '~95 นาที', xfer: '0 ครั้ง', price: 9110, conf: 'src',
-      note: '25 ต.ค. เป็นวันอาทิตย์ขากลับ คนเยอะ — จองล่วงหน้าเถอะ เย็นนี้มีนัดกินข้าว · ⚠️ ลงที่ Tokyo Sta. แล้ว<strong>ต้องต่อ Chuo Line ไป Shinjuku อีก ~15 นาที ~¥210</strong>' },
+  { leg: 'Fukushima → Ueno (กลับโตเกียว)', day: 'DAY 6 · 25 ต.ค.', from: 'Fukushima Station', to: 'Ueno Station Tokyo', options: [
+    { method: 'Tohoku Shinkansen (Yamabiko) — ไม่จองที่นั่ง', time: '~90–110 นาที', xfer: '0 ครั้ง', price: 8580, conf: 'calc',
+      note: 'ค่าโดยสารเป็นงบประมาณเผื่อจากแผนเดิม เช็กราคาจริงถึง Ueno ก่อนซื้อ · เลือกขบวน Yamabiko ที่จอด Ueno' },
+    { method: 'Tohoku Shinkansen — จองที่นั่ง', time: '~90–110 นาที', xfer: '0 ครั้ง', price: 9110, conf: 'calc',
+      note: 'เลือกขบวนถึง Ueno ราว 13:00 เพื่อชม Horyuji ตามแผน ก่อนเช็คอิน Mukojima และไป Ginza ตอนเย็น · ค่าโดยสารเป็นงบเผื่อ เช็กราคาจริงตอนจอง' },
+  ]},
+  { leg: 'กลับดึกจาก Ginza: Shimbashi → Oshiage', day: 'DAY 6 · 25 ต.ค. (กลางคืน)', from: 'Shimbashi Station Tokyo', to: 'Oshiage Station Tokyo', options: [
+    { method: 'Toei Asakusa Line — รถตรงฝั่ง Oshiage / Keisei', time: '~20 นาทีบนรถ', xfer: '0 ครั้ง', price: 300, conf: 'calc',
+      note: 'ราคาเป็นงบเผื่อ ไม่ใช่ค่าโดยสารที่ยืนยัน · เช็คบิลอิซากายะราว 22:30 ขึ้นรถเป้าหมาย 23:00 แล้วเดินเข้าที่พัก 15–20 นาที · ตารางวันอาทิตย์: https://www.kotsu.metro.tokyo.jp/subway/timetable/asakusa/A10NH.html' },
   ]},
   { leg: 'Oshiage (ที่พัก Mukojima) → Narita Airport', day: 'DAY 9 · 28 ต.ค.', from: 'Oshiage Station Tokyo', to: 'Narita Airport Terminal 1 Station', options: [
     { method: '🚃 Keisei Access Express — วิ่งตรงจาก Oshiage', time: '~50–60 นาที', xfer: '0 ครั้ง', price: 1170, conf: 'src',
@@ -1133,6 +1146,10 @@ PLACES.forEach((place) => { if (ARCHITECTURE_ACCESS[place.name]) place.visitAcce
 const TOKYO_PLAN_PIN_DAYS = {
   'Ueno Park / Ameyoko': 6,
   'Gallery of Hōryū-ji Treasures': 6,
+  'Ginza': 6,
+  'GINZA SIX': 6,
+  'Ginza Place': 6,
+  'Ginza Godaigo': 6,
   'Prada Aoyama': 7,
   'Dior Omotesando': 7,
   'Shibuya Crossing + Sky': 7,

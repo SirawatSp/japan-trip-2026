@@ -96,14 +96,25 @@ const flightRowsMigrated = migrateFlightRows(itinerary);
 const cityLuggageMigrated = migrateCityLuggageRows(itinerary);
 function applyTokyoSavedPlan(days) {
   const pending = days.filter((day) => day.day >= 6 && day.day <= 9
-    && day.planRevision !== 'tokyo-saved-2026-10-12');
+    && day.planRevision !== DEFAULT_ITINERARY.find((d) => d.day === day.day)?.planRevision);
   if (!pending.length) return false;
   if (localStorage.getItem('jt26_tokyo_plan_backup') === null) {
     store.save('jt26_tokyo_plan_backup', pending);
   }
   for (const day of pending) {
     const updated = DEFAULT_ITINERARY.find((d) => d.day === day.day);
-    Object.assign(day, structuredClone(updated));
+    if (day.day === 6 && day.planRevision === 'tokyo-saved-2026-10-12') {
+      if (localStorage.getItem('jt26_ginza_plan_backup') === null) store.save('jt26_ginza_plan_backup', [day]);
+      // Replace only the evening so custom morning/afternoon edits survive this update.
+      const eveningAt = (item) => Number(item.t?.match(/(\d{1,2}):/)?.[1]) >= 17
+        || item.act === 'ออกจากที่พักไปยังร้านนัดเพื่อน';
+      const start = day.items.findIndex(eveningAt);
+      day.items.splice(start < 0 ? day.items.length : start, day.items.length, ...structuredClone(updated.items.filter(eveningAt)));
+      day.title = updated.title;
+      day.planRevision = updated.planRevision;
+    } else {
+      Object.assign(day, structuredClone(updated));
+    }
   }
   return true;
 }

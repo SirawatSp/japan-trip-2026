@@ -68,7 +68,7 @@ const ITINERARY_EN = [
     ['Transfer departs on time → Fukushima at 16:00', 'The vehicle will not wait for late hikers.'],
     ['Iizaka Onsen · celebratory dinner', 'If Sabakoyu was skipped on Friday, visit tonight (approximately JPY 200), or choose a longer day-use bath at a ryokan.'],
   ]},
-  { day: 6, sourceHash: '6182d177', date: 'Sun 25 Oct', title: 'Fukushima → Ueno / Horyuji Treasures → dinner with friends', items: [
+  { day: 6, sourceHash: 'e80368ac', date: 'Sun 25 Oct', title: 'Fukushima → Ueno / Horyuji Treasures → Ginza · late izakaya dinner', items: [
     ['Breakfast · pack luggage · souvenirs near Fukushima Station', 'Skip distant morning sightseeing to return to Tokyo earlier.'],
     ['Check out · head to Fukushima Station with luggage', 'Allow at least 15 minutes to reach the platform.'],
     ['Tohoku Shinkansen (Yamabiko): Fukushima → Ueno', 'Target time, not a booked train. Choose a service stopping at Ueno and arriving around 13:00. Allow 90–110 minutes and reserve seats. Fare is an estimate; confirm when booking.'],
@@ -76,8 +76,12 @@ const ITINERARY_EN = [
     ['Tokyo National Museum · Gallery of Horyuji Treasures', 'Yoshio Taniguchi (1999). Included in TNM collection admission, approximately JPY 1,000. https://www.tnm.jp/ If arrival at Ueno is after 14:30, skip the museum to protect the dinner appointment. Do not move it to Monday 26 Oct, when it is closed.'],
     ['Collect luggage · Ueno → Asakusa → Hikifune → J House', 'Ginza Line, then Tobu Skytree Line and a walk to the accommodation. Allow 45–60 minutes with luggage; estimated transport JPY 400.'],
     ['Check in at Mukojima accommodation · shower and rest', 'Confirm check-in time with the accommodation before travel.'],
-    ['Leave accommodation for the dinner meeting', 'Restaurant location is not yet confirmed. Adjust departure for the chosen neighbourhood; allow approximately 45–60 minutes.'],
-    ['Dinner with friends in central Tokyo', 'Today’s main appointment. Confirm the restaurant and reserve a table for four.'],
+    ['Leave accommodation · Oshiage → Higashi-ginza', 'Walk to Oshiage and take the Toei Asakusa Line towards Nishi-magome / Haneda, getting off at Higashi-ginza. About 20 minutes on the train; allow 40–50 minutes including walks and waiting. Transport budget JPY 300/person.'],
+    ['Ginza stroll · Ginza 4-chome / GINZA SIX → Corridor Street', 'Look at the architecture and choose one or two shops according to opening hours, then walk to meet friends around Ginza Corridor Street. Large bags stay at the accommodation.'],
+    ['Late izakaya dinner with friends around Ginza / Corridor Street', 'Option: Ginza Godaigo — Kyoto-style oden, yakitori and sake. Listed Sunday hours 17:00–23:00. Confirm the restaurant, reserve a table for four, and check seating duration and last orders. Food and drinks budget approximately JPY 5,000/person. https://daiwa-j.com/brands/godaigo/ginza/'],
+    ['Settle the bill · walk from Corridor Street to Shimbashi Station', 'Start walking back around 22:30. Allow 10–15 minutes and time to find the Toei Asakusa Line entrance towards Oshiage / Keisei.'],
+    ['Shimbashi → Oshiage · direct Toei Asakusa Line train', 'Target departure around 23:00, not a booked service. About 20 minutes on the train, with no change. Take the direction for Oshiage / Aoto / Keisei-Takasago. The current weekend timetable lists 23:00, 23:11 and 23:19, with the last train at 00:09; recheck on the travel date and avoid relying on the last train. Budget JPY 300/person. https://www.kotsu.metro.tokyo.jp/subway/timetable/asakusa/A10NH.html'],
+    ['Walk from Oshiage to the Mukojima accommodation · rest', 'Allow approximately 15–20 minutes to walk from the station to J House. Arrival depends on the train actually taken.'],
   ]},
   { day: 7, sourceHash: '9a173f7', date: 'Mon 26 Oct', title: 'St. Mary’s Cathedral → Omotesando → Shibuya', items: [
     ['Oshiage → Otemachi → Edogawabashi · walk to the cathedral', 'Hanzomon Line, then Yurakucho Line. Allow around 60 minutes total, including a 15–20-minute walk from Edogawabashi.'],

@@ -48,6 +48,25 @@ test('Tokyo migration and editable A4 print report', async () => {
       remote[0].title = 'REMOTE NORTH';
       return applyTokyoSavedPlan(remote) && remote[0].title === 'REMOTE NORTH' && !applyTokyoSavedPlan(remote);
     }), true);
+    assert.equal(await page.evaluate(() => {
+      const remote = structuredClone(DEFAULT_ITINERARY);
+      const day = remote.find((d) => d.day === 6);
+      day.planRevision = 'tokyo-saved-2026-10-12';
+      day.title = 'PREVIOUS DINNER PLAN';
+      day.items[0].act = 'CUSTOM MORNING TO KEEP';
+      day.items = [...day.items.slice(0, 7), { t: '17:30', act: 'ออกจากที่พักไปยังร้านนัดเพื่อน', note: '', cost: 500, tag: 'move' }, { t: '18:30', act: 'OLD DINNER', note: '', cost: 4000, tag: 'food' }];
+      remote[6].title = 'CUSTOM NEXT DAY TO KEEP';
+      const morning = JSON.stringify(day.items.slice(0, 7));
+      const otherDays = JSON.stringify(remote.filter((d) => d.day !== 6));
+      const updated = applyTokyoSavedPlan(remote);
+      const backup = JSON.parse(localStorage.getItem('jt26_ginza_plan_backup'));
+      const valid = updated && JSON.stringify(day.items.slice(0, 7)) === morning
+        && JSON.stringify(remote.filter((d) => d.day !== 6)) === otherDays
+        && day.title.includes('Ginza') && day.items.some((i) => i.t === '~23:00' && i.act.includes('Oshiage'))
+        && !day.items.some((i) => i.act === 'OLD DINNER') && backup[0].title === 'PREVIOUS DINNER PLAN';
+      day.items.at(-1).note = 'CUSTOM EDIT AFTER GINZA UPDATE';
+      return valid && !applyTokyoSavedPlan(remote) && day.items.at(-1).note === 'CUSTOM EDIT AFTER GINZA UPDATE';
+    }), true);
     await page.locator('.day-title-input[data-idx="6"]').fill('CUSTOM TOKYO AFTER UPDATE');
     await page.locator('.day-title-input[data-idx="6"]').blur();
     await page.locator('.day-act-input[data-idx="6"][data-item="0"]').fill('CUSTOM ACTIVITY <img src=x onerror=alert(1)>');
