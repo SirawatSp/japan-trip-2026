@@ -68,7 +68,7 @@ function commonsImg(file, width) {
 /* ---------- itinerary (default — user can edit/reset in the app) ----------
    แต่ละรายการ = { t: เวลา, act: กิจกรรม, note: รายละเอียดเพิ่ม, cost: ราคาประมาณต่อคน (เยน) }
    ขึ้นเวอร์ชันทุกครั้งที่แก้แผนเริ่มต้น เพื่อให้เครื่องที่เคยบันทึกไว้รู้ว่ามีของใหม่ */
-const ITINERARY_VERSION = 15;
+const ITINERARY_VERSION = 16;
 /* ป้ายประเภทกิจกรรมในแผนรายวัน — ใช้ดูภาพรวมว่าวันไหนออกนอกเมือง วันไหนอยู่ในเมือง */
 const ITEM_TAGS = {
   nature: { icon: '🌿', th: 'ธรรมชาติ', en: 'Nature',  color: '#3e5c46' },
@@ -114,39 +114,35 @@ const DEFAULT_ITINERARY = [
     { t: '12:15', act: 'ข้าวเที่ยงแถวสถานี Utsunomiya', note: '', tag: 'food', cost: 1200 },
     { t: '13:30', act: '🚄 ชินคันเซ็น Utsunomiya → Fukushima', note: '~55 นาที · Yamabiko', tag: 'move', cost: 6250 },
     { t: '14:40', act: 'ถึง Fukushima · เช็คอิน Airbnb (3 คืน)', note: 'ครึ่งบ่ายที่เหลือเอาไว้ตั้งหลัก อย่าอัดโปรแกรม', tag: 'move', cost: 0 },
-    { t: '16:00', act: 'เดินย่านสถานี · ซื้อเสบียงวันเดินเขา · เดินดูทาง West Exit', note: 'ให้รู้ทางก่อนเช้าวันเสาร์ จะได้ไม่หลง · เผื่อซื้อถุงมือ/หมวกที่ยังขาด', tag: 'city', cost: 1500 },
+    { t: '16:00', act: 'เดินย่านสถานี · ซื้อเสบียงวันเดินเขา · เดินดูทาง West Exit', note: 'ให้รู้ทางก่อนรับรถเช้าวันศุกร์ 23 ต.ค. · เผื่อซื้อถุงมือ/หมวกที่ยังขาด', tag: 'city', cost: 1500 },
     { t: '18:00', act: '🥟 เย็น: เกี๊ยวซ่าจานกลม (円盤餃子)', note: 'ของขึ้นชื่อประจำเมือง — ร้านดังรอบสถานีมีหลายเจ้า บางร้านหมดเร็ว ไปก่อน 19:00', tag: 'food', cost: 1500 },
     { t: '—', act: '🔁 ถ้ายังมีแรงเย็นนี้: light-up อุโมงค์แปะก๊วย @ Azuma Sports Park', note: 'เปิดไฟ 17:00–20:00 ช่วงปลาย ต.ค.–กลาง พ.ย. · บัสจากสถานี ~30 นาที — เก็บวันนี้ได้ถ้าไม่อยากเบียดวันศุกร์', tag: 'nature', cost: 500 },
   ]},
-  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', title: 'เต็มวัน ① — 🚗 ขับรถเที่ยวธรรมชาติ Urabandai (ไม่เหนื่อย)', items: [
-    { t: '07:00', act: '⚠️ เช็คพยากรณ์อากาศของวันพรุ่งนี้ก่อนออก', note: 'ถ้าเสาร์ 24 อากาศแย่ ให้สลับ — เดินเขาวันนี้ แล้วยกวันทะเลสาบไปวันเสาร์แทน (ทะเลสาบเที่ยวได้แม้ฟ้าปิด)', tag: 'other', cost: 0 },
-    { t: '08:00', act: '🚗 รับรถเช่าที่สาขาใกล้สถานี Fukushima', note: 'ดูสาขา+ลิงก์จองในหมวด「การเดินทาง → 🚗 ร้านเช่ารถ」· เช่า 2 วัน (23-24) คืนรถเย็นวันพรุ่งนี้หลังเดินเขา · ค่ารถ/น้ำมันวันนี้ (ครึ่งหนึ่งของ 2 วัน) ≈ ¥3,440/คน — ดูสรุปเต็มในกล่อง 🚗 คุ้มไหมถ้าเช่ารถ', tag: 'move', cost: 3440 },
-    { t: '08:30', act: 'ออกทาง Tohoku Expressway → ทางด่วนล้วน ไม่ผ่านภูเขา', note: 'เลี่ยง Bandai-Azuma Skyline (ทางภูเขาโค้งเยอะ 28.7 กม. ขับ 90 นาที เหนื่อยกว่า และใบไม้บนที่สูงมักพีคไปแล้วตั้งแต่ต้น-กลาง ต.ค.) — ไปทางด่วนสบายกว่าและตรงจังหวะใบไม้ของปีนี้กว่า', tag: 'move', cost: 0 },
-    { t: '09:15', act: '📸 หุบเขา Nakatsugawa — จุดถ่ายรูปใบไม้แดงชื่อดังของ Urabandai', note: 'จอดที่ Nakatsugawa Rest House แล้วเดินลงสะพานแค่ ~5 นาที ทางราบเรียบ ไม่เหนื่อยเลย · หินขัดมันจากกระแสน้ำ + ป่าเมเปิลรอบหุบ · จุดถ่ายภาพสวยระดับที่ช่างภาพมาจากทั่วประเทศ', tag: 'nature', cost: 0 },
-    { t: '09:50', act: '🥾 เดินเข้า Goshiki-numa แบบไป-กลับสั้น ๆ (ไม่ต้องเดินทะลุ)', note: 'จอดรถที่ Goshikinuma Iriguchi เดินเข้าไปถึง Bishamon-numa บึงสีสวยที่สุด (~15-20 นาที/ขา) แล้วเดินย้อนกลับมาที่รถ — รวม ~40-50 นาที ทางราบล้วน ไม่ต้องเดินทะลุออกอีกฝั่งแบบตอนไม่มีรถ (ปกติคนไม่มีรถต้องเดินทะลุ 3.6 กม. 80-90 นาทีเพราะรถบัสจอดคนละฝั่ง) · ใบไม้พีคกลาง ต.ค.–ต้น พ.ย. — ตรงช่วงเราพอดี', tag: 'nature', cost: 0 },
-    { t: '11:00', act: 'ขับรถ ~10 นาที ไปข้าวเที่ยงแถว Urabandai Kogen', note: 'ร้านอาหาร/คาเฟ่รวมกันแถวนี้ ที่จอดรถสะดวก', tag: 'food', cost: 1200 },
-    { t: '13:00', act: '🚤 ล่องเรือทะเลสาบ Hibara ~35 นาที', note: 'เปิดปลาย เม.ย.–ต้น พ.ย. — ปลาย ต.ค. ยังทัน · ~¥1,500 · นั่งเรือชมวิว ไม่ต้องเดิน พักขาได้เต็มที่ · จุดขายตั๋ว/ที่จอดรถอยู่ติดกัน', tag: 'nature', cost: 1500 },
-    { t: '14:00', act: 'นั่งชิลริมทะเลสาบ · คาเฟ่ · ร้านของฝาก', note: 'วันนี้ตั้งใจให้เหลือเวลาไม่ต้องรีบ ไม่มีตารางรถบัสมากำหนด — ต่างจากวันเดินเขาพรุ่งนี้ที่มีเดดไลน์', tag: 'nature', cost: 800 },
-    { t: '15:30', act: '🚗 ขับกลับ Fukushima ทางด่วน', note: '~45-50 นาที · ทางเดียวกับขามา ไม่ต้องขับใหม่ ไม่เหนื่อย', tag: 'move', cost: 0 },
-    { t: '16:30', act: '♨️ ถึงเมือง — เลือกอย่างใดอย่างหนึ่งตามแรงที่เหลือ', note: 'A) Iizaka Onsen + Sabakoyu (~¥200 + ค่ารถ) · B) light-up อุโมงค์แปะก๊วย Azuma Sports Park (17:00–20:00) · C) กลับที่พักเลย จอดรถไว้ (ที่พักมีที่จอด) เตรียมของวันเดินเขา', tag: 'other', cost: 950 },
-    { t: '19:30', act: '🥟 ข้าวเย็น · เตรียมของวันเดินเขา นอนเร็ว', note: 'พรุ่งนี้ตื่น 07:00 · รถยังอยู่ที่จอดของที่พัก ไม่ต้องคืนวันนี้', tag: 'food', cost: 1200 },
-    { t: '—', act: '🔁 อยากเดินเต็มเส้น Goshiki-numa 3.6 กม. ทะลุสองฝั่ง', note: 'เดินฝั่ง Iriguchi → ออก Urabandai Kogen-eki (80-90 นาที) แล้วเดิน/แท็กซี่กลับมาเอารถที่จุดจอดเดิม — เหนื่อยกว่าแบบไป-กลับสั้น แต่เห็นบึงครบทุกจุด', tag: 'nature', cost: 0 },
-    { t: '—', act: '🔁 ไม่มีรถ: แผนเดิมด้วยรถไฟ+บัส', note: 'Fukushima→Koriyama ชินคันเซ็น ¥1,800 → Inawashiro ¥770 → บัส Bandai Toto ¥790 → เดินทะลุ Goshiki-numa → เรือ Hibara → บัสกลับ → รถไฟกลับ (รวม ~¥8,000/คน) · ใช้เวลาทั้งวันเกือบเต็ม เพราะรอบบัสห่าง', tag: 'move', cost: 0 },
-    { t: '—', act: '🔁 ถ้าไม่อยากขับไกล: ทะเลสาบ Inawashiro อย่างเดียว', note: 'อยู่ใกล้ทางด่วนกว่า ตัดช่วง Urabandai ออก ประหยัดเวลาขับรถ · ปลาย ต.ค. หงส์อพยพเริ่มมา', tag: 'nature', cost: 0 },
-  ]},
-  { day: 5, date: 'ส. 24 ต.ค.', area: 'fukushima', title: 'เต็มวัน ② — ⛰ เดินเขา Mt. Issaikyo', items: [
+  { day: 4, date: 'ศ. 23 ต.ค.', area: 'fukushima', planRevision: 'fukushima-hike-fireworks-2026-10-14', title: 'Mt. Issaikyo — เดินเขา + รับรถเช่า (ใช้ต่อ 24 ต.ค.)', items: [
     { t: '07:00', act: 'ตื่น · ซื้อเสบียงเพิ่มที่เซเว่น', note: 'น้ำ 1.5 ลิตร + ข้าวกล่อง + snack ฉุกเฉิน', tag: 'food', cost: 1000 },
-    { t: '08:15', act: 'ถึง Fukushima Sta. West Exit', note: 'เข้าห้องน้ำให้เรียบร้อย เตรียม QR จองรถ', tag: 'move', cost: 0 },
-    { t: '08:30', act: 'Sky Access ออกเดินทาง → Jododaira', note: 'ราคาต่อคน ¥13,000 · จองภายใน 15:00 ของวันก่อน · เป็นรถเหมา/แท็กซี่ ไม่ใช่บัสประจำทาง', tag: 'move', cost: 13000 },
-    { t: '—', act: '🔁 ทางเลือกถูกกว่ามากเมื่อไป 4 คน: เช่ารถขับเอง', note: 'รถ+น้ำมัน+ที่จอดรวม ~¥10,000 ต่อคัน หาร 4 = ~¥2,500/คน (ประหยัดกว่า Sky Access ~¥10,500 ต่อคน) · Skyline ฟรีไม่มีค่าผ่านทาง · ออกกี่โมงก็ได้ ไม่ต้องรีบกลับ 15:00 · ต้องมีใบขับขี่สากล (เจนีวา 1949) และเช็คเวลาปิดประตูตอนเย็น', tag: 'move', cost: 0 },
-    { t: '09:30', act: 'ถึง Jododaira · เช็ค Visitor Center', note: 'ถามลม เส้นทาง น้ำแข็ง และประกาศภูเขาไฟทุกครั้ง', tag: 'nature', cost: 0 },
-    { t: '09:40', act: 'เริ่มเดิน: Wetland → Sugadaira Shelter', note: 'ชันช่วงแรก เดินช้า ๆ วอร์มขา', tag: 'nature', cost: 0 },
-    { t: '11:20', act: 'ถึงยอด 1,949 ม. · วิว Goshikinuma「ดวงตาแม่มด」', note: 'ถ่ายรูป 15-20 นาที ไม่ลงไปริมทะเลสาบ', tag: 'nature', cost: 0 },
+    { t: '07:15', act: 'เช็กอากาศบนเขา ถนน Skyline และประกาศภูเขาไฟ', note: 'ถ้าลมแรง ทางมีน้ำแข็ง หรือปิดทาง ให้ยกเลิกยอด ไม่สลับเดินเขาไปทับวันพลุโดยอัตโนมัติ · ถาม Visitor Center ก่อนออกเดิน', tag: 'other', cost: 0 },
+    { t: '08:00', act: 'รับรถเช่าใกล้สถานี Fukushima · ใช้ 23–24 ต.ค.', note: 'เวลาเป้าหมาย ต้องยืนยันเวลาเปิดสาขา · คนขับทุกคนเตรียมใบขับขี่ไทย ใบขับขี่สากล Geneva 1949 และพาสปอร์ตตัวจริง · งบรถรวม 2 วันหาร 4 คน แบ่งวันนี้ ¥4,250/คน ยังไม่รวมประกันและค่าเพิ่มกรณีคืน 25 เช้า', tag: 'move', cost: 4250 },
+    { t: '08:30', act: 'ขับรถไป Jododaira ทาง Bandai-Azuma Skyline', note: 'เผื่อขับ 75–90 นาทีหลังรับรถ ไม่ใช่เวลายืนยัน · เช็กเส้นทางเปิดจริงและการซ่อมสะพาน คืน 23 มีประกาศปิดบางช่วง 21:00–06:00 · https://www.pref.fukushima.lg.jp/sec/41310a/bandaiazumaskyline.html', tag: 'move', cost: 0 },
+    { t: '09:45–10:00', act: 'ถึง Jododaira · เช็ค Visitor Center', note: 'ถามลม เส้นทาง น้ำแข็ง และประกาศภูเขาไฟทุกครั้ง', tag: 'nature', cost: 0 },
+    { t: '10:15', act: 'เริ่มเดิน: Wetland → Sugadaira Shelter', note: 'ชันช่วงแรก เดินช้า ๆ วอร์มขา · ถ้าถึงช้าให้ย่อเส้นทาง ไม่เร่งเพื่อไล่เวลา', tag: 'nature', cost: 0 },
+    { t: '11:45', act: 'ถึงยอด 1,949 ม. · วิว Goshikinuma「ดวงตาแม่มด」', note: 'ถ่ายรูป 15-20 นาที ไม่ลงไปริมทะเลสาบ', tag: 'nature', cost: 0 },
     { t: '12:30', act: 'พักกลางวันใกล้ shelter', note: 'ถ้าลมแรงอย่ากินบนยอด', tag: 'food', cost: 0 },
     { t: '12:50', act: 'แยกไป Kamanuma → Ubagahara', note: 'เดินตามป้าย Jododaira ห้ามออกนอกทาง', tag: 'nature', cost: 0 },
-    { t: '14:10', act: 'กลับถึง Jododaira · ซื้อของ/ห้องน้ำ', note: 'เหลือ buffer อย่างน้อย 40 นาที', tag: 'nature', cost: 500 },
-    { t: '15:00', act: 'รถออกตรงเวลา → ถึง Fukushima 16:00', note: 'รถไม่รอคนกลับช้า', tag: 'move', cost: 0 },
-    { t: '17:00', act: 'Iizaka Onsen + ข้าวเย็นฉลอง 🍜', note: 'ถ้าวันศุกร์ยังไม่ได้ไป Sabakoyu (~¥200) คืนนี้เก็บได้ · หรือแช่ยาว ๆ ที่เรียวกังแบบ day-use', tag: 'food', cost: 2300 },
+    { t: '14:30', act: 'กลับถึง Jododaira · พักและเข้าห้องน้ำ', note: 'ตั้งเป้าลงเขาเสร็จก่อน 15:00 เพื่อขับทางภูเขาช่วงกลางวัน · ย่อวงรอบถ้าอากาศหรือเวลาไม่พอ', tag: 'nature', cost: 500 },
+    { t: '15:00–16:30', act: 'ขับกลับที่พัก Fukushima · เก็บรถไว้ใช้พรุ่งนี้', note: 'เวลาเป็นกรอบเผื่อ ไม่ใช่เวลานำทางสด · ยืนยันที่จอดกับที่พัก · ห้ามขับต่อถ้าอ่อนเพลีย', tag: 'move', cost: 0 },
+    { t: '18:00', act: 'ข้าวเย็นในเมือง · พักขาหลังเดินเขา', note: 'ไม่เพิ่มขับรถไปเที่ยวไกลคืนนี้ เตรียมเสื้อกันหนาวสำหรับชมพลุพรุ่งนี้', tag: 'food', cost: 2000 },
+  ]},
+  { day: 5, date: 'ส. 24 ต.ค.', area: 'fukushima', planRevision: 'fukushima-hike-fireworks-2026-10-14', title: 'Lake Inawashiro → พลุ Iwase / Sukagawa (ผู้จัดประกาศแล้ว)', items: [
+    { t: '08:00', act: 'ข้าวเช้า · ตรวจประกาศงานพลุและเส้นทางกลับ', note: 'ผู้จัดประกาศ 24 ต.ค. เปิด 16:00 ช่วงแรก 17:30 พลุหลัก 18:15 ไม่มีชัตเทิล · ตรวจอากาศ เวลาจบ และการคืนรถอีกครั้ง โทร 岩瀬商工会 0248-65-3210 · http://sci-iwase.com/eternal/', tag: 'other', cost: 1000 },
+    { t: '08:30–10:00', act: 'ขับ Fukushima → Lake Inawashiro / Nagahama', note: 'กรอบเผื่อขับและพัก ไม่ใช่เวลานำทางสด · งบรถรวม 2 วันแบ่งวันนี้ ¥4,250/คน รวมเผื่อน้ำมัน ที่จอด ทางด่วน แต่ยังไม่รวมประกัน ตั๋วพลุ หรือค่าเพิ่มกรณีคืน 25 เช้า', tag: 'move', cost: 4250 },
+    { t: '10:00–11:30', act: 'เดินริม Lake Inawashiro · Nagahama', note: 'เดินชิลพักขาหลังเดินเขา · ไม่รับประกันว่าจะมีหงส์ · หมุด Nagahama บนแผนที่คือจุดทะเลสาบ ไม่ใช่สถานีรถไฟ', tag: 'nature', cost: 0 },
+    { t: '11:30', act: 'เรือชมวิว Inawashiro ถ้าเปิดและอากาศเหมาะ', note: 'ประมาณ ¥1,500/คน · เช็กรอบและการเดินเรือจริงหน้างาน ไม่ใช่ตั๋วจองแล้ว · https://www.bandaisan.or.jp/fun/nagahama-2/', tag: 'nature', cost: 1500 },
+    { t: '12:30', act: 'ข้าวกลางวันแถว Inawashiro · พักคาเฟ่', note: 'เลือกจุดกินตามเส้นทาง ไม่อัด Urabandai/Hibara เพิ่มในวันเดียวเพื่อรักษาเวลาพลุ', tag: 'food', cost: 1500 },
+    { t: '14:00', act: 'ออกจากทะเลสาบไปย่าน Iwase / Sukagawa', note: 'ตั้งเป้าจอดประมาณ 15:30 แล้วเผื่อเดินขาละ 25–60 นาทีตามที่จอด ใช้แผนที่ผู้จัด ไม่จอดริมถนน · ถ้าทางช้าหรือคนขับล้าให้ตัดงานพลุ ไม่เร่งรถ', tag: 'move', cost: 0 },
+    { t: '15:30–17:00', act: 'จอดรถ · เดินไปพื้นที่ชมงาน Iwase', note: 'ที่จอดผู้จัด: Miura ประมาณ 1.5 กม. / Iwase Civic Service Center 2.7 กม. / Iwase Yukyu no Sato 4 กม. จากงาน ไม่มีชัตเทิล · เป้าถึงพื้นที่ชมก่อน 17:00 ไม่รับประกันที่ว่าง · เตรียมไฟฉายและเสื้อกันหนาว', tag: 'other', cost: 0 },
+    { t: '17:30 / 18:15', act: 'Iwase Yukyu Festival Fireworks · ประกาศทางการ 2026', note: '17:30 พลุประกวดออกแบบโดยเด็ก; 18:15 พลุหลัก · พื้นที่ชมฟรีอยู่ใกล้ทางเข้า พื้นที่เดิมเปลี่ยนเป็นแบบเสียเงิน ราคาที่นั่งและเวลาจบยังต้องตรวจเพิ่ม ไม่ใช่ตั๋วจองแล้ว · http://sci-iwase.com/eternal/', tag: 'city', cost: 0 },
+    { t: 'หลังงาน', act: 'ขับกลับ Fukushima · คืนรถตามเวลาที่ตกลงกับสาขา', note: 'ยืนยันเวลาจบงานและรถติดก่อนคำนวณเวลาคืน ห้ามสมมติว่าคืนหลังสาขาปิดได้ · ถ้าไม่ทันให้ตกลงคืนเช้า 25 และเช็กราคาเพิ่ม/ประกันล่วงหน้า ต้องเผื่อขึ้นรถไฟกลับโตเกียว', tag: 'move', cost: 0 },
+    { t: 'ทางเลือก', act: 'ถ้าพลุยกเลิก: กลับ Fukushima เร็วขึ้น · ข้าวเย็นและพัก', note: 'เช็กประกาศผู้จัดก่อนออกจากทะเลสาบ · ถ้าไม่ขับและไม่ใช้แท็กซี่ แนะนำทะเลสาบอย่างเดียว เพราะยังไม่มีรถสาธารณะขากลับงานที่ต่อได้ครบ · เก็บนัดเพื่อนเย็น 25 ต.ค. ในโตเกียวตามเดิม', tag: 'other', cost: 2000 },
   ]},
   { day: 6, date: 'อา. 25 ต.ค.', area: 'tokyo', planRevision: 'tokyo-saved-2026-10-12', title: 'Fukushima → Ueno / Horyuji Treasures → นัดเพื่อน', items: [
     { t: '09:00', act: 'ข้าวเช้า · เก็บกระเป๋า · ซื้อของฝากใกล้สถานี Fukushima', note: 'ตัดเที่ยวไกลช่วงเช้าเพื่อกลับโตเกียวเร็วขึ้น', tag: 'food', cost: 1200 },
@@ -353,6 +349,11 @@ const PLACES = [
     en: { name: 'IBM Makuhari Building', ticket: 'Private office building — no public access inside', desc: '🏛 Chiba (1991) — an IBM office block, exterior viewing only, not a museum' } },
 ];
 
+// Align the existing Fukushima hiking/lakes pins with the approved day swap.
+PLACES.forEach((place) => {
+  if (place.area === 'fukushima' && [4, 5].includes(place.day)) place.day = place.day === 4 ? 5 : 4;
+});
+
 /* ---------- main route line (station to station) ---------- */
 const ROUTE = [
   [35.6812, 139.7671],  // Tokyo — นัดข้าวกับญาติ (20 ต.ค.)
@@ -365,14 +366,14 @@ const ROUTE = [
 
 /* ---------- Mt. Issaikyo loop (schematic line between official waypoints) ---------- */
 const HIKING_ROUTE = [
-  { name: 'Jododaira Visitor Center', ja: '浄土平ビジターセンター', lat: 37.7232, lng: 140.2542, time: '09:40', note: 'จุดเริ่มเดิน ห้องน้ำ และข้อมูลสภาพทางล่าสุด' },
-  { name: 'Sugadaira trail junction', ja: '酸ヶ平分岐', lat: 37.7249, lng: 140.2439, time: '10:20', note: 'ทางแยกไป Kamanuma และ Mt. Issaikyo' },
-  { name: 'Sugadaira Shelter', ja: '酸ヶ平避難小屋', lat: 37.72678, lng: 140.24131, time: '10:35', note: 'จุดหลบอากาศฉุกเฉินระหว่างทาง' },
-  { name: 'Mt. Issaikyo summit', ja: '一切経山山頂', lat: 37.7358, lng: 140.2442, time: '11:20', note: 'ยอด 1,949 ม. จุดชม Goshikinuma หรือดวงตาแม่มด' },
+  { name: 'Jododaira Visitor Center', ja: '浄土平ビジターセンター', lat: 37.7232, lng: 140.2542, time: '10:15', note: 'จุดเริ่มเดิน ห้องน้ำ และข้อมูลสภาพทางล่าสุด' },
+  { name: 'Sugadaira trail junction', ja: '酸ヶ平分岐', lat: 37.7249, lng: 140.2439, time: '10:50', note: 'ทางแยกไป Kamanuma และ Mt. Issaikyo' },
+  { name: 'Sugadaira Shelter', ja: '酸ヶ平避難小屋', lat: 37.72678, lng: 140.24131, time: '11:00', note: 'จุดหลบอากาศฉุกเฉินระหว่างทาง' },
+  { name: 'Mt. Issaikyo summit', ja: '一切経山山頂', lat: 37.7358, lng: 140.2442, time: '11:45', note: 'ยอด 1,949 ม. จุดชม Goshikinuma หรือดวงตาแม่มด' },
   { name: 'Sugadaira Shelter', ja: '酸ヶ平避難小屋', lat: 37.72678, lng: 140.24131, time: '12:30', note: 'ย้อนทางเดิมจากยอดแล้วแยกไป Kamanuma' },
   { name: 'Kamanuma', ja: '鎌沼', lat: 37.7189, lng: 140.2352, time: '13:10', note: 'บึงและทางไม้กระดานในพื้นที่ชุ่มน้ำ' },
   { name: 'Ubagahara', ja: '姥ヶ原', lat: 37.7147, lng: 140.2412, time: '13:35', note: 'ทุ่งพืชอัลไพน์ เดินตามป้ายกลับ Jododaira' },
-  { name: 'Jododaira Visitor Center', ja: '浄土平ビジターセンター', lat: 37.7232, lng: 140.2542, time: '14:10', note: 'จบเส้นทาง เผื่อรถ Sky Access รอบ 15:00' },
+  { name: 'Jododaira Visitor Center', ja: '浄土平ビジターセンター', lat: 37.7232, lng: 140.2542, time: '14:30', note: 'จบเส้นทาง ตั้งเป้าขับลงเขาก่อน 15:00 ในช่วงกลางวัน' },
 ];
 
 const HIKING_CHECKLIST = [
@@ -435,17 +436,17 @@ const TRANSPORT = [
   { title: 'Utsunomiya → Fukushima', day: 'DAY 3 · 22 ต.ค. (บ่าย)', options: [
     { method: 'Tohoku Shinkansen (Yamabiko)', note: 'ขึ้นตรงจาก Utsunomiya ไม่ต้องย้อนกลับโตเกียว — เช็คเอาท์เช้า ฝากกระเป๋าไว้ล็อกเกอร์ แล้วเที่ยว Oya ก่อนได้', time: '~55 นาที', price: 6250 },
   ]},
-  { title: 'Fukushima Station ⇄ Lake Inawashiro · Nagahama', day: 'DAY 4 · 23 ต.ค. / สำรอง 24–25 ต.ค.', options: [
-    { method: '🚃 แนะนำวันศุกร์ 23 · รถธรรมดา + บัส Kin no Hashi (ไป-กลับ)', note: 'Fukushima → Koriyama รถ JR Tohoku Line ~50 นาที ¥990 · ต่อ JR Ban\'etsu West Line → Inawashiro ~35–40 นาที ¥770 · บัสหน้าสถานี → Nagahama 9 นาที ¥540 · ขาไปบัส 09:28 / 12:18 / 15:08 / 16:38 / 18:53; ขากลับจาก Nagahama 10:49 / 13:49 / 15:44 / 17:19 · เผื่อเวลาต่อรถเพราะขบวน JR ห่าง', time: '~2–3 ชม./เที่ยว', price: 4600 },
-    { method: '⚡ เร็วขึ้นวันศุกร์ 23 · Shinkansen ถึง Koriyama + รถไฟ/บัส (ไป-กลับ)', note: 'เปลี่ยนขา Fukushima → Koriyama เป็น Tohoku Shinkansen ~12 นาที ~¥1,800 แล้วต่อ Ban\'etsu West Line และบัส Kin no Hashi เหมือนเดิม · ประหยัดเวลานั่งรถ แต่ยังต้องรอตารางต่อรถที่ Koriyama/Inawashiro', time: '~1 ชม. 40 นาที–2 ชม. 30 นาที/เที่ยว', price: 6220 },
-    { method: '🚌 สำรองเสาร์–อาทิตย์ 24–25 · รถท่องเที่ยว Hideyo-kun (ไป-กลับ)', note: 'บัสปกติหยุดวิ่งช่วงสุดสัปดาห์ 18 ก.ค.–8 พ.ย. 2026 · ใช้ Hideyo-kun จาก Inawashiro Sta. 10:05 / 11:05 / 12:05 / 13:10 / 14:10 / 15:10 ถึง Nagahama ใน 9 นาที · ¥500/เที่ยว หรือ day pass ¥1,200 ถ้าจะแวะ Tenkyokaku/พิพิธภัณฑ์ Noguchi Hideyo', time: '~2–3 ชม./เที่ยวจาก Fukushima', price: 4520 },
+  { title: 'Fukushima Station ⇄ Lake Inawashiro · Nagahama (ข้อมูลขนส่งสำรอง)', day: 'DAY 5 · 24 ต.ค. · แผนหลักใช้รถเช่าต่อไปพลุ', options: [
+    { method: '🚃 ข้อมูลวันธรรมดาเท่านั้น · รถธรรมดา + บัส Kin no Hashi (ไป-กลับ)', note: 'ไม่ใช้ตารางนี้วันที่ 24 · Fukushima → Koriyama รถ JR Tohoku Line ~50 นาที ¥990 · ต่อ JR Ban\'etsu West Line → Inawashiro ~35–40 นาที ¥770 · บัสหน้าสถานี → Nagahama 9 นาที ¥540 · ขาไปบัส 09:28 / 12:18 / 15:08 / 16:38 / 18:53; ขากลับจาก Nagahama 10:49 / 13:49 / 15:44 / 17:19 · เผื่อเวลาต่อรถเพราะขบวน JR ห่าง', time: '~2–3 ชม./เที่ยว', price: 4600 },
+    { method: '⚡ ข้อมูลวันธรรมดาเท่านั้น · Shinkansen ถึง Koriyama + รถไฟ/บัส (ไป-กลับ)', note: 'ไม่ใช้ตารางนี้วันที่ 24 · เปลี่ยนขา Fukushima → Koriyama เป็น Tohoku Shinkansen ~12 นาที ~¥1,800 แล้วต่อ Ban\'etsu West Line และบัส Kin no Hashi เหมือนเดิม · ประหยัดเวลานั่งรถ แต่ยังต้องรอตารางต่อรถที่ Koriyama/Inawashiro', time: '~1 ชม. 40 นาที–2 ชม. 30 นาที/เที่ยว', price: 6220 },
+    { method: '🚌 สำรองเสาร์–อาทิตย์ 24–25 · รถท่องเที่ยว Hideyo-kun (ไป-กลับ)', note: 'บัสปกติหยุดวิ่งช่วงสุดสัปดาห์ 18 ก.ค.–8 พ.ย. 2026 · ใช้ Hideyo-kun จาก Inawashiro Sta. 10:05 / 11:05 / 12:05 / 13:10 / 14:10 / 15:10 ถึง Nagahama ใน 9 นาที · ขากลับวนรอบ เช่น Nagahama 13:23 → สถานี 14:00 · ¥500/ครั้ง สองครั้ง ¥1,000 ถูกกว่า day pass ¥1,200 · ไม่รวมไปงานพลุ', time: '~2–3 ชม./เที่ยวจาก Fukushima', price: 4520 },
   ], links: [
     { label: 'รีวิว JapanKakkoii (ข้อมูลปี 2019)', url: 'https://www.japankakkoii.com/japan-travel/lake-inawashiro-fukushima/' },
     { label: 'ตารางบัสวันธรรมดา 2026', url: 'https://www.bandaisan.or.jp/new_bandaisanorjp/wp-content/uploads/2026/07/%E8%B7%AF%E7%B7%9A%E3%83%90%E3%82%B9%EF%BC%8F%E9%87%91%E3%81%AE%E6%A9%8B%E7%B7%9A%E6%99%82%E5%88%BB%E8%A1%A8.pdf' },
     { label: 'Hideyo-kun 2026 (เสาร์–อาทิตย์)', url: 'https://www.bandaisan.or.jp/news/news-20252/' },
     { label: 'เช็ครอบ JR Inawashiro', url: 'https://timetables.jreast.co.jp/timetable/list0151.html' },
   ]},
-  { title: 'วันเดินเขา: Fukushima ⇄ Jododaira', day: 'DAY 5 · 24 ต.ค.', options: [
+  { title: 'วันเดินเขา: Fukushima ⇄ Jododaira', day: 'DAY 4 · 23 ต.ค. · แผนหลักใช้รถเช่า', options: [
     { method: '🚗 เช่ารถขับเอง — ถูกที่สุดเมื่อไป 4 คน', note: 'รถเล็ก ~¥8,000/วัน + น้ำมัน ~¥1,500 + ที่จอด Jododaira ¥500 = ~¥10,000 ต่อคัน → หาร 4 เหลือ ~¥2,500/คน · Skyline ไม่มีค่าผ่านทาง · ⚠️ ต้องมีใบขับขี่สากลแบบอนุสัญญาเจนีวา 1949 · ประตูอาจปิดกลางคืน 17:00–07:00', time: '~75 นาที/เที่ยว', price: 2500 },
     { method: '🚌 Jododaira Sky Access — คอร์สนักเดินเขา', note: 'ราคาต่อคน ไม่ใช่ต่อคัน · ออก Fukushima West Exit 08:30 · ถึง Jododaira 09:30 · รถกลับ 15:00 · จองออนไลน์ภายใน 15:00 ของวันก่อน · เป็นรถเหมา/แท็กซี่ ไม่ใช่บัสประจำทาง จึงแพง', time: '5.5 ชม. ที่ Jododaira', price: 13000 },
     { method: '🚕 บัสประจำทางไป Takayu Onsen + แท็กซี่ต่อ', note: 'บัส Fukushima → Takayu Onsen มีวิ่งประจำ (ถูก) แต่จาก Takayu ถึง Jododaira ยังเหลืออีก 15 กม. บน Skyline ต้องต่อแท็กซี่และ⚠️นัดเที่ยวกลับล่วงหน้า — เช็คกับศูนย์ข้อมูลก่อนว่ามีรถจริงในวันนั้น', time: '~90 นาที/เที่ยว', price: 6000 },
@@ -468,11 +469,12 @@ const TRANSPORT = [
 /* ---------- เช่ารถที่ Fukushima (23–24 ต.ค.) เทียบกับไปด้วยขนส่งสาธารณะ ----------
    ราคาประมาณการช่วง high season ใบไม้เปลี่ยนสี — เช็คราคาจริงตอนจอง */
 const CAR_PLAN = {
-  days: 2,                 // รับรถเช้า 23 คืนรถเย็น 24
+  days: 2,                 // ใช้ 23-24; late return / 25 morning requires a quote
   guests: 4,               // 4 คน
   carPerDay: 11000,        // รถกลาง/แวกอน พอสำหรับ 4 คน + กระเป๋า
-  fuel: 4000,              // 23: ทางด่วนไป Urabandai ไป-กลับ · 24: ขึ้น Bandai-Azuma Skyline ไป Jododaira
-  parking: 1500,           // Jododaira ~¥500 + เผื่อจุดอื่น (ที่พักมีที่จอดอยู่แล้ว)
+  fuel: 6000,              // Planning allowance: Skyline, Inawashiro, Iwase, Fukushima
+  parking: 2000,           // Allowance; festival parking price is not confirmed
+  tolls: 4000,             // Planning allowance, not a quoted toll
   publicHike: 13000,       // Sky Access ต่อคน
   publicLake: 8300,        // ค่ารถวันทะเลสาบ Urabandai ต่อคน
 };
@@ -514,13 +516,13 @@ const RAIL_FARES = [
     { method: '🚃 รถธรรมดาต่อกัน (Kuroiso → Shin-Shirakawa → Koriyama)', time: '~4 ชม.', xfer: '3 ครั้ง', price: 3410, conf: 'calc',
       note: '💰 ประหยัด ~¥2,800/คน (4 คน = ~¥11,300) แต่กินเวลาครึ่งวัน — วันนี้ยังมีโปรแกรมเช้าที่ Oya จึงไม่คุ้ม เก็บไว้เป็นแผนสำรองถ้าตัดเช้าออก' },
   ]},
-  { leg: 'Fukushima → Koriyama (วันไป Urabandai)', day: 'DAY 4 · 23 ต.ค.', from: 'Fukushima Station', to: 'Koriyama Station', options: [
+  { leg: 'Fukushima → Koriyama (สำรองวันทะเลสาบ)', day: 'DAY 5 · 24 ต.ค. · ไม่ใช้ในแผนรถเช่า', from: 'Fukushima Station', to: 'Koriyama Station', options: [
     { method: 'Tohoku Shinkansen', time: '~12 นาที', xfer: '0 ครั้ง', price: 1800, conf: 'src',
       note: 'ช่วงราคา ~¥1,520-1,800 แล้วแต่จองที่นั่งหรือไม่ · ระยะสั้นมาก 33-45 กม.' },
     { method: '🚃 JR Tohoku Line รถธรรมดา', time: '~50 นาที', xfer: '0 ครั้ง', price: 990, conf: 'calc',
       note: '💰 ประหยัด ~¥800/คน · ต้องออกจากที่พักเช้ากว่าราว 40 นาที' },
   ]},
-  { leg: 'Koriyama → Inawashiro (ประตูสู่ Urabandai)', day: 'DAY 4 · 23 ต.ค.', from: 'Koriyama Station', to: 'Inawashiro Station', options: [
+  { leg: 'Koriyama → Inawashiro (ขนส่งสำรอง)', day: 'DAY 5 · 24 ต.ค. · ไม่ใช้ในแผนรถเช่า', from: 'Koriyama Station', to: 'Inawashiro Station', options: [
     { method: "JR Ban'etsu West Line", time: '~35 นาที', xfer: '0 ครั้ง', price: 770, conf: 'calc',
       note: '⚠️ ขบวนห่างกันมาก บางช่วงเว้น 1-2 ชม. เช็ครอบทั้งขาไปขากลับตั้งแต่ก่อนออกเดินทาง' },
   ]},
@@ -856,13 +858,13 @@ const LIVE_CAMS = [
   { id: 'fukushima',  name: 'เมือง Fukushima',            ja: '福島市',        area: 'fukushima', lat: 37.7543, lng: 140.4590, day: 3,
     youtubeId: '', q: '福島市 ライブカメラ',
     why: 'ฐานที่พัก 22-25 ต.ค. — เช็คว่าเช้านี้ฟ้าเปิดไหมก่อนตัดสินใจสลับวันเดินเขากับวันทะเลสาบ' },
-  { id: 'jododaira',  name: 'Jododaira / Mt. Issaikyo',   ja: '浄土平・一切経山', area: 'fukushima', lat: 37.7264, lng: 140.2489, day: 5,
+  { id: 'jododaira',  name: 'Jododaira / Mt. Issaikyo',   ja: '浄土平・一切経山', area: 'fukushima', lat: 37.7264, lng: 140.2489, day: 4,
     youtubeId: '', q: '浄土平 ライブカメラ 吾妻',
-    why: '⛰ จุดสำคัญที่สุด — วันเดินเขา 24 ต.ค. ที่ 1,600 ม. อากาศเปลี่ยนเร็วมาก และปลาย ต.ค. อาจมีน้ำแข็งเช้ามืด ดูกล้องก่อนออกจากที่พัก' },
-  { id: 'urabandai',  name: 'Urabandai / Goshiki-numa',   ja: '裏磐梯・五色沼',  area: 'fukushima', lat: 37.6479, lng: 140.0722, day: 4,
+    why: 'วันเดินเขา 23 ต.ค. ที่ 1,600 ม. อากาศเปลี่ยนเร็วมาก ดูกล้องและถาม Visitor Center ก่อนออกเดิน' },
+  { id: 'urabandai',  name: 'Urabandai / Goshiki-numa',   ja: '裏磐梯・五色沼',  area: 'fukushima', lat: 37.6479, lng: 140.0722, day: 5,
     youtubeId: '', q: '裏磐梯 ライブカメラ 磐梯山',
-    why: 'วันขับรถเที่ยว 23 ต.ค. — ดูว่าใบไม้เปลี่ยนสีถึงไหนแล้ว และฟ้าเปิดพอจะเห็นภูเขาบันไดสะท้อนน้ำไหม' },
-  { id: 'inawashiro', name: 'ทะเลสาบ Inawashiro',         ja: '猪苗代湖',      area: 'fukushima', lat: 37.4667, lng: 140.1000, day: 4,
+    why: 'ตัวเลือกแทน Inawashiro วันที่ 24 ไม่บวกเพิ่มทุกจุดในวันพลุ · เช็กวิวและใบไม้ก่อนเลือกเส้นทาง' },
+  { id: 'inawashiro', name: 'ทะเลสาบ Inawashiro',         ja: '猪苗代湖',      area: 'fukushima', lat: 37.4667, lng: 140.1000, day: 5,
     youtubeId: '', q: '猪苗代湖 ライブカメラ',
     why: 'แผนสำรองวันฟ้าปิด · ปลาย ต.ค. หงส์อพยพเริ่มมา' },
   { id: 'nikko',      name: 'Nikko / ทะเลสาบ Chuzenji',   ja: '日光・中禅寺湖',  area: 'nikko',     lat: 36.7333, lng: 139.4833, day: 2,
@@ -912,6 +914,8 @@ LIVE_CAMS.forEach((c) => {
 
 /* ---------- events (ยืนยันวันที่จริงปี 2026 แล้ว — อัปเดต ก.ค. 2026) ---------- */
 const EVENTS = [
+  { title: 'Iwase Yukyu Festival Fireworks · Sukagawa', area: 'fukushima', dateText: '24 ต.ค. 2026 · ช่วงแรก 17:30 / พลุหลัก 18:15 · ผู้จัดประกาศแล้ว', status: 'hit',
+    desc: 'เปิด 16:00 ย่าน Imaizumi · ไม่มีชัตเทิล ที่จอดอยู่ห่างประมาณ 1.5–4 กม. · ชมฟรีใกล้ทางเข้า มีพื้นที่เสียเงินแยก ราคาที่นั่งและเวลาจบต้องเช็กเพิ่ม โทร 0248-65-3210 · ตารางบัสวันเสาร์ใกล้งานไม่แสดงเที่ยวรถ แนะนำรถเช่าและเผื่อเดินจากที่จอด ตรวจเวลาคืนรถก่อนจอง', url: 'http://sci-iwase.com/eternal/' },
   // --- เทศกาล/บรรยากาศ ---
   { title: 'Tokyo Ramen Festa @ Komazawa Olympic Park', area: 'tokyo', dateText: '23 ต.ค. – 3 พ.ย. 2026 ✓ ยืนยันแล้ว', status: 'hit',
     desc: 'เทศกาลราเมงใหญ่สุดของโตเกียว ร้านดัง ~39 ร้าน หมุนเวียน 3 ช่วง เข้าฟรี ซื้อตั๋วราเมงใบละ ¥1,100 ต่อชาม', url: 'https://tokyocheapo.com/events/tokyo-ramen-show/' },
@@ -1019,12 +1023,12 @@ const STAYS = [
   {
     id: 'fukushima', city: 'Fukushima', ja: '福島', area: 'fukushima',
     checkIn: '2026-10-22', checkOut: '2026-10-25', nights: 3, days: 'DAY 3–5',
-    station: 'JR Fukushima Sta. — บัสขึ้นเขาออกฝั่ง West Exit 08:30',
+    station: 'JR Fukushima Sta. — รับรถเช่า 23 ต.ค. ใช้ต่อถึง 24 ต.ค.',
     searchQuery: 'Fukushima Station, Fukushima, Japan',
     lat: 37.7543, lng: 140.4590,
     pick: { label: 'ลิสต์ที่ wishlist ไว้', url: 'https://th.airbnb.com/rooms/1500308318751323061?adults=4&children=0&infants=0&pets=0&check_in=2026-10-22&check_out=2026-10-25' },
     note: 'พัก 3 คืน 22–25 ต.ค. · เข้าพักบ่าย 22 ต.ค. · เช้า 25 เช็คเอาท์แล้วเลือกชินคันเซ็นราว 11:00 ให้ถึง Ueno ประมาณ 13:00 เพื่อชม Horyuji ก่อนนัดเพื่อนเย็น; เวลาเป็นเป้าหมาย ต้องเช็กขบวนจริงก่อนจอง',
-    en: { city: 'Fukushima', station: 'JR Fukushima Sta. — mountain bus leaves the West Exit at 08:30', note: 'The most important location of the trip: on hiking day we must leave by 08:15 to catch Sky Access at the West Exit' },
+    en: { city: 'Fukushima', station: 'JR Fukushima Sta. — collect rental car on 23 Oct, use through 24 Oct', note: 'Three nights, 22–25 Oct. Hike on 23 Oct; lake and fireworks on 24 Oct. Confirm parking and the rental return time, including any extra charge for returning on 25 Oct morning. Aim for a shinkansen around 11:00 on 25 Oct to reach Ueno around 13:00 before the evening appointment.' },
   },
   {
     id: 'tokyo', city: 'Tokyo — Mukojima (จองแล้ว)', ja: '向島・Jハウス', area: 'tokyo',

@@ -108,7 +108,22 @@ function applyTokyoSavedPlan(days) {
   return true;
 }
 const tokyoPlanMigrated = applyTokyoSavedPlan(itinerary);
-if (localStorage.getItem('jt26_itinerary') !== null && (flightRowsMigrated || cityLuggageMigrated || tokyoPlanMigrated)) {
+function applyFukushimaSavedPlan(days) {
+  const pending = days.filter((day) => [4, 5].includes(day.day)
+    && day.planRevision !== 'fukushima-hike-fireworks-2026-10-14');
+  if (!pending.length) return false;
+  const prep = days.find((day) => day.day === 3);
+  const oldPrepNote = 'ให้รู้ทางก่อนเช้าวันเสาร์ จะได้ไม่หลง · เผื่อซื้อถุงมือ/หมวกที่ยังขาด';
+  const prepRow = prep?.items.find((item) => item.note === oldPrepNote);
+  if (localStorage.getItem('jt26_fukushima_plan_backup') === null) {
+    store.save('jt26_fukushima_plan_backup', prepRow ? [...pending, prep] : pending);
+  }
+  pending.forEach((day) => Object.assign(day, structuredClone(DEFAULT_ITINERARY.find((d) => d.day === day.day))));
+  if (prepRow) prepRow.note = DEFAULT_ITINERARY.find((day) => day.day === 3).items.find((item) => item.act === prepRow.act)?.note || prepRow.note;
+  return true;
+}
+const fukushimaPlanMigrated = applyFukushimaSavedPlan(itinerary);
+if (localStorage.getItem('jt26_itinerary') !== null && (flightRowsMigrated || cityLuggageMigrated || tokyoPlanMigrated || fukushimaPlanMigrated)) {
   store.save('jt26_itinerary', itinerary);
   store.save('jt26_itinerary_v', ITINERARY_VERSION);
 }
@@ -140,6 +155,7 @@ TripSync.init((remote) => {
     const flightRowsChanged = migrateFlightRows(itinerary);
     itineraryChanged = migrateCityLuggageRows(itinerary) || flightRowsChanged;
     itineraryChanged = applyTokyoSavedPlan(itinerary) || itineraryChanged;
+    itineraryChanged = applyFukushimaSavedPlan(itinerary) || itineraryChanged;
     if (itineraryChanged) store.save('jt26_itinerary_v', ITINERARY_VERSION);
   }
   if (remote.stays) stays = remote.stays;
@@ -1104,7 +1120,7 @@ $('#reset-hike-checklist').addEventListener('click', () => {
 renderHikeChecklist();
 
 /* ============ Mt. Issaikyo live weather ============ */
-const HIKE_DATE = '2026-10-24';
+const HIKE_DATE = '2026-10-23';
 const WEATHER_CACHE_KEY = 'jt26_hike_weather';
 const WEATHER_CACHE_MS = 6 * 60 * 60 * 1000;
 const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?latitude=37.7232&longitude=140.2542&elevation=1600&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max,sunrise,sunset&temperature_unit=celsius&wind_speed_unit=kmh&timezone=Asia%2FTokyo&forecast_days=16';
@@ -1162,7 +1178,7 @@ function renderHikeWeather(data, fetchedAt) {
         '<div class="weather-wait-copy"><h4>' +
           (tripPassed ? 'ข้อมูลพยากรณ์ย้อนหลังไม่แสดงในแผงนี้' : 'ยังไม่ถึงช่วงพยากรณ์ 16 วัน') +
         '</h4><p>' +
-          (tripPassed ? 'แผงนี้จะแสดงเฉพาะ forecast ก่อนวันเดินเขา' : 'ข้อมูลวันที่ 24 ต.ค. ควรเริ่มแสดงอัตโนมัติประมาณ 8 ต.ค. 2026') +
+          (tripPassed ? 'แผงนี้จะแสดงเฉพาะ forecast ก่อนวันเดินเขา' : 'ข้อมูลวันที่ 23 ต.ค. จะแสดงเมื่ออยู่ในช่วงพยากรณ์ 16 วัน') +
         '</p>' + liveNow + '</div>' +
       '</div>';
     return;
@@ -1336,30 +1352,28 @@ function renderTransport() {
   setHTML('#rental-price-note', `<strong>ราคาอ้างอิง:</strong> เว็บเทียบราคารายงานรถเล็กในจังหวัดฟุกุชิมะเริ่มราว
     <span class="mono">US$37–51/วัน</span> (≈ <span class="mono">¥5,500–7,600</span>) แล้วแต่เจ้าและวันที่ —
     แผนของเราตั้งงบไว้ที่ <span class="mono">${yen(c2.carPerDay)}/วัน</span> เพราะ 4 คนต้องขยับไปรถขนาดกลาง/แวกอนให้พอกับกระเป๋า
-    และ 23–24 ต.ค. เป็นเสาร์-อาทิตย์ช่วงใบไม้เปลี่ยนสีซึ่งราคาขึ้น ·
+    ใช้รถวันที่ 23–24 ต.ค. (ศุกร์–เสาร์) ช่วงใบไม้เปลี่ยนสี ·
     ตัวเลขนี้แก้ได้ที่ <span class="mono">CAR_PLAN.carPerDay</span> ใน <span class="mono">js/data.js</span> เมื่อได้ราคาจริงแล้ว`);
 
   /* คุ้มไหมถ้าเช่ารถช่วง Fukushima */
   const c = CAR_PLAN;
-  const carTotal = c.carPerDay * c.days + c.fuel + c.parking;
+  const carTotal = c.carPerDay * c.days + c.fuel + c.parking + c.tolls;
   const carEach = carTotal / c.guests;
   const publicEach = c.publicHike + c.publicLake;
-  const saveEach = publicEach - carEach;
   setHTML('#car-note', `
-    <h3>🚗 คุ้มไหมถ้าเช่ารถ ${c.days} วันตอนอยู่ Fukushima (23–24 ต.ค.)?</h3>
+    <h3>🚗 งบรถเช่า ${c.days} วัน · เดินเขา 23 / ทะเลสาบและพลุ 24 ต.ค.</h3>
     <table class="mini-table">
       <tr><td>ค่ารถ ${c.days} วัน (รถกลาง/แวกอน พอ 4 คน + กระเป๋า)</td><td class="mono">${yenThb(c.carPerDay * c.days)}</td></tr>
-      <tr><td>น้ำมัน (Urabandai ไป-กลับ + ขึ้น Skyline)</td><td class="mono">${yenThb(c.fuel)}</td></tr>
+      <tr><td>เผื่อน้ำมัน (Skyline + Inawashiro + Iwase + กลับ Fukushima)</td><td class="mono">${yenThb(c.fuel)}</td></tr>
+      <tr><td>เผื่อค่าทางด่วน (ไม่ใช่ราคายืนยัน)</td><td class="mono">${yenThb(c.tolls)}</td></tr>
       <tr><td>ที่จอดนอกที่พัก (Jododaira ฯลฯ)</td><td class="mono">${yenThb(c.parking)}</td></tr>
       <tr><td><strong>รวมต่อคัน</strong></td><td class="mono"><strong>${yenThb(carTotal)}</strong></td></tr>
       <tr><td><strong>หาร ${c.guests} คน</strong></td><td class="mono"><strong>${yenThb(carEach)}/คน</strong></td></tr>
-      <tr><td>ถ้าไม่เช่ารถ: Sky Access ${yen(c.publicHike)} + ค่ารถวันทะเลสาบ ~${yen(c.publicLake)}</td><td class="mono">${yenThb(publicEach)}/คน</td></tr>
+      <tr><td>อ้างอิงแผนขนส่งเดิม: Sky Access + Urabandai (ไม่รวมไปพลุ)</td><td class="mono">${yenThb(publicEach)}/คน</td></tr>
     </table>
-    <p><strong>เช่ารถถูกกว่าประมาณ ${yen(saveEach)} ต่อคน (≈ ${baht(saveEach * rate)})</strong>
-    และที่พัก Fukushima มีที่จอดรถอยู่แล้ว จึงไม่มีค่าจอดรายคืนเพิ่ม</p>
+    <p><strong>งบตั้งต้น ${yen(carEach)}/คน สำหรับ 2 วัน</strong> ไม่ใช่ใบเสนอราคา ยังไม่รวมประกัน ตั๋วพลุ และค่าเพิ่มกรณีคืนเช้า 25 ต.ค. · ยืนยันที่จอดกับที่พัก</p>
     <p class="note">⚠️ เงื่อนไขก่อนตัดสินใจ: ต้องมี<strong>ใบขับขี่สากลแบบอนุสัญญาเจนีวา 1949</strong> (ทำที่กรมการขนส่งฯ ใช้ได้ 1 ปี) พร้อมใบขับขี่ไทยตัวจริง · ญี่ปุ่นขับเลนซ้าย พวงมาลัยขวา ·
-    Bandai-Azuma Skyline และ Lake Line ไม่มีค่าผ่านทาง แต่ทางโค้งเยอะและ<strong>ประตูอาจปิดกลางคืน 17:00–07:00</strong> ถ้าเสี่ยงถนนลื่น ·
-    ปลาย ต.ค. บนเขา 1,600 ม. อาจมีน้ำแข็งช่วงเช้ามืด · จองรถล่วงหน้าเพราะเป็นเสาร์-อาทิตย์ฤดูใบไม้แดง · ยืนยันกับเจ้าของ Airbnb ว่าที่จอดฟรีและรถขนาดไหนเข้าได้</p>`);
+    ตรวจประกาศ Skyline ก่อนขึ้นเขา ถนนอาจปิดจากน้ำแข็ง ก๊าซ หรือซ่อมสะพาน · <strong>ต้องตกลงเวลาคืนรถหลังพลุวันที่ 24 ก่อนจอง หากไม่ทันสาขาปิดให้ขอราคาคืนเช้า 25 และเผื่อรถไฟกลับโตเกียว ห้ามสมมติว่าคืนรถนอกเวลาได้</strong></p>`);
 
   if (!transportBound) {
   on('#rental-grid', 'click', (e) => {

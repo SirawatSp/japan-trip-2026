@@ -38,7 +38,46 @@ test('Tokyo migration and editable A4 print report', async () => {
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => typeof itinerary !== 'undefined');
     assert.equal(await page.evaluate(() => itinerary[0].title), old[0].title);
-    assert.deepEqual(await page.evaluate(() => itinerary.slice(0, 5)), old.slice(0, 5));
+    assert.deepEqual(await page.evaluate(() => itinerary.slice(0, 3)), old.slice(0, 3));
+    assert.match(await page.evaluate(() => itinerary[3].title), /Mt\. Issaikyo/);
+    assert.match(await page.evaluate(() => itinerary[4].title), /Iwase/);
+    assert.match(await page.evaluate(() => itinerary[4].items[7].note), /18:15/);
+    assert.match(await page.locator('#iwase-transport').innerText(), /ยังไม่มีเส้นทาง/);
+    assert.equal(await page.locator('#event-grid .event-status').first().innerText(), 'ทันทริป ✓');
+    assert.match(await page.locator('.hike-plan').innerText(), /รับรถเช่า/);
+    assert.doesNotMatch(await page.locator('.hike-plan').innerText(), /Sky Access/);
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('jt26_fukushima_plan_backup'))[0]), old[3]);
+    assert.equal(await page.evaluate(() => applyFukushimaSavedPlan(itinerary)), false);
+    assert.equal(await page.evaluate(() => {
+      const saved = structuredClone(DEFAULT_ITINERARY);
+      delete saved[3].planRevision;
+      const row = saved[2].items[7];
+      row.note = 'ให้รู้ทางก่อนเช้าวันเสาร์ จะได้ไม่หลง · เผื่อซื้อถุงมือ/หมวกที่ยังขาด';
+      saved[2].title = 'KEEP CUSTOM PREP DAY';
+      applyFukushimaSavedPlan(saved);
+      return row.note.includes('23 ต.ค.') && saved[2].title === 'KEEP CUSTOM PREP DAY';
+    }), true);
+    assert.equal(await page.evaluate(() => {
+      const remote = structuredClone(DEFAULT_ITINERARY);
+      delete remote[3].planRevision;
+      delete remote[4].planRevision;
+      remote[0].title = 'KEEP REMOTE DAY 1';
+      const changed = applyFukushimaSavedPlan(remote);
+      remote[3].title = 'CUSTOM HIKE AFTER MIGRATION';
+      return changed && !applyFukushimaSavedPlan(remote) && remote[0].title === 'KEEP REMOTE DAY 1' && remote[3].title === 'CUSTOM HIKE AFTER MIGRATION';
+    }), true);
+    assert.equal(await page.evaluate(() => PLACES.find((p) => p.name === 'Jododaira Visitor Center').day), 4);
+    assert.equal(await page.evaluate(() => PLACES.find((p) => p.name === 'Lake Inawashiro · Nagahama').day), 5);
+    assert.equal(await page.evaluate(() => HIKE_DATE), '2026-10-23');
+    assert.match(await page.locator('#hike-weather-title').innerText(), /23/);
+    await page.evaluate(() => renderHikeWeather({ daily: {
+      time: ['2026-10-23', '2026-10-24'], weather_code: [0, 61],
+      temperature_2m_min: [1, 12], temperature_2m_max: [5, 20],
+      apparent_temperature_min: [-2, 10], precipitation_probability_max: [10, 90],
+      precipitation_sum: [0, 20], wind_speed_10m_max: [10, 30], wind_gusts_10m_max: [20, 60],
+      sunrise: ['2026-10-23T06:00', '2026-10-24T06:01'], sunset: ['2026-10-23T17:00', '2026-10-24T16:59'],
+    } }, Date.now()));
+    assert.equal(await page.locator('.weather-temp').innerText(), '1–5°C');
     assert.match(await page.evaluate(() => itinerary[5].title), /Horyuji/);
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('jt26_tokyo_plan_backup'))[0].title), 'OLD TOKYO');
     assert.equal(await page.evaluate(() => applyTokyoSavedPlan(itinerary)), false);
@@ -108,6 +147,7 @@ test('Tokyo migration and editable A4 print report', async () => {
     assert.equal(await page.locator('#confirm-print-btn').isEnabled(), true);
     await page.locator('#print-costs').check();
     assert.match(await page.locator('#trip-print-report').innerText(), /JPY\s*\/\s*person/);
+    await page.evaluate((day4) => { itinerary[3] = day4; }, legacyDay4);
     await page.locator('#print-scope').selectOption('4');
     const legacyEnglish = await page.locator('#trip-print-report').innerText();
     assert.doesNotMatch(legacyEnglish, /[\u0E00-\u0E7F]/u);
@@ -123,6 +163,7 @@ test('Tokyo migration and editable A4 print report', async () => {
     await page.locator('#print-details').uncheck();
     assert.doesNotMatch(await page.locator('#trip-print-report').innerText(), /[\u0E00-\u0E7F]/u);
     await page.locator('#print-details').check();
+    await page.evaluate((data) => { itinerary = JSON.parse(data); }, savedThai);
     await page.locator('#print-scope').selectOption('all');
     await page.screenshot({ path: path.join(artifacts, 'print-preview-english.png') });
     await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
@@ -188,6 +229,18 @@ test('Tokyo migration and editable A4 print report', async () => {
     assert.equal(await page.evaluate(() => document.querySelector('#trip-print-dialog').scrollWidth <= document.querySelector('#trip-print-dialog').clientWidth), true);
     assert.doesNotMatch(await page.locator('#trip-print-report').innerText(), /[\u0E00-\u0E7F]/u);
     await page.screenshot({ path: path.join(artifacts, 'print-day4-transit-mobile.png') });
+    await page.locator('#print-scope').selectOption('5');
+    assert.doesNotMatch(await page.locator('#trip-print-report').innerText(), /[\u0E00-\u0E7F]/u);
+    assert.match(await page.locator('#trip-print-report').innerText(), /18:15/);
+    await page.screenshot({ path: path.join(artifacts, 'print-day5-fireworks-mobile.png') });
+    await page.locator('#close-print-btn').click();
+    await page.locator('#iwase-transport details').evaluate((el) => { el.open = true; });
+    await page.locator('#iwase-transport').scrollIntoViewIfNeeded();
+    assert.equal(await page.locator('#iwase-transport').evaluate((el) => el.scrollWidth <= el.clientWidth), true);
+    await page.screenshot({ path: path.join(artifacts, 'iwase-comparison-mobile.png') });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.locator('#iwase-transport').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: path.join(artifacts, 'iwase-comparison-desktop.png') });
     console.log('Verified: migration, custom edits, scopes, details/costs, Thai/English A4 PDFs, complete English content, safe persistent custom translations, unchanged itinerary and mobile preview.');
   } finally {
     await browser.close();
