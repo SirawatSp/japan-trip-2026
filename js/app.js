@@ -96,14 +96,25 @@ const flightRowsMigrated = migrateFlightRows(itinerary);
 const cityLuggageMigrated = migrateCityLuggageRows(itinerary);
 function applyTokyoSavedPlan(days) {
   const pending = days.filter((day) => day.day >= 6 && day.day <= 9
-    && day.planRevision !== 'tokyo-saved-2026-10-12');
+    && day.planRevision !== DEFAULT_ITINERARY.find((d) => d.day === day.day)?.planRevision);
   if (!pending.length) return false;
   if (localStorage.getItem('jt26_tokyo_plan_backup') === null) {
     store.save('jt26_tokyo_plan_backup', pending);
   }
   for (const day of pending) {
     const updated = DEFAULT_ITINERARY.find((d) => d.day === day.day);
-    Object.assign(day, structuredClone(updated));
+    if (day.day === 6 && day.planRevision === 'tokyo-saved-2026-10-12') {
+      if (localStorage.getItem('jt26_ginza_plan_backup') === null) store.save('jt26_ginza_plan_backup', [day]);
+      // Replace only the evening so custom morning/afternoon edits survive this update.
+      const eveningAt = (item) => Number(item.t?.match(/(\d{1,2}):/)?.[1]) >= 17
+        || item.act === 'ออกจากที่พักไปยังร้านนัดเพื่อน';
+      const start = day.items.findIndex(eveningAt);
+      day.items.splice(start < 0 ? day.items.length : start, day.items.length, ...structuredClone(updated.items.filter(eveningAt)));
+      day.title = updated.title;
+      day.planRevision = updated.planRevision;
+    } else {
+      Object.assign(day, structuredClone(updated));
+    }
   }
   return true;
 }
@@ -404,7 +415,20 @@ function selectedPrintDays() {
   return itinerary.filter((d) => String(d.day) === scope);
 }
 const printEnglish = store.load('jt26_print_english', {});
+let pdfBusy = false;
+let pdfURL;
+let printRevision = 0;
+function clearPDFDownload() {
+  if (pdfURL) URL.revokeObjectURL(pdfURL);
+  pdfURL = null;
+  $('#pdf-download-links').hidden = true;
+  $('#save-pdf-link').removeAttribute('href');
+  $('#open-pdf-link').removeAttribute('href');
+  $('#pdf-status').textContent = '';
+}
 function updatePrintPreview({ refreshTranslations = true } = {}) {
+  printRevision++;
+  clearPDFDownload();
   const days = selectedPrintDays();
   const language = $('#print-language').value;
   const options = {
@@ -418,6 +442,7 @@ function updatePrintPreview({ refreshTranslations = true } = {}) {
   $('#trip-print-report').lang = language;
   $('#trip-print-report').innerHTML = TripPrint.render(days, options);
   $('#confirm-print-btn').disabled = !days.length || missing.length > 0;
+  $('#download-pdf-btn').disabled = pdfBusy || $('#confirm-print-btn').disabled;
   $('#print-translations-title').textContent = missing.length
     ? `คำแปล English ของข้อความที่แก้เอง · ยังขาด ${missing.length} รายการ`
     : 'คำแปล English ครบแล้ว';
@@ -445,6 +470,37 @@ on('#print-translation-fields', 'input', (event) => {
   updatePrintPreview({ refreshTranslations: false });
 });
 on('#close-print-btn', 'click', () => $('#trip-print-dialog').close());
+on('#download-pdf-btn', 'click', async () => {
+  if (pdfBusy) return;
+  updatePrintPreview();
+  if ($('#download-pdf-btn').disabled) return;
+  const revision = printRevision;
+  const report = $('#trip-print-report').cloneNode(true);
+  const filename = `japan-trip-2026-${$('#print-scope').value}-${report.lang}.pdf`;
+  pdfBusy = true;
+  $('#download-pdf-btn').disabled = true;
+  $('#download-pdf-btn').textContent = 'กำลังสร้าง PDF…';
+  $('#pdf-status').textContent = 'กำลังสร้างไฟล์ PDF · ครั้งแรกอาจใช้เวลาสักครู่';
+  try {
+    const blob = await TripPDF.create(report);
+    // Do not offer an outdated file if the selection or translations changed meanwhile.
+    if (revision !== printRevision) return;
+    pdfURL = URL.createObjectURL(blob);
+    $('#save-pdf-link').href = pdfURL;
+    $('#save-pdf-link').download = filename;
+    $('#open-pdf-link').href = pdfURL;
+    $('#pdf-download-links').hidden = false;
+    $('#pdf-status').textContent = 'PDF พร้อมแล้ว · หากไฟล์ไม่ดาวน์โหลด ให้กดบันทึก PDF อีกครั้ง หรือเปิด PDF';
+    $('#save-pdf-link').click();
+  } catch (error) {
+    console.error('PDF export failed', error);
+    if (revision === printRevision) $('#pdf-status').textContent = 'สร้าง PDF ไม่สำเร็จ โปรดตรวจการเชื่อมต่อแล้วลองอีกครั้ง หรือใช้ปุ่มพิมพ์ / บันทึก PDF';
+  } finally {
+    pdfBusy = false;
+    $('#download-pdf-btn').textContent = 'ดาวน์โหลด PDF';
+    $('#download-pdf-btn').disabled = $('#confirm-print-btn').disabled;
+  }
+});
 on('#confirm-print-btn', 'click', async () => {
   updatePrintPreview();
   if ($('#confirm-print-btn').disabled) return;

@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Anuphan:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/print.css">
+<link rel="stylesheet" href="css/print.css?v=mobile-pdf-1">
 <script type="importmap">
 {
   "imports": {
@@ -115,7 +115,16 @@
     <label>ช่วงวัน <select id="print-scope"><option value="all">ทั้งทริป</option></select></label>
     <label><input type="checkbox" id="print-details"> รายละเอียดเพิ่มเติม</label>
     <label><input type="checkbox" id="print-costs"> ค่าใช้จ่าย</label>
-    <button type="button" class="btn" id="confirm-print-btn">พิมพ์ / บันทึก PDF</button>
+    <div class="print-actions">
+      <button type="button" class="btn" id="download-pdf-btn">ดาวน์โหลด PDF</button>
+      <button type="button" class="btn-mini" id="confirm-print-btn">พิมพ์ / บันทึก PDF</button>
+    </div>
+  </div>
+  <p class="print-download-help">มือถือ: กดดาวน์โหลด PDF เพื่อบันทึกไฟล์ หรือเปิดไฟล์แล้วเลือกแชร์ → บันทึกไปยังไฟล์</p>
+  <p id="pdf-status" class="print-download-help" role="status" aria-live="polite"></p>
+  <div id="pdf-download-links" class="print-download-links" hidden>
+    <a id="save-pdf-link" class="btn-mini">บันทึก PDF อีกครั้ง</a>
+    <a id="open-pdf-link" class="btn-mini" target="_blank" rel="noopener">เปิด PDF</a>
   </div>
   <details id="print-translations" hidden>
     <summary id="print-translations-title"></summary>
@@ -501,10 +510,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/sync.js"></script>
-<script src="js/data.js"></script>
-<script src="js/itinerary-en.js"></script>
+<script src="js/data.js?v=ginza-night-1"></script>
+<script src="js/itinerary-en.js?v=ginza-night-1"></script>
 <script src="js/itinerary-print.js"></script>
-<script src="js/app.js"></script>
+<script src="js/itinerary-pdf.js"></script>
+<script src="js/app.js?v=ginza-night-1"></script>
 <script type="module" src="js/hike-terrain.js"></script>
 </body>
 </html>
